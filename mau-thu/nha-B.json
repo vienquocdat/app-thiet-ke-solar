@@ -2,7 +2,7 @@
   "dinhDang": "tdh-solar-sao-luu",
   "phienBan": 1,
   "ngayXuat": "2026-11-20T00:00:00.000Z",
-  "ghiChu": "Hồ sơ mẫu nhà B dùng để tự kiểm thử từng giai đoạn. Số đo thật đang chờ anh cung cấp.",
+  "ghiChu": "Hồ sơ mẫu nhà B. Đã vẽ sẵn mái và vật cản trên ảnh drone xa (toạ độ điểm ảnh). Chưa có số đo thật: nhập cạnh A, B ở thẻ Vẽ mái → Tỉ lệ; nhập chiều cao vật cản, độ dốc mái tôn.",
   "soHoSo": 1,
   "hoSo": [
     {
@@ -10,34 +10,278 @@
       "ngayTao": "2026-11-20",
       "ngaySua": "2026-11-20T00:00:00.000Z",
       "trangThai": "khao-sat",
-      "khach": { "ten": "Nhà mẫu B (kiểm thử)", "dienThoai": "", "zalo": "", "diaChi": "[CẦN ĐIỀN]", "toaDo": null },
-      "dien": {
-        "hoaDon": [{ "thang": "", "kWh": null, "tien": null }],
-        "phanTramDungBanNgay": null, "banDienDu": "", "loaiDien": "",
-        "viTriCongTo": "", "viTriTuDien": "", "viTriInverter": "",
-        "quangDuongDayM": null, "coWifi": "", "tiepDia": ""
+      "khach": {
+        "ten": "Nhà mẫu B (kiểm thử)",
+        "dienThoai": "",
+        "zalo": "",
+        "diaChi": "[CẦN ĐIỀN]",
+        "toaDo": null
       },
-      "nhuCau": { "loaiHe": "", "nganSach": null, "mucTieu": "" },
+      "dien": {
+        "hoaDon": [
+          {
+            "thang": "",
+            "kWh": null,
+            "tien": null
+          }
+        ],
+        "phanTramDungBanNgay": null,
+        "banDienDu": "",
+        "loaiDien": "",
+        "viTriCongTo": "",
+        "viTriTuDien": "",
+        "viTriInverter": "",
+        "quangDuongDayM": null,
+        "coWifi": "",
+        "tiepDia": ""
+      },
+      "nhuCau": {
+        "loaiHe": "",
+        "nganSach": null,
+        "mucTieu": ""
+      },
       "hienTrang": {
-        "huongNha": "", "gocLaBan": null,
+        "huongNha": "",
+        "gocLaBan": null,
         "ketCauMai": "Mái bê tông phía trước (có tường lan can) + mái tôn dốc thấp dần về phía sau, cuối nhà có dải bê tông.",
         "thamDot": "",
         "bongChe": "Trên mái bê tông: 2 bồn nước inox nằm, 2 giếng trời có khung, 1 cột anten, 1 hộp/tum kỹ thuật.",
         "loiLenMai": "",
         "ghiChuKhac": "Số đo thật bằng thước: [CẦN ĐIỀN] (chiều rộng nhà, chiều dài mái bê tông, chiều dài mái tôn, kích thước bồn nước, giếng trời, chiều cao lan can).",
         "anh": [
-          { "id": "anh-mau-b-gan", "loai": "drone-cheo", "ghiChu": "Drone gần, chụp hơi chéo" },
-          { "id": "anh-mau-b-xa", "loai": "drone-cheo", "ghiChu": "Drone xa, chụp hơi chéo" }
+          {
+            "id": "anh-mau-b-gan",
+            "loai": "drone-cheo",
+            "ghiChu": "Drone gần, chụp hơi chéo"
+          },
+          {
+            "id": "anh-mau-b-xa",
+            "loai": "drone-cheo",
+            "ghiChu": "Drone xa, chụp hơi chéo"
+          }
         ]
       },
-      "mai": null,
+      "mai": {
+        "anhNen": "anh-mau-b-xa",
+        "cheDo": "nan",
+        "tiLe": {
+          "diem": [],
+          "chieuDaiM": null
+        },
+        "nan": {
+          "diem": [
+            [
+              502,
+              56
+            ],
+            [
+              877,
+              49
+            ],
+            [
+              898,
+              376
+            ],
+            [
+              483,
+              376
+            ]
+          ],
+          "canhA": null,
+          "canhB": null,
+          "ghiChu": "4 góc mái bê tông. Cạnh A (1→2) = chiều rộng, cạnh B (2→3) = chiều dài: [CẦN ĐIỀN] số đo thật"
+        },
+        "mangMai": [
+          {
+            "id": "mai-be-tong",
+            "ten": "Mái bê tông",
+            "loai": "be-tong",
+            "doDocDo": 0,
+            "diem": [
+              [
+                502,
+                56
+              ],
+              [
+                877,
+                49
+              ],
+              [
+                898,
+                376
+              ],
+              [
+                483,
+                376
+              ]
+            ]
+          },
+          {
+            "id": "mai-ton",
+            "ten": "Mái tôn sau",
+            "loai": "ton",
+            "doDocDo": null,
+            "diem": [
+              [
+                489,
+                379
+              ],
+              [
+                890,
+                379
+              ],
+              [
+                897,
+                584
+              ],
+              [
+                481,
+                584
+              ]
+            ]
+          }
+        ],
+        "vatCan": [
+          {
+            "id": "vc-bon1",
+            "ten": "Bồn nước 1",
+            "loai": "bon-nuoc",
+            "caoM": null,
+            "diem": [
+              [
+                634,
+                76
+              ],
+              [
+                728,
+                76
+              ],
+              [
+                728,
+                112
+              ],
+              [
+                634,
+                112
+              ]
+            ]
+          },
+          {
+            "id": "vc-bon2",
+            "ten": "Bồn nước 2",
+            "loai": "bon-nuoc",
+            "caoM": null,
+            "diem": [
+              [
+                634,
+                120
+              ],
+              [
+                728,
+                120
+              ],
+              [
+                728,
+                160
+              ],
+              [
+                634,
+                160
+              ]
+            ]
+          },
+          {
+            "id": "vc-gt1",
+            "ten": "Giếng trời 1",
+            "loai": "gieng-troi",
+            "caoM": null,
+            "diem": [
+              [
+                578,
+                180
+              ],
+              [
+                658,
+                180
+              ],
+              [
+                658,
+                245
+              ],
+              [
+                578,
+                245
+              ]
+            ]
+          },
+          {
+            "id": "vc-gt2",
+            "ten": "Giếng trời 2",
+            "loai": "gieng-troi",
+            "caoM": null,
+            "diem": [
+              [
+                703,
+                180
+              ],
+              [
+                785,
+                180
+              ],
+              [
+                785,
+                245
+              ],
+              [
+                703,
+                245
+              ]
+            ]
+          },
+          {
+            "id": "vc-tum",
+            "ten": "Hộp kỹ thuật",
+            "loai": "tum",
+            "caoM": null,
+            "diem": [
+              [
+                705,
+                36
+              ],
+              [
+                773,
+                36
+              ],
+              [
+                773,
+                97
+              ],
+              [
+                705,
+                97
+              ]
+            ]
+          }
+        ],
+        "kiemTra": []
+      },
       "xepPin": null,
       "phuongAn": [],
       "ghiChu": "Theo bản vẽ đội thi công: khung nâng răng cưa trên mái bê tông, pin áp mái tôn. Số tấm chính xác: [CẦN ĐIỀN]."
     }
   ],
   "anh": [
-    { "id": "anh-mau-b-gan", "hoSoId": "hs-mau-nha-b", "ten": "nha-B-drone-gan.webp", "duongDan": "mau-thu/nha-B-drone-gan.webp" },
-    { "id": "anh-mau-b-xa", "hoSoId": "hs-mau-nha-b", "ten": "nha-B-drone-xa.webp", "duongDan": "mau-thu/nha-B-drone-xa.webp" }
+    {
+      "id": "anh-mau-b-gan",
+      "hoSoId": "hs-mau-nha-b",
+      "ten": "nha-B-drone-gan.webp",
+      "duongDan": "mau-thu/nha-B-drone-gan.webp"
+    },
+    {
+      "id": "anh-mau-b-xa",
+      "hoSoId": "hs-mau-nha-b",
+      "ten": "nha-B-drone-xa.webp",
+      "duongDan": "mau-thu/nha-B-drone-xa.webp"
+    }
   ]
 }

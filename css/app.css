@@ -193,3 +193,9 @@ select.can-dien option { color: var(--chu); }
 }
 .nut-noi-trai button.chinh { background: var(--xanh); color: #fff; }
 .nut-noi-trai button[hidden] { display: none; }
+
+/* ---------- Giai đoạn 3: xếp pin ---------- */
+.khung-mat-bang { background: #fff; border: 1px solid var(--vien); }
+.khung-mat-bang canvas { cursor: default; }
+.ds-thieu { margin: 4px 0 6px; padding-left: 18px; }
+.nut-noi-trai button:disabled { opacity: .5; }

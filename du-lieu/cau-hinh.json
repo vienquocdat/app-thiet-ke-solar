@@ -75,6 +75,22 @@
       "ghiChu": "Dùng ở Giai đoạn 3 (xếp pin)"
     },
     {
+      "ma": "chuaVatCanM",
+      "ten": "Khoảng cách tấm pin tới vật cản",
+      "donVi": "m",
+      "kieu": "so",
+      "giaTri": "[CẦN ĐIỀN]",
+      "ghiChu": "Dùng ở Giai đoạn 3 (xếp pin)"
+    },
+    {
+      "ma": "khoangHoGiuaTamM",
+      "ten": "Khe hở giữa 2 tấm pin cạnh nhau",
+      "donVi": "m",
+      "kieu": "so",
+      "giaTri": "[CẦN ĐIỀN]",
+      "ghiChu": "Theo kẹp giữa của hệ khung đang dùng"
+    },
+    {
       "ma": "nguongLechDoPhanTram",
       "ten": "Ngưỡng lệch cho phép khi đo trên ảnh",
       "donVi": "%",

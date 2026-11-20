@@ -94,6 +94,7 @@ const ManHoSo = (() => {
     const theChon = THE.find(t => t.ma === the) || THE[0];
     if (theChon.ma === 'khao-sat') veKhaoSat(vungThe);
     else if (theChon.ma === 've-mai') await ManVeMai.ve(vungThe, hs, luuSau);
+    else if (theChon.ma === 'xep-pin') await ManXepPin.ve(vungThe, hs, luuSau);
     else vungThe.replaceChildren(TI.el('div', { class: 'the trong' },
       TI.el('b', {}, theChon.ten), TI.el('p', { class: 'mo' }, `Phần này sẽ làm ở Giai đoạn ${theChon.gd}.`)));
   }

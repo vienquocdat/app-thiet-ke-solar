@@ -33,6 +33,62 @@ const HH = {
     return Math.hypot(p[0] - a[0] - t * dx, p[1] - a[1] - t * dy);
   },
 
+  // 2 đoạn thẳng ab và cd cắt ngang nhau (chạm đầu mút không tính).
+  catNhau(a, b, c, d) {
+    const o = (p, q, r) => (q[0] - p[0]) * (r[1] - p[1]) - (q[1] - p[1]) * (r[0] - p[0]);
+    const d1 = o(c, d, a), d2 = o(c, d, b), d3 = o(a, b, c), d4 = o(a, b, d);
+    const E = 1e-12;
+    return ((d1 > E && d2 < -E) || (d1 < -E && d2 > E)) && ((d3 > E && d4 < -E) || (d3 < -E && d4 > E));
+  },
+
+  coCanhCatNhau(A, B) {
+    for (let i = 0; i < A.length; i++) {
+      for (let j = 0; j < B.length; j++) {
+        if (HH.catNhau(A[i], A[(i + 1) % A.length], B[j], B[(j + 1) % B.length])) return true;
+      }
+    }
+    return false;
+  },
+
+  // 2 đa giác có phần chung (đè lên nhau).
+  chongNhau(A, B) {
+    return HH.coCanhCatNhau(A, B) || HH.namTrong(A[0], B) || HH.namTrong(B[0], A) ||
+      HH.namTrong(HH.trongTam(A), B) || HH.namTrong(HH.trongTam(B), A);
+  },
+
+  // Đa giác A nằm trọn trong đa giác B.
+  namTronTrong(A, B) {
+    if (!A.every(p => HH.namTrong(p, B))) return false;
+    if (HH.coCanhCatNhau(A, B)) return false;
+    return !B.some(p => HH.namTrong(p, A));
+  },
+
+  // Hình chữ nhật theo hệ trục riêng: tâm (u, v), rộng theo u = a, sâu theo v = b, nới thêm "them" mỗi phía.
+  hinhChuNhat(u, v, a, b, them = 0) {
+    const x = a / 2 + them, y = b / 2 + them;
+    return [[u - x, v - y], [u + x, v - y], [u + x, v + y], [u - x, v + y]];
+  },
+
+  // Thu nhỏ đa giác vào trong một khoảng d (để vẽ đường chừa mép). Đúng với đa giác lồi và lõm nhẹ.
+  thuVao(ds, d) {
+    const n = ds.length;
+    if (n < 3 || !(d > 0)) return ds;
+    const dau = HH.dienTichCoDau(ds) > 0 ? 1 : -1;
+    const duong = ds.map((a, i) => {
+      const b = ds[(i + 1) % n], L = HH.kc(a, b) || 1;
+      const nx = -(b[1] - a[1]) / L * dau, ny = (b[0] - a[0]) / L * dau; // pháp tuyến hướng vào trong
+      return [[a[0] + nx * d, a[1] + ny * d], [b[0] + nx * d, b[1] + ny * d]];
+    });
+    return duong.map((l1, i) => {
+      const l0 = duong[(i - 1 + n) % n];
+      const [p1, p2] = l0, [p3, p4] = l1;
+      const den = (p1[0] - p2[0]) * (p3[1] - p4[1]) - (p1[1] - p2[1]) * (p3[0] - p4[0]);
+      if (Math.abs(den) < 1e-12) return p3;
+      const t = ((p1[0] - p3[0]) * (p3[1] - p4[1]) - (p1[1] - p3[1]) * (p3[0] - p4[0])) / den;
+      return [p1[0] + t * (p2[0] - p1[0]), p1[1] + t * (p2[1] - p1[1])];
+    });
+  },
+
   // Phép "nắn ảnh": tìm ma trận biến 4 điểm trên ảnh chụp chéo thành 4 góc hình chữ nhật thật (mét).
   // Giải hệ 8 phương trình 8 ẩn bằng phương pháp khử Gauss.
   timMaTranNan(nguon, dich) {
