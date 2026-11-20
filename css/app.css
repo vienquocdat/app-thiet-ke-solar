@@ -139,3 +139,57 @@ select.can-dien option { color: var(--chu); }
 @media (min-width: 600px) {
   .luoi-o { grid-template-columns: 1fr 1fr 1fr; }
 }
+
+/* ---------- Giai đoạn 2: vẽ mái ---------- */
+.hang-anh-nen { display: flex; gap: 8px; margin-bottom: 8px; }
+.hang-anh-nen select { flex: 1; min-width: 0; }
+.khung-ve {
+  position: relative; height: min(62vh, 560px); min-height: 300px;
+  border-radius: var(--bo); overflow: hidden; background: #1b1f24;
+  touch-action: none; user-select: none; -webkit-user-select: none;
+}
+.khung-ve canvas { width: 100%; height: 100%; display: block; touch-action: none; cursor: crosshair; }
+.goi-y-ve {
+  position: absolute; left: 8px; right: 8px; top: 8px; pointer-events: none;
+  background: rgba(0, 0, 0, .62); color: #fff; font-size: 13px; padding: 6px 10px; border-radius: 8px;
+}
+.nut-noi { position: absolute; right: 8px; bottom: 8px; display: flex; flex-direction: column; gap: 6px; }
+.nut-noi button {
+  width: 40px; height: 40px; border-radius: 10px; border: none; font-size: 20px; line-height: 1;
+  background: rgba(255, 255, 255, .9); color: #222; cursor: pointer; box-shadow: 0 1px 4px rgba(0, 0, 0, .3);
+}
+.bang-ve { margin-top: 10px; }
+.phan-doan { display: flex; gap: 4px; background: #e3e8ee; padding: 4px; border-radius: 12px; margin-bottom: 10px; }
+.phan-doan button {
+  flex: 1; min-height: 40px; border: none; background: none; border-radius: 9px;
+  font: inherit; font-size: 14px; font-weight: 500; color: var(--chu); cursor: pointer; padding: 4px 2px;
+}
+.phan-doan button.dang-chon { background: #fff; color: var(--xanh); box-shadow: 0 1px 3px rgba(0, 0, 0, .15); }
+.lua-chon { display: flex; align-items: center; gap: 10px; padding: 8px 0; font-size: 15px; }
+.lua-chon input { width: 20px; height: 20px; flex: none; }
+.the.nho, p.nho.the { font-size: 13px; padding: 8px 10px; }
+.ket-qua { font-weight: 600; color: var(--xanh-dam); margin: 8px 0; }
+.danh-sach-hinh { display: flex; flex-direction: column; gap: 6px; margin-bottom: 8px; }
+.muc-hinh {
+  display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 8px 12px; text-align: left;
+  border: 1px solid var(--vien); border-radius: var(--bo); background: #fff; font: inherit; cursor: pointer;
+}
+.muc-hinh small { margin-left: auto; color: var(--mo); }
+.muc-hinh.dang-chon, .the-kiem-tra.dang-chon { border-color: var(--xanh); box-shadow: 0 0 0 2px #1f6fbf33; }
+.cham-mau { width: 14px; height: 14px; border-radius: 4px; flex: none; }
+.chi-tiet-hinh { background: #fafbfc; }
+.the-kiem-tra { cursor: pointer; }
+.tong-hop { margin-top: 16px; }
+.bang-so { width: 100%; border-collapse: collapse; font-size: 14px; background: #fff; border-radius: var(--bo); overflow: hidden; }
+.bang-so th, .bang-so td { padding: 8px 6px; border-bottom: 1px solid var(--vien); text-align: right; vertical-align: top; }
+.bang-so th:first-child, .bang-so td:first-child { text-align: left; }
+.bang-so th { font-size: 12px; color: var(--mo); font-weight: 600; background: #f0f3f6; }
+.bang-so tfoot td { font-weight: 700; }
+.ds-vat-can { margin: 4px 0; padding-left: 18px; }
+.nut-noi-trai { position: absolute; left: 8px; bottom: 8px; display: flex; gap: 8px; }
+.nut-noi-trai button {
+  min-height: 44px; padding: 0 16px; border-radius: 22px; border: none; font: inherit; font-weight: 600;
+  background: rgba(255, 255, 255, .92); color: #222; cursor: pointer; box-shadow: 0 1px 4px rgba(0, 0, 0, .3);
+}
+.nut-noi-trai button.chinh { background: var(--xanh); color: #fff; }
+.nut-noi-trai button[hidden] { display: none; }

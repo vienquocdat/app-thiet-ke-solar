@@ -93,6 +93,7 @@ const ManHoSo = (() => {
 
     const theChon = THE.find(t => t.ma === the) || THE[0];
     if (theChon.ma === 'khao-sat') veKhaoSat(vungThe);
+    else if (theChon.ma === 've-mai') await ManVeMai.ve(vungThe, hs, luuSau);
     else vungThe.replaceChildren(TI.el('div', { class: 'the trong' },
       TI.el('b', {}, theChon.ten), TI.el('p', { class: 'mo' }, `Phần này sẽ làm ở Giai đoạn ${theChon.gd}.`)));
   }
@@ -147,17 +148,7 @@ const ManHoSo = (() => {
       TI.el('span', {}, t.n), t.dv ? TI.el('div', { class: 'co-don-vi' }, o, TI.el('i', {}, t.dv)) : o);
   }
 
-  // Ô nhập số: gõ kiểu Việt Nam (dấu phẩy thập phân), sai định dạng thì viền đỏ và không lưu.
-  function oSo(gt, khiDoi, phu = {}) {
-    const o = TI.el('input', { type: 'text', inputmode: 'decimal', value: TI.soVN(gt), ...phu });
-    o.addEventListener('input', () => {
-      const n = TI.docSo(o.value);
-      o.classList.toggle('sai', Number.isNaN(n));
-      if (!Number.isNaN(n)) khiDoi(n);
-    });
-    o.addEventListener('blur', () => { const n = TI.docSo(o.value); if (n !== null && !Number.isNaN(n)) o.value = TI.soVN(n); });
-    return o;
-  }
+  const oSo = TI.oSo;
 
   function veToaDo(t) {
     const hien = TI.el('span', { class: 'mo' });
@@ -280,5 +271,5 @@ const ManHoSo = (() => {
   document.addEventListener('visibilitychange', () => { if (document.hidden) luuNeuDangCho(); });
   window.addEventListener('pagehide', luuNeuDangCho);
 
-  return { ve, luuNeuDangCho };
+  return { ve, luuNeuDangCho, LOAI_ANH };
 })();

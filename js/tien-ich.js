@@ -42,6 +42,18 @@ const TI = {
     return isNaN(n) ? NaN : n;
   },
 
+  // Ô nhập số: gõ kiểu Việt Nam (dấu phẩy thập phân), sai định dạng thì viền đỏ và không lưu.
+  oSo(gt, khiDoi, phu = {}) {
+    const o = TI.el('input', { type: 'text', inputmode: 'decimal', value: TI.soVN(gt), ...phu });
+    o.addEventListener('input', () => {
+      const n = TI.docSo(o.value);
+      o.classList.toggle('sai', Number.isNaN(n));
+      if (!Number.isNaN(n)) khiDoi(n);
+    });
+    o.addEventListener('blur', () => { const n = TI.docSo(o.value); if (n !== null && !Number.isNaN(n)) o.value = TI.soVN(n); });
+    return o;
+  },
+
   homNay() {
     const d = new Date();
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
