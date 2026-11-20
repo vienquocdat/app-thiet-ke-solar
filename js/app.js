@@ -16,6 +16,7 @@ const App = (() => {
     window.scrollTo(0, 0);
     try {
       await ManHoSo.luuNeuDangCho();
+      ManDung3D.huy(); // giải phóng khung 3D cũ (nếu có) trước khi vẽ màn hình mới
       if (phan[0] === 'ho-so' && phan[1]) await ManHoSo.ve(v, phan[1], phan[2] || 'khao-sat');
       else if (phan[0] === 'cai-dat') await ManCaiDat.ve(v, phan[1]);
       else await ManDanhSach.ve(v);

@@ -37,9 +37,14 @@ const ManThongSo = (() => {
       // --- Mảng mái ---
       const dsMang = M.mangMai.filter(m => m.diem.length >= 3);
       if (!dsMang.length) lk('Mảng mái', 'Vẽ ít nhất 1 mảng mái', false, 've-mai', 'Vẽ ở thẻ Vẽ mái → Mảng mái');
-      for (const m of dsMang) {
+      dsMang.forEach((m, i) => {
         const ten = m.ten || 'Mảng mái';
         if (!m.xep) m.xep = XepPin.caiDatMacDinh(m, m.diem);
+        if (!m.d3) m.d3 = { caoDoM: null, lanCanM: null };
+        if (i > 0) ds.push({ nhom: 'Mảng mái', nhan: `${ten}: cao độ so với mái chính (${dsMang[0].ten || 'mảng đầu'})`, dv: 'm', kieu: 'so', batBuoc: true,
+          lay: () => m.d3.caoDoM, dat: (n) => { m.d3.caoDoM = n; }, ghiChu: 'Thấp hơn thì ghi số âm, vd −0,6. Mái dốc: đo ở mép thấp. Dùng cho 3D.' });
+        ds.push({ nhom: 'Mảng mái', nhan: `${ten}: chiều cao tường lan can`, dv: 'm', kieu: 'so', batBuoc: false,
+          lay: () => m.d3.lanCanM, dat: (n) => { m.d3.lanCanM = n; }, ghiChu: 'Dùng cho 3D' });
         ds.push({ nhom: 'Mảng mái', nhan: `${ten}: độ dốc mái`, dv: '°', kieu: 'so', batBuoc: m.loai === 'ton',
           lay: () => m.doDocDo, dat: (n) => { m.doDocDo = n; }, ghiChu: m.loai === 'ton' ? 'Mái tôn cần độ dốc để tính diện tích và xếp tấm' : 'Mái bằng nhập 0' });
         ds.push({ nhom: 'Mảng mái', nhan: `${ten}: cách lắp`, kieu: 'chon', batBuoc: true,
@@ -54,8 +59,16 @@ const ManThongSo = (() => {
             lay: () => m.xep.soHangMoiDay, dat: (n) => { m.xep.soHangMoiDay = n; }, ghiChu: 'Để trống = xếp liền' });
           ds.push({ nhom: 'Mảng mái', nhan: `${ten}: khoảng hở giữa các dãy khung`, dv: 'm', kieu: 'so', batBuoc: false,
             lay: () => m.xep.khoangCachDayM, dat: (n) => { m.xep.khoangCachDayM = n; } });
+          ds.push({ nhom: 'Mảng mái', nhan: `${ten}: khung nhô ra ngoài mép mái`, dv: 'm', kieu: 'so', batBuoc: false,
+            lay: () => m.xep.nhoRaM, dat: (n) => { m.xep.nhoRaM = n; } });
+          ds.push({ nhom: 'Mảng mái', nhan: `${ten}: mép thấp của tấm quay về`, kieu: 'chon', batBuoc: true,
+            tc: [['canh-goc', 'Phía vạch cam (cạnh xếp hàng)'], ['nguoc', 'Phía ngược lại']],
+            lay: () => m.xep.mepThap || 'canh-goc', dat: (v) => { m.xep.mepThap = v; } });
         }
-      }
+      });
+      if (!hs.dung3d) hs.dung3d = { caoNhaM: null };
+      ds.push({ nhom: 'Mảng mái', nhan: 'Chiều cao nhà (chỉ để vẽ 3D cho đẹp)', dv: 'm', kieu: 'so', batBuoc: false,
+        lay: () => hs.dung3d.caoNhaM, dat: (n) => { hs.dung3d.caoNhaM = n; } });
       // --- Vật cản ---
       for (const v of M.vatCan.filter(x => x.diem.length >= 3)) {
         ds.push({ nhom: 'Vật cản', nhan: `${v.ten || 'Vật cản'}: chiều cao so với mặt mái`, dv: 'm', kieu: 'so', batBuoc: true,

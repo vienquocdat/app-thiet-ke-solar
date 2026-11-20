@@ -55,7 +55,7 @@ const ManHoSo = (() => {
 
   const LOAI_ANH = [
     ['drone-thang', 'Drone chụp thẳng xuống'], ['drone-cheo', 'Drone chụp chéo'],
-    ['hien-truong', 'Hiện trường'], ['hoa-don', 'Hóa đơn điện'], ['khac', 'Khác'],
+    ['hien-truong', 'Hiện trường'], ['hoa-don', 'Hóa đơn điện'], ['phoi-canh', 'Phối cảnh 3D'], ['khac', 'Khác'],
   ];
 
   let hs = null;
@@ -109,6 +109,7 @@ const ManHoSo = (() => {
     else if (theChon.ma === 'thong-so') await ManThongSo.ve(vungThe, hs, luuSau);
     else if (theChon.ma === 've-mai') await ManVeMai.ve(vungThe, hs, luuSau);
     else if (theChon.ma === 'xep-pin') await ManXepPin.ve(vungThe, hs, luuSau);
+    else if (theChon.ma === '3d') await ManDung3D.ve(vungThe, hs, luuSau);
     else vungThe.replaceChildren(TI.el('div', { class: 'the trong' },
       TI.el('b', {}, theChon.ten), TI.el('p', { class: 'mo' }, `Phần này sẽ làm ở Giai đoạn ${theChon.gd}.`)));
   }

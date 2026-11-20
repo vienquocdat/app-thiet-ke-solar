@@ -106,7 +106,7 @@ const ManXepPin = (() => {
       const mau = MAU_MAI[nc.mang.loai] || MAU_MAI['be-tong'];
       duong(nc.P); ctx.fillStyle = mau + '14'; ctx.fill(); ctx.lineWidth = 1.5; ctx.strokeStyle = mau; ctx.stroke();
       const mep = XepPin.chuaMep(nc.mang, cfg);
-      if (SO(mep) && mep > 0) { duong(HH.thuVao(nc.P, mep)); ctx.setLineDash([5, 4]); ctx.lineWidth = 1; ctx.stroke(); ctx.setLineDash([]); }
+      if (SO(mep) && mep !== 0) { duong(HH.thuVao(nc.P, mep)); ctx.setLineDash([5, 4]); ctx.lineWidth = 1; ctx.stroke(); ctx.setLineDash([]); }
       const k = nc.mang.xep.canhGoc, a = nc.P[k], b = nc.P[(k + 1) % nc.P.length];
       ctx.beginPath(); ctx.moveTo(...kv.S(a)); ctx.lineTo(...kv.S(b)); ctx.lineWidth = 4; ctx.strokeStyle = '#f08c00'; ctx.stroke();
     }
@@ -290,8 +290,9 @@ const ManXepPin = (() => {
         so('Góc nghiêng tấm', 'gocNghieng', '°'),
         so('Chiều cao khung', 'caoKhungM', 'm'),
         so('Số hàng tấm mỗi dãy khung', 'soHangMoiDay', 'hàng'),
-        so('Khoảng hở giữa các dãy', 'khoangCachDayM', 'm')),
-        TI.el('p', { class: 'mo nho' }, 'Vật cản thấp hơn khung (đã nhập chiều cao ở thẻ Vẽ mái) sẽ không chặn tấm. Số hàng mỗi dãy để trống = xếp liền.'));
+        so('Khoảng hở giữa các dãy', 'khoangCachDayM', 'm'),
+        so('Khung nhô ra ngoài mép mái', 'nhoRaM', 'm')),
+        TI.el('p', { class: 'mo nho' }, 'Vật cản thấp hơn khung (đã nhập chiều cao ở thẻ Vẽ mái) sẽ không chặn tấm. Số hàng mỗi dãy để trống = xếp liền. Khung nhô ra: để trống = không nhô, tấm vẫn chừa mép như mái thường.'));
     } else {
       noiDung.push(TI.el('p', { class: 'mo nho' }, `Độ dốc mái: ${SO(m.doDocDo) ? TI.soVN(m.doDocDo) + '°' : 'chưa nhập'} (sửa ở thẻ Vẽ mái).`));
     }

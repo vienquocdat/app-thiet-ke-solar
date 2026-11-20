@@ -20,6 +20,8 @@ const XepPin = (() => {
       caoKhungM: null,         // chiều cao khung nâng so với mặt mái (m)
       soHangMoiDay: null,      // số hàng tấm trên 1 dãy khung (để trống = xếp liền)
       khoangCachDayM: null,    // khoảng hở giữa 2 dãy khung (m)
+      nhoRaM: null,            // khung nâng nhô ra ngoài mép mái (m)
+      mepThap: 'canh-goc',     // mép thấp của tấm trên khung quay về phía cạnh xếp hàng hay phía ngược lại
     };
   }
 
@@ -49,7 +51,12 @@ const XepPin = (() => {
     return huong === 'doc' ? { wu: rong, dv: dai * c } : { wu: dai, dv: rong * c };
   }
 
-  const chuaMep = (mang, cfg) => mang.loai === 'ton' ? cfg.chuaMepMaiTonM : cfg.chuaMepMaiBeTongM;
+  // Khoảng chừa mép thực dùng. Khung nâng có nhập "nhô ra ngoài mép" (nhoRaM) → tấm được vượt mép mái
+  // tối đa đúng bằng nhoRaM (chừa mép âm); không nhập thì chừa mép như mái thường.
+  const chuaMep = (mang, cfg) => {
+    if (mang.xep && mang.xep.kieuLap === 'khung-nang' && SO(mang.xep.nhoRaM) && mang.xep.nhoRaM > 0) return -mang.xep.nhoRaM;
+    return mang.loai === 'ton' ? cfg.chuaMepMaiTonM : cfg.chuaMepMaiBeTongM;
+  };
 
   // Vật cản có chặn tấm của mảng này không: khung nâng cao hơn vật cản thì không chặn.
   function laVatCanChan(mang, vc) {
@@ -75,6 +82,10 @@ const XepPin = (() => {
     const { wu, dv } = kichThuoc(nc.mang, tam.huong, tp);
     return HH.hinhChuNhat(tam.u, tam.v, wu, dv, them);
   }
+  // Vùng được đặt tấm: chừa mép dương → nới tấm ra rồi đặt trong mái; chừa mép âm (khung nhô ra) → nới mái ra ngoài.
+  function vungDat(nc, mep) {
+    return mep < 0 ? { L: HH.thuVao(nc.L, mep), them: 0 } : { L: nc.L, them: mep };
+  }
   const daGiacTamChung = (nc, tam, tp, them = 0) => daGiacTam(nc, tam, tp, them).map(nc.H.sangChung);
 
   // Tự xếp tối đa cho 1 mảng: xếp theo hàng song song cạnh xếp hàng, mỗi hàng đặt tấm từ trái qua phải
@@ -87,7 +98,8 @@ const XepPin = (() => {
     const umin = Math.min(...us), umax = Math.max(...us), vmin = Math.min(...vs), vmax = Math.max(...vs);
     const nhom = x.soHangMoiDay > 0 ? x.soHangMoiDay : Infinity;
     const khe = x.khoangCachDayM > 0 ? x.khoangCachDayM : 0;
-    const hopLe = (u, v) => HH.namTronTrong(HH.hinhChuNhat(u, v, wu, dv, mep), nc.L) &&
+    const vd = vungDat(nc, mep - 0.001); // nới 1 mm để tấm nằm đúng sát đường chừa mép vẫn tính là hợp lệ
+    const hopLe = (u, v) => HH.namTronTrong(HH.hinhChuNhat(u, v, wu, dv, vd.them), vd.L) &&
       !nc.chan.some(O => HH.chongNhau(HH.hinhChuNhat(u, v, wu, dv, cvc), O));
     const BUOC = 0.02;
     let tot = [];
@@ -95,9 +107,9 @@ const XepPin = (() => {
       const kq = [];
       for (let r = 0; ; r++) {
         const v = vmin + mep + dv / 2 + t * (dv + gap) / 8 + r * (dv + gap) + (nhom < Infinity ? Math.floor(r / nhom) * khe : 0);
-        if (v + dv / 2 > vmax) break;
+        if (v + dv / 2 > vmax - mep) break;   // mep âm (khung nhô ra) → được vượt mép
         let u = umin + mep + wu / 2;
-        while (u + wu / 2 <= umax) {
+        while (u + wu / 2 <= umax - mep) {
           if (hopLe(u, v)) { kq.push({ u, v }); u += wu + gap; } else u += BUOC;
         }
       }
@@ -117,7 +129,8 @@ const XepPin = (() => {
       const nc = theoMang.get(tam.mang);
       if (!nc) { them(tam.id, 'mảng mái đã bị xóa'); continue; }
       const mep = chuaMep(nc.mang, cfg);
-      if (!HH.namTronTrong(daGiacTam(nc, tam, tp, mep - SAI_SO), nc.L)) them(tam.id, 'vượt khoảng chừa mép');
+      const vd = vungDat(nc, mep - SAI_SO);
+      if (!HH.namTronTrong(daGiacTam(nc, tam, tp, vd.them), vd.L)) them(tam.id, 'vượt khoảng chừa mép');
       const R = daGiacTam(nc, tam, tp, cfg.chuaVatCanM - SAI_SO);
       if (nc.chan.some(O => HH.chongNhau(R, O))) them(tam.id, 'đè hoặc quá gần vật cản');
       hinh.push({ id: tam.id, P: daGiacTamChung(nc, tam, tp, -0.001) });
@@ -130,5 +143,5 @@ const XepPin = (() => {
     return loi;
   }
 
-  return { SO, caiDatMacDinh, nguCanh, kichThuoc, gocChieu, chuaMep, laVatCanChan, daGiacTamChung, tuXep, kiemTra, canhDaiNhat };
+  return { SO, caiDatMacDinh, nguCanh, kichThuoc, gocChieu, chuaMep, laVatCanChan, daGiacTamChung, tuXep, kiemTra, canhDaiNhat, heTruc };
 })();

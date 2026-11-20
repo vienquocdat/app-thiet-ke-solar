@@ -22,3 +22,6 @@ Rồi mở http://localhost:8000
 
 ## Kiểm thử
 `mau-thu/nha-B.json` là hồ sơ mẫu nhà B, nạp bằng nút **Nạp hồ sơ mẫu nhà B** ở cuối trang danh sách.
+
+## Khi cập nhật app
+Tăng số `?v=` trong `index.html` (ví dụ `?v=4` → `?v=5`) để điện thoại tải bản mới, không dùng bản cũ đã lưu tạm.

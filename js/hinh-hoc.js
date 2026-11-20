@@ -69,10 +69,10 @@ const HH = {
     return [[u - x, v - y], [u + x, v - y], [u + x, v + y], [u - x, v + y]];
   },
 
-  // Thu nhỏ đa giác vào trong một khoảng d (để vẽ đường chừa mép). Đúng với đa giác lồi và lõm nhẹ.
+  // Thu nhỏ đa giác vào trong một khoảng d (d âm = nới rộng ra ngoài). Đúng với đa giác lồi và lõm nhẹ.
   thuVao(ds, d) {
     const n = ds.length;
-    if (n < 3 || !(d > 0)) return ds;
+    if (n < 3 || !d) return ds;
     const dau = HH.dienTichCoDau(ds) > 0 ? 1 : -1;
     const duong = ds.map((a, i) => {
       const b = ds[(i + 1) % n], L = HH.kc(a, b) || 1;

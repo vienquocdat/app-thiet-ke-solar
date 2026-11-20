@@ -99,7 +99,7 @@ const TI = {
 
   // Lưu file về máy. Trên điện thoại ưu tiên mở bảng "Chia sẻ" (gửi Zalo, lưu vào Tệp…).
   async luuFile(tenFile, noiDung, kieu = 'application/json') {
-    const blob = new Blob([noiDung], { type: kieu });
+    const blob = noiDung instanceof Blob ? noiDung : new Blob([noiDung], { type: kieu });
     const laDienThoai = window.matchMedia('(pointer: coarse)').matches;
     if (laDienThoai && navigator.canShare) {
       const file = new File([blob], tenFile, { type: kieu });
@@ -148,3 +148,11 @@ const TI = {
     } finally { URL.revokeObjectURL(url); }
   },
 };
+
+// Thay nội dung 1 phần tử nhưng bỏ qua các ô trống (null/false) – tránh hiện chữ "null" trên màn hình.
+{
+  const thayGoc = Element.prototype.replaceChildren;
+  Element.prototype.replaceChildren = function (...con) {
+    return thayGoc.apply(this, con.filter(c => c !== null && c !== undefined && c !== false));
+  };
+}
