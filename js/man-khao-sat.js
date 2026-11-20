@@ -110,6 +110,7 @@ const ManHoSo = (() => {
     else if (theChon.ma === 've-mai') await ManVeMai.ve(vungThe, hs, luuSau);
     else if (theChon.ma === 'xep-pin') await ManXepPin.ve(vungThe, hs, luuSau);
     else if (theChon.ma === '3d') await ManDung3D.ve(vungThe, hs, luuSau);
+    else if (theChon.ma === 'ky-thuat') await ManKyThuat.ve(vungThe, hs, luuSau);
     else vungThe.replaceChildren(TI.el('div', { class: 'the trong' },
       TI.el('b', {}, theChon.ten), TI.el('p', { class: 'mo' }, `Phần này sẽ làm ở Giai đoạn ${theChon.gd}.`)));
   }

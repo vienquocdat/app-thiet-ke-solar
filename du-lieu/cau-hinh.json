@@ -52,6 +52,34 @@
       "giaTri": 1.3
     },
     {
+      "ma": "heSoCBDC",
+      "ten": "Hệ số chọn CB DC (dòng CB ≥ hệ số × Isc × số chuỗi song song)",
+      "kieu": "so",
+      "giaTri": "[CẦN ĐIỀN]",
+      "ghiChu": "Theo tiêu chuẩn công ty áp dụng"
+    },
+    {
+      "ma": "soChuoiCanCauChi",
+      "ten": "Số chuỗi song song trên 1 MPPT từ đó phải lắp cầu chì chuỗi",
+      "kieu": "so",
+      "giaTri": "[CẦN ĐIỀN]",
+      "ghiChu": "Theo tiêu chuẩn công ty áp dụng"
+    },
+    {
+      "ma": "heSoCauChi",
+      "ten": "Hệ số chọn cầu chì chuỗi (dòng cầu chì ≥ hệ số × Isc)",
+      "kieu": "so",
+      "giaTri": "[CẦN ĐIỀN]",
+      "ghiChu": "Theo tiêu chuẩn công ty áp dụng"
+    },
+    {
+      "ma": "heSoCBAC",
+      "ten": "Hệ số chọn CB AC (dòng CB ≥ hệ số × dòng AC định mức inverter)",
+      "kieu": "so",
+      "giaTri": "[CẦN ĐIỀN]",
+      "ghiChu": "Theo tiêu chuẩn công ty áp dụng"
+    },
+    {
       "ma": "suyGiamNamPhanTram",
       "ten": "Suy giảm hiệu suất tấm mỗi năm",
       "donVi": "%/năm",

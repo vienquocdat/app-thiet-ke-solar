@@ -2,24 +2,108 @@
   "tieuDe": "Danh mục inverter",
   "moTa": "Lấy đúng từ datasheet của hãng. Giá là giá bán cho khách.",
   "truong": [
-    { "ma": "giaDaGomVAT", "ten": "Giá đã gồm VAT chưa", "kieu": "chon", "tuyChon": ["[CẦN ĐIỀN]", "Đã gồm VAT", "Chưa gồm VAT"], "giaTri": "[CẦN ĐIỀN]" }
+    {
+      "ma": "giaDaGomVAT",
+      "ten": "Giá đã gồm VAT chưa",
+      "kieu": "chon",
+      "tuyChon": [
+        "[CẦN ĐIỀN]",
+        "Đã gồm VAT",
+        "Chưa gồm VAT"
+      ],
+      "giaTri": "[CẦN ĐIỀN]"
+    }
   ],
   "bang": {
     "tieuDe": "Các loại inverter",
     "cot": [
-      { "ma": "model", "ten": "Model", "kieu": "chu" },
-      { "ma": "loai", "ten": "Loại", "kieu": "chon", "tuyChon": ["[CẦN ĐIỀN]", "Hòa lưới", "Hybrid"] },
-      { "ma": "congSuatACkW", "ten": "Công suất AC", "donVi": "kW", "kieu": "so" },
-      { "ma": "soPha", "ten": "Số pha", "kieu": "chon", "tuyChon": ["[CẦN ĐIỀN]", "1 pha", "3 pha"] },
-      { "ma": "dienApDCMaxV", "ten": "Điện áp DC tối đa", "donVi": "V", "kieu": "so" },
-      { "ma": "mpptMinV", "ten": "Dải MPPT – thấp nhất", "donVi": "V", "kieu": "so" },
-      { "ma": "mpptMaxV", "ten": "Dải MPPT – cao nhất", "donVi": "V", "kieu": "so" },
-      { "ma": "soMPPT", "ten": "Số MPPT", "kieu": "so" },
-      { "ma": "dongMPPTMaxA", "ten": "Dòng vào tối đa mỗi MPPT", "donVi": "A", "kieu": "so" },
-      { "ma": "gia", "ten": "Giá", "donVi": "đ", "kieu": "so" }
+      {
+        "ma": "model",
+        "ten": "Model",
+        "kieu": "chu"
+      },
+      {
+        "ma": "loai",
+        "ten": "Loại",
+        "kieu": "chon",
+        "tuyChon": [
+          "[CẦN ĐIỀN]",
+          "Hòa lưới",
+          "Hybrid"
+        ]
+      },
+      {
+        "ma": "congSuatACkW",
+        "ten": "Công suất AC",
+        "donVi": "kW",
+        "kieu": "so"
+      },
+      {
+        "ma": "soPha",
+        "ten": "Số pha",
+        "kieu": "chon",
+        "tuyChon": [
+          "[CẦN ĐIỀN]",
+          "1 pha",
+          "3 pha"
+        ]
+      },
+      {
+        "ma": "dienApDCMaxV",
+        "ten": "Điện áp DC tối đa",
+        "donVi": "V",
+        "kieu": "so"
+      },
+      {
+        "ma": "mpptMinV",
+        "ten": "Dải MPPT – thấp nhất",
+        "donVi": "V",
+        "kieu": "so"
+      },
+      {
+        "ma": "mpptMaxV",
+        "ten": "Dải MPPT – cao nhất",
+        "donVi": "V",
+        "kieu": "so"
+      },
+      {
+        "ma": "soMPPT",
+        "ten": "Số MPPT",
+        "kieu": "so"
+      },
+      {
+        "ma": "dongMPPTMaxA",
+        "ten": "Dòng vào tối đa mỗi MPPT",
+        "donVi": "A",
+        "kieu": "so"
+      },
+      {
+        "ma": "dongACmaxA",
+        "ten": "Dòng AC định mức (đầu ra)",
+        "donVi": "A",
+        "kieu": "so"
+      },
+      {
+        "ma": "gia",
+        "ten": "Giá",
+        "donVi": "đ",
+        "kieu": "so"
+      }
     ],
     "dong": [
-      { "model": "[CẦN ĐIỀN]", "loai": "[CẦN ĐIỀN]", "congSuatACkW": "[CẦN ĐIỀN]", "soPha": "[CẦN ĐIỀN]", "dienApDCMaxV": "[CẦN ĐIỀN]", "mpptMinV": "[CẦN ĐIỀN]", "mpptMaxV": "[CẦN ĐIỀN]", "soMPPT": "[CẦN ĐIỀN]", "dongMPPTMaxA": "[CẦN ĐIỀN]", "gia": "[CẦN ĐIỀN]" }
+      {
+        "model": "[CẦN ĐIỀN]",
+        "loai": "[CẦN ĐIỀN]",
+        "congSuatACkW": "[CẦN ĐIỀN]",
+        "soPha": "[CẦN ĐIỀN]",
+        "dienApDCMaxV": "[CẦN ĐIỀN]",
+        "mpptMinV": "[CẦN ĐIỀN]",
+        "mpptMaxV": "[CẦN ĐIỀN]",
+        "soMPPT": "[CẦN ĐIỀN]",
+        "dongMPPTMaxA": "[CẦN ĐIỀN]",
+        "gia": "[CẦN ĐIỀN]",
+        "dongACmaxA": "[CẦN ĐIỀN]"
+      }
     ]
   }
 }
