@@ -1,0 +1,21 @@
+{
+  "tieuDe": "Giá điện sinh hoạt bậc thang EVN",
+  "moTa": "Lấy từ website EVN hoặc quyết định giá điện hiện hành. Ghi rõ nguồn và ngày áp dụng.",
+  "truong": [
+    { "ma": "nguon", "ten": "Nguồn (văn bản / đường link)", "kieu": "chu", "giaTri": "[CẦN ĐIỀN]" },
+    { "ma": "ngayApDung", "ten": "Ngày áp dụng", "kieu": "chu", "giaTri": "[CẦN ĐIỀN]" },
+    { "ma": "daGomVAT", "ten": "Đơn giá đã gồm VAT chưa", "kieu": "chon", "tuyChon": ["[CẦN ĐIỀN]", "Đã gồm VAT", "Chưa gồm VAT"], "giaTri": "[CẦN ĐIỀN]" }
+  ],
+  "bang": {
+    "tieuDe": "Các bậc giá",
+    "cot": [
+      { "ma": "bac", "ten": "Bậc", "kieu": "so" },
+      { "ma": "tuKWh", "ten": "Từ", "donVi": "kWh", "kieu": "so" },
+      { "ma": "denKWh", "ten": "Đến", "donVi": "kWh", "kieu": "so", "goiY": "bậc cuối gõ 0 = không giới hạn" },
+      { "ma": "donGia", "ten": "Đơn giá", "donVi": "đ/kWh", "kieu": "so" }
+    ],
+    "dong": [
+      { "bac": 1, "tuKWh": "[CẦN ĐIỀN]", "denKWh": "[CẦN ĐIỀN]", "donGia": "[CẦN ĐIỀN]" }
+    ]
+  }
+}

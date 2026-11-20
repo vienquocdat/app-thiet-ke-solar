@@ -1,0 +1,16 @@
+{
+  "tieuDe": "Hằng số tính toán",
+  "moTa": "Các hằng số dùng trong công thức. Sửa ở đây, không sửa trong code.",
+  "truong": [
+    { "ma": "PR", "ten": "Hệ số hiệu suất hệ thống PR", "kieu": "so", "giaTri": 0.8, "ghiChu": "Mặc định theo file yêu cầu, cần anh xác nhận" },
+    { "ma": "tMin", "ten": "Nhiệt độ thấp nhất mùa đông", "donVi": "°C", "kieu": "so", "giaTri": "[CẦN ĐIỀN]", "ghiChu": "Dùng tính Voc tối đa" },
+    { "ma": "tVmpNong", "ten": "Nhiệt độ tấm khi nóng", "donVi": "°C", "kieu": "so", "giaTri": 70, "ghiChu": "Theo công thức Vmp nóng trong file yêu cầu" },
+    { "ma": "rhoDong", "ten": "Điện trở suất đồng ρ", "donVi": "Ω·mm²/m", "kieu": "so", "giaTri": 0.0175 },
+    { "ma": "nguongSutApPhanTram", "ten": "Ngưỡng cảnh báo sụt áp DC", "donVi": "%", "kieu": "so", "giaTri": 2 },
+    { "ma": "dcAcMin", "ten": "Tỉ lệ DC/AC thấp nhất", "kieu": "so", "giaTri": 1.0 },
+    { "ma": "dcAcMax", "ten": "Tỉ lệ DC/AC cao nhất", "kieu": "so", "giaTri": 1.3 },
+    { "ma": "suyGiamNamPhanTram", "ten": "Suy giảm hiệu suất tấm mỗi năm", "donVi": "%/năm", "kieu": "so", "giaTri": 0.5 },
+    { "ma": "chuaMepMaiTonM", "ten": "Khoảng chừa mép – mái tôn", "donVi": "m", "kieu": "so", "giaTri": "[CẦN ĐIỀN]", "ghiChu": "Dùng ở Giai đoạn 3 (xếp pin)" },
+    { "ma": "chuaMepMaiBeTongM", "ten": "Khoảng chừa mép – mái bê tông", "donVi": "m", "kieu": "so", "giaTri": "[CẦN ĐIỀN]", "ghiChu": "Dùng ở Giai đoạn 3 (xếp pin)" }
+  ]
+}

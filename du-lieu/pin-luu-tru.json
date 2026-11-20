@@ -1,0 +1,17 @@
+{
+  "tieuDe": "Danh mục pin lưu trữ",
+  "moTa": "Chỉ cần nếu có bán hệ hybrid.",
+  "bang": {
+    "tieuDe": "Các loại pin lưu trữ",
+    "cot": [
+      { "ma": "model", "ten": "Model", "kieu": "chu" },
+      { "ma": "dungLuongKWh", "ten": "Dung lượng", "donVi": "kWh", "kieu": "so" },
+      { "ma": "dienApV", "ten": "Điện áp", "donVi": "V", "kieu": "so" },
+      { "ma": "inverterTuongThich", "ten": "Inverter tương thích", "kieu": "chu" },
+      { "ma": "gia", "ten": "Giá", "donVi": "đ", "kieu": "so" }
+    ],
+    "dong": [
+      { "model": "[CẦN ĐIỀN]", "dungLuongKWh": "[CẦN ĐIỀN]", "dienApV": "[CẦN ĐIỀN]", "inverterTuongThich": "[CẦN ĐIỀN]", "gia": "[CẦN ĐIỀN]" }
+    ]
+  }
+}

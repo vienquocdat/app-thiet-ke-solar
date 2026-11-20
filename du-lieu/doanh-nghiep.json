@@ -1,0 +1,13 @@
+{
+  "tieuDe": "Thông tin doanh nghiệp",
+  "moTa": "In trên đầu app và trên báo giá PDF.",
+  "truong": [
+    { "ma": "tenThuongHieu", "ten": "Tên thương hiệu", "kieu": "chu", "giaTri": "[CẦN ĐIỀN]" },
+    { "ma": "tenDayDu", "ten": "Tên công ty đầy đủ", "kieu": "chu", "giaTri": "[CẦN ĐIỀN]" },
+    { "ma": "logo", "ten": "File logo", "kieu": "chu", "giaTri": "anh/logo-tdh.png" },
+    { "ma": "hotline", "ten": "Hotline", "kieu": "chu", "giaTri": "[CẦN ĐIỀN]" },
+    { "ma": "zalo", "ten": "Zalo", "kieu": "chu", "giaTri": "[CẦN ĐIỀN]" },
+    { "ma": "diaChi", "ten": "Địa chỉ", "kieu": "chu", "giaTri": "[CẦN ĐIỀN]" },
+    { "ma": "khuVuc", "ten": "Khu vực hoạt động", "kieu": "chu", "giaTri": "[CẦN ĐIỀN]" }
+  ]
+}

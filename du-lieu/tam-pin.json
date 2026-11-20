@@ -1,0 +1,25 @@
+{
+  "tieuDe": "Danh mục tấm pin",
+  "moTa": "Lấy đúng từ datasheet của hãng. Giá là giá bán cho khách.",
+  "truong": [
+    { "ma": "giaDaGomVAT", "ten": "Giá đã gồm VAT chưa", "kieu": "chon", "tuyChon": ["[CẦN ĐIỀN]", "Đã gồm VAT", "Chưa gồm VAT"], "giaTri": "[CẦN ĐIỀN]" }
+  ],
+  "bang": {
+    "tieuDe": "Các loại tấm pin",
+    "cot": [
+      { "ma": "model", "ten": "Model", "kieu": "chu" },
+      { "ma": "congSuatW", "ten": "Công suất", "donVi": "W", "kieu": "so" },
+      { "ma": "daiMm", "ten": "Chiều dài", "donVi": "mm", "kieu": "so" },
+      { "ma": "rongMm", "ten": "Chiều rộng", "donVi": "mm", "kieu": "so" },
+      { "ma": "vocV", "ten": "Voc", "donVi": "V", "kieu": "so" },
+      { "ma": "iscA", "ten": "Isc", "donVi": "A", "kieu": "so" },
+      { "ma": "vmpV", "ten": "Vmp", "donVi": "V", "kieu": "so" },
+      { "ma": "impA", "ten": "Imp", "donVi": "A", "kieu": "so" },
+      { "ma": "heSoNhietVoc", "ten": "Hệ số nhiệt Voc", "donVi": "%/°C", "kieu": "so", "goiY": "số âm, vd −0,25" },
+      { "ma": "gia", "ten": "Giá", "donVi": "đ/tấm", "kieu": "so" }
+    ],
+    "dong": [
+      { "model": "[CẦN ĐIỀN]", "congSuatW": "[CẦN ĐIỀN]", "daiMm": "[CẦN ĐIỀN]", "rongMm": "[CẦN ĐIỀN]", "vocV": "[CẦN ĐIỀN]", "iscA": "[CẦN ĐIỀN]", "vmpV": "[CẦN ĐIỀN]", "impA": "[CẦN ĐIỀN]", "heSoNhietVoc": "[CẦN ĐIỀN]", "gia": "[CẦN ĐIỀN]" }
+    ]
+  }
+}

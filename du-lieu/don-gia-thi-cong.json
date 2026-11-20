@@ -1,0 +1,22 @@
+{
+  "tieuDe": "Đơn giá thi công",
+  "moTa": "Giá bán cho khách.",
+  "truong": [
+    { "ma": "giaDaGomVAT", "ten": "Giá đã gồm VAT chưa", "kieu": "chon", "tuyChon": ["[CẦN ĐIỀN]", "Đã gồm VAT", "Chưa gồm VAT"], "giaTri": "[CẦN ĐIỀN]" },
+    { "ma": "khungApMaiTon", "ten": "Khung áp mái tôn", "donVi": "đ/kWp", "kieu": "so", "giaTri": "[CẦN ĐIỀN]" },
+    { "ma": "capTuDienBaoVe", "ten": "Cáp, tủ điện, thiết bị bảo vệ, tiếp địa", "donVi": "đ/kWp", "kieu": "so", "giaTri": "[CẦN ĐIỀN]" },
+    { "ma": "nhanCong", "ten": "Nhân công lắp đặt", "donVi": "đ/kWp", "kieu": "so", "giaTri": "[CẦN ĐIỀN]" },
+    { "ma": "chongPhatNguoc", "ten": "Chống phát ngược (khách không bán điện)", "donVi": "đ", "kieu": "so", "giaTri": "[CẦN ĐIỀN]" }
+  ],
+  "bang": {
+    "tieuDe": "Khung nâng trên mái bê tông (theo chiều cao khung)",
+    "cot": [
+      { "ma": "caoTuM", "ten": "Chiều cao từ", "donVi": "m", "kieu": "so" },
+      { "ma": "caoDenM", "ten": "Chiều cao đến", "donVi": "m", "kieu": "so" },
+      { "ma": "donGia", "ten": "Đơn giá", "donVi": "đ/kWp", "kieu": "so" }
+    ],
+    "dong": [
+      { "caoTuM": "[CẦN ĐIỀN]", "caoDenM": "[CẦN ĐIỀN]", "donGia": "[CẦN ĐIỀN]" }
+    ]
+  }
+}
