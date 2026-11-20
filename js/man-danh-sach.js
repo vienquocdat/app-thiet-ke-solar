@@ -41,7 +41,12 @@ const ManDanhSach = (() => {
     const oFile = TI.el('input', { type: 'file', accept: '.json,application/json', hidden: true,
       onchange: async (e) => { const f = e.target.files[0]; e.target.value = ''; if (f) await nhapTuFile(f); } });
 
+    let tongThieu = 0;
+    for (const ten of DuLieu.DANH_SACH) tongThieu += DuLieu.demCanDien(await DuLieu.lay(ten));
+
     v.replaceChildren(
+      tongThieu ? TI.el('a', { class: 'the canh-bao nho lien-ket-cai-dat', href: '#/cai-dat' },
+        `Số liệu chung còn ${tongThieu} ô ${CAN_DIEN} (thiết bị, giá, giá điện, hằng số). Bấm để điền trong Cài đặt →`) : null,
       TI.el('div', { class: 'hang' },
         TI.el('button', { class: 'nut chinh to', onclick: taoHoSoMoi }, '+ Hồ sơ mới')),
       oTim,

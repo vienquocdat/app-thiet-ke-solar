@@ -1,7 +1,7 @@
 // Khung app: đọc địa chỉ sau dấu # để biết đang ở màn hình nào.
 //   #/                       → danh sách hồ sơ
 //   #/ho-so/<mã>/<thẻ>       → hồ sơ khách (thẻ: khao-sat, ve-mai, xep-pin, 3d, ky-thuat, bao-gia)
-//   #/cai-dat                → cài đặt
+//   #/cai-dat[/<tên file>]   → cài đặt (mở sẵn mục của file đó)
 const App = (() => {
   const vung = () => document.getElementById('noi-dung');
 
@@ -17,7 +17,7 @@ const App = (() => {
     try {
       await ManHoSo.luuNeuDangCho();
       if (phan[0] === 'ho-so' && phan[1]) await ManHoSo.ve(v, phan[1], phan[2] || 'khao-sat');
-      else if (phan[0] === 'cai-dat') await ManCaiDat.ve(v);
+      else if (phan[0] === 'cai-dat') await ManCaiDat.ve(v, phan[1]);
       else await ManDanhSach.ve(v);
     } catch (e) {
       console.error(e);

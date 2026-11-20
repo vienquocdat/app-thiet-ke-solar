@@ -1,14 +1,14 @@
 // Màn hình 4: Cài đặt – xem và sửa các file số liệu trong du-lieu/.
 // Mọi ô có kiểu (chữ / số / chọn) lấy từ chính file JSON, nên thêm cột mới chỉ cần sửa file, không sửa code.
 const ManCaiDat = (() => {
-  async function ve(v) {
+  async function ve(v, moMuc) {
     App.datTieuDe('Cài đặt');
     const cacMuc = [];
     let tongCanDien = 0;
     for (const ten of DuLieu.DANH_SACH) {
       const nd = await DuLieu.lay(ten);
       tongCanDien += DuLieu.demCanDien(nd);
-      cacMuc.push(await veMuc(ten, nd));
+      cacMuc.push(await veMuc(ten, nd, ten === moMuc));
     }
     v.replaceChildren(
       TI.el('a', { href: '#/', class: 'quay-lai' }, '‹ Danh sách'),
@@ -18,9 +18,11 @@ const ManCaiDat = (() => {
           : 'Đã điền đủ số liệu.'),
       TI.el('p', { class: 'mo nho' }, 'Số thập phân gõ dấu phẩy, ví dụ 0,8. Để trống ô nghĩa là chưa có số liệu.'),
       ...cacMuc);
+    const mo = v.querySelector('details[open]');
+    if (mo) requestAnimationFrame(() => mo.scrollIntoView({ block: 'start' }));
   }
 
-  async function veMuc(ten, nd) {
+  async function veMuc(ten, nd, moSan = false) {
     const ngaySua = await DuLieu.thongTinSua(ten);
     const soThieu = DuLieu.demCanDien(nd);
     const huyHieu = TI.el('span', { class: 'nhan ' + (soThieu ? 'nhan-thieu' : 'nhan-du') }, soThieu ? `${soThieu} ô cần điền` : 'Đủ');
@@ -54,7 +56,7 @@ const ManCaiDat = (() => {
       } }, 'Về mặc định'),
       TI.el('button', { class: 'nut', onclick: () => TI.luuFile(`${ten}.json`, JSON.stringify(nd, null, 2) + '\n') }, 'Xuất file')));
 
-    return TI.el('details', { class: 'nhom' },
+    return TI.el('details', { class: 'nhom', open: moSan },
       TI.el('summary', {}, TI.el('span', {}, nd.tieuDe), huyHieu),
       TI.el('div', { class: 'nhom-noi-dung' }, ...noiDung));
   }

@@ -1,6 +1,7 @@
 // Màn hình 2–3: khung hồ sơ khách (các thẻ) + phiếu khảo sát.
 const ManHoSo = (() => {
   const THE = [
+    { ma: 'thong-so', ten: 'Thông số' },
     { ma: 'khao-sat', ten: 'Khảo sát' },
     { ma: 've-mai', ten: 'Vẽ mái', gd: 2 },
     { ma: 'xep-pin', ten: 'Xếp pin', gd: 3 },
@@ -59,6 +60,14 @@ const ManHoSo = (() => {
 
   let hs = null;
   let henLuu = null;
+  let oHuyHieu = null;
+
+  // Số đỏ trên thẻ "Thông số" = số thông số bắt buộc của nhà này còn thiếu.
+  function capNhatHuyHieu(n) {
+    if (!oHuyHieu) return;
+    oHuyHieu.textContent = n ? String(n) : '✓';
+    oHuyHieu.classList.toggle('du', !n);
+  }
   let oTrangThaiLuu = null;
 
   function luuSau() {
@@ -83,16 +92,21 @@ const ManHoSo = (() => {
     App.datTieuDe(hs.khach.ten || 'Hồ sơ mới');
     oTrangThaiLuu = TI.el('span', { class: 'trang-thai-luu' }, 'Đã lưu ✓');
 
+    oHuyHieu = TI.el('b', { class: 'huy-hieu' });
     const thanhThe = TI.el('nav', { class: 'thanh-the' }, ...THE.map(t =>
-      TI.el('a', { href: `#/ho-so/${hs.id}/${t.ma}`, class: t.ma === the ? 'dang-chon' : '' }, t.ten)));
+      TI.el('a', { href: `#/ho-so/${hs.id}/${t.ma}`, class: t.ma === the ? 'dang-chon' : '' }, t.ten, t.ma === 'thong-so' ? oHuyHieu : null)));
+    capNhatHuyHieu(ManThongSo.demThieu(hs));
 
     const vungThe = TI.el('div', {});
     v.replaceChildren(
       TI.el('div', { class: 'hang-giua' }, TI.el('a', { href: '#/', class: 'quay-lai' }, '‹ Danh sách'), oTrangThaiLuu),
       thanhThe, vungThe);
 
-    const theChon = THE.find(t => t.ma === the) || THE[0];
+    const theChon = THE.find(t => t.ma === the) || THE[1];
+    const nutThe = thanhThe.querySelector('.dang-chon');
+    if (nutThe) requestAnimationFrame(() => nutThe.scrollIntoView({ block: 'nearest', inline: 'nearest' }));
     if (theChon.ma === 'khao-sat') veKhaoSat(vungThe);
+    else if (theChon.ma === 'thong-so') await ManThongSo.ve(vungThe, hs, luuSau);
     else if (theChon.ma === 've-mai') await ManVeMai.ve(vungThe, hs, luuSau);
     else if (theChon.ma === 'xep-pin') await ManXepPin.ve(vungThe, hs, luuSau);
     else vungThe.replaceChildren(TI.el('div', { class: 'the trong' },
@@ -272,5 +286,5 @@ const ManHoSo = (() => {
   document.addEventListener('visibilitychange', () => { if (document.hidden) luuNeuDangCho(); });
   window.addEventListener('pagehide', luuNeuDangCho);
 
-  return { ve, luuNeuDangCho, LOAI_ANH };
+  return { ve, luuNeuDangCho, LOAI_ANH, capNhatHuyHieu };
 })();

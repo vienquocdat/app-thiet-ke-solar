@@ -199,3 +199,14 @@ select.can-dien option { color: var(--chu); }
 .khung-mat-bang canvas { cursor: default; }
 .ds-thieu { margin: 4px 0 6px; padding-left: 18px; }
 .nut-noi-trai button:disabled { opacity: .5; }
+
+/* ---------- Thẻ Thông số, nút Cài đặt ---------- */
+.nut-cai-dat { width: auto; border-radius: 22px; padding: 0 10px; font-size: 15px; gap: 4px; display: flex; align-items: center; white-space: nowrap; }
+.nut-cai-dat span { font-size: 14px; font-weight: 600; }
+.huy-hieu { display: inline-block; min-width: 20px; margin-left: 6px; padding: 0 6px; border-radius: 99px; background: var(--do); color: #fff; font-size: 12px; line-height: 20px; text-align: center; }
+.huy-hieu.du { background: var(--xanh-la); }
+.lien-ket-cai-dat { text-decoration: none; color: var(--chu); }
+.lien-ket-cai-dat small { margin-left: auto; }
+a.nut { display: inline-flex; align-items: center; text-decoration: none; }
+a.nut.can-dien { border-color: #f0b3b3; }
+.nhom { scroll-margin-top: 72px; }

@@ -532,7 +532,11 @@ const ManVeMai = (() => {
         TI.el('label', { class: 'truong' }, TI.el('span', {}, laMai ? 'Tên mảng mái' : 'Tên (không bắt buộc)'),
           TI.el('input', { type: 'text', value: x.ten || '', oninput: (e) => { x.ten = e.target.value; luuSau(); veLai(); } })),
         TI.el('label', { class: 'truong' }, TI.el('span', {}, 'Loại'),
-          TI.el('select', { onchange: (e) => { x.loai = e.target.value; luuSau(); veBang(); veLai(); } },
+          TI.el('select', { onchange: (e) => {
+            x.loai = e.target.value;
+            if (laMai && x.loai === 'ton' && x.doDocDo === 0) x.doDocDo = null; // mái tôn phải nhập độ dốc thật
+            luuSau(); veBang(); veLai();
+          } },
             ...(laMai ? LOAI_MAI : LOAI_VAT_CAN).map(([ma, ten]) => TI.el('option', { value: ma, selected: x.loai === ma }, ten)))),
         laMai
           ? TI.el('label', { class: 'truong' }, TI.el('span', {}, 'Độ dốc mái (mái bằng nhập 0)'),
