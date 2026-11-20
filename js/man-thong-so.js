@@ -14,6 +14,11 @@ const ManThongSo = (() => {
       lay: () => hs.dien.loaiDien, dat: (v) => { hs.dien.loaiDien = v; } });
     const coHoaDon = hs.dien.hoaDon.some(h => SO(h.kWh) && h.kWh > 0);
     lk('Khảo sát', 'Số điện (kWh) ít nhất 1 tháng hóa đơn', coHoaDon, 'khao-sat', coHoaDon ? 'Đã có' : 'Nhập ở thẻ Khảo sát → Hóa đơn');
+    ds.push({ nhom: 'Khảo sát', nhan: 'Điện dùng ban ngày khoảng bao nhiêu', dv: '%', kieu: 'so', batBuoc: true,
+      lay: () => hs.dien.phanTramDungBanNgay, dat: (n) => { hs.dien.phanTramDungBanNgay = n; }, ghiChu: 'Dùng tính tiền tiết kiệm (Báo giá)' });
+    ds.push({ nhom: 'Khảo sát', nhan: 'Khách muốn bán điện dư cho EVN?', kieu: 'chon', batBuoc: true,
+      tc: [['', '— chọn —'], ['Có', 'Có'], ['Không', 'Không'], ['Chưa rõ', 'Chưa rõ']],
+      lay: () => hs.dien.banDienDu, dat: (v) => { hs.dien.banDienDu = v; }, ghiChu: 'Không bán thì báo giá thêm chống phát ngược' });
     ds.push({ nhom: 'Khảo sát', nhan: 'Quãng đường đi dây từ mái đến inverter', dv: 'm', kieu: 'so', batBuoc: true,
       lay: () => hs.dien.quangDuongDayM, dat: (n) => { hs.dien.quangDuongDayM = n; }, ghiChu: 'Dùng tính sụt áp cáp DC (Giai đoạn 5)' });
 

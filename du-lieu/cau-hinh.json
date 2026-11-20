@@ -87,6 +87,14 @@
       "giaTri": 0.5
     },
     {
+      "ma": "hieuSuatPinLuuTruPhanTram",
+      "ten": "Hiệu suất sạc–xả pin lưu trữ",
+      "donVi": "%",
+      "kieu": "so",
+      "giaTri": "[CẦN ĐIỀN]",
+      "ghiChu": "Chỉ dùng cho phương án có pin lưu trữ"
+    },
+    {
       "ma": "chuaMepMaiTonM",
       "ten": "Khoảng chừa mép – mái tôn",
       "donVi": "m",

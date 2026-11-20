@@ -2,12 +2,94 @@
   "tieuDe": "Thông tin doanh nghiệp",
   "moTa": "In trên đầu app và trên báo giá PDF.",
   "truong": [
-    { "ma": "tenThuongHieu", "ten": "Tên thương hiệu", "kieu": "chu", "giaTri": "[CẦN ĐIỀN]" },
-    { "ma": "tenDayDu", "ten": "Tên công ty đầy đủ", "kieu": "chu", "giaTri": "[CẦN ĐIỀN]" },
-    { "ma": "logo", "ten": "File logo", "kieu": "chu", "giaTri": "anh/logo-tdh.png" },
-    { "ma": "hotline", "ten": "Hotline", "kieu": "chu", "giaTri": "[CẦN ĐIỀN]" },
-    { "ma": "zalo", "ten": "Zalo", "kieu": "chu", "giaTri": "[CẦN ĐIỀN]" },
-    { "ma": "diaChi", "ten": "Địa chỉ", "kieu": "chu", "giaTri": "[CẦN ĐIỀN]" },
-    { "ma": "khuVuc", "ten": "Khu vực hoạt động", "kieu": "chu", "giaTri": "[CẦN ĐIỀN]" }
+    {
+      "ma": "tenThuongHieu",
+      "ten": "Tên thương hiệu",
+      "kieu": "chu",
+      "giaTri": "[CẦN ĐIỀN]"
+    },
+    {
+      "ma": "tenDayDu",
+      "ten": "Tên công ty đầy đủ",
+      "kieu": "chu",
+      "giaTri": "[CẦN ĐIỀN]"
+    },
+    {
+      "ma": "logo",
+      "ten": "File logo",
+      "kieu": "chu",
+      "giaTri": "anh/logo-tdh.png"
+    },
+    {
+      "ma": "hotline",
+      "ten": "Hotline",
+      "kieu": "chu",
+      "giaTri": "[CẦN ĐIỀN]"
+    },
+    {
+      "ma": "zalo",
+      "ten": "Zalo",
+      "kieu": "chu",
+      "giaTri": "[CẦN ĐIỀN]"
+    },
+    {
+      "ma": "diaChi",
+      "ten": "Địa chỉ",
+      "kieu": "chu",
+      "giaTri": "[CẦN ĐIỀN]"
+    },
+    {
+      "ma": "khuVuc",
+      "ten": "Khu vực hoạt động",
+      "kieu": "chu",
+      "giaTri": "[CẦN ĐIỀN]"
+    },
+    {
+      "ma": "nguoiTuVan",
+      "ten": "Người tư vấn (in trên báo giá)",
+      "kieu": "chu",
+      "giaTri": "[CẦN ĐIỀN]"
+    },
+    {
+      "ma": "baoHanhTamPinNam",
+      "ten": "Bảo hành sản phẩm tấm pin",
+      "donVi": "năm",
+      "kieu": "so",
+      "giaTri": "[CẦN ĐIỀN]"
+    },
+    {
+      "ma": "baoHanhHieuSuatNam",
+      "ten": "Bảo hành hiệu suất tấm pin",
+      "donVi": "năm",
+      "kieu": "so",
+      "giaTri": "[CẦN ĐIỀN]"
+    },
+    {
+      "ma": "baoHanhInverterNam",
+      "ten": "Bảo hành inverter",
+      "donVi": "năm",
+      "kieu": "so",
+      "giaTri": "[CẦN ĐIỀN]"
+    },
+    {
+      "ma": "baoHanhThiCongNam",
+      "ten": "Bảo hành thi công, chống dột",
+      "donVi": "năm",
+      "kieu": "so",
+      "giaTri": "[CẦN ĐIỀN]"
+    },
+    {
+      "ma": "hieuLucBaoGiaNgay",
+      "ten": "Báo giá có hiệu lực trong",
+      "donVi": "ngày",
+      "kieu": "so",
+      "giaTri": "[CẦN ĐIỀN]"
+    },
+    {
+      "ma": "cacBuocTiepTheo",
+      "ten": "Các bước tiếp theo (mỗi bước cách nhau dấu ;)",
+      "kieu": "chu",
+      "giaTri": "Khảo sát kỹ thuật chi tiết tại nhà; Thống nhất phương án và ký hợp đồng; Lắp đặt hệ thống; Đo kiểm, nghiệm thu và bàn giao; Hướng dẫn theo dõi sản lượng qua ứng dụng"
+    }
   ]
 }
