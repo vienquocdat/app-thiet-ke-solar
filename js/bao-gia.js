@@ -108,18 +108,24 @@ const ManBaoGia = (() => {
   // Tóm tắt phương án đề xuất + danh sách còn thiếu
   function veTomTat(dx, thieu) {
     const kq = dx.kq, pa = dx.pa;
-    const chiSo = (nhan, gt) => TI.el('div', { class: 'bgm-chi-so' }, TI.el('small', {}, nhan), gt ? TI.el('b', {}, gt) : TI.el('b', { class: 'gt-thieu' }, 'chưa có'));
+    // Con số chính là tổng tiền báo giá; các chỉ số khác xếp thành danh sách gọn bên dưới.
+    const gtHoac = (gt) => gt ? TI.el('dd', {}, gt) : TI.el('dd', {}, TI.el('span', { class: 'gt-thieu' }, 'chưa có'));
     return TI.el('div', { class: 'bgm-tom-tat' },
       TI.el('div', { class: 'bgm-tom-tat-dau' }, TI.el('span', {}, 'Phương án đề xuất'), TI.el('b', {}, pa.ten)),
-      TI.el('div', { class: 'bgm-luoi-chi-so' },
-        chiSo('Công suất', SO(pa.kWp) ? `${TI.soVN(pa.kWp, 2)} kWp` : null),
-        chiSo('Tổng chi phí', SO(kq.chiPhi.tong) ? tienGon(kq.chiPhi.tong) : null),
-        chiSo('Tiết kiệm mỗi tháng', SO(kq.tietKiemNam1) ? tienGon(kq.tietKiemNam1 / 12) : null),
-        chiSo('Hoàn vốn dự kiến', SO(kq.hoanVon) ? `khoảng ${TI.soVN(kq.hoanVon, 1)} năm` : null)),
+      TI.el('div', { class: 'bgm-tong' }, TI.el('small', {}, 'Tổng chi phí'),
+        SO(kq.chiPhi.tong) ? TI.el('b', {}, tien(kq.chiPhi.tong)) : TI.el('b', { class: 'gt-thieu' }, 'chưa có')),
+      TI.el('dl', { class: 'bgm-dl' },
+        TI.el('dt', {}, 'Công suất'), gtHoac(SO(pa.kWp) ? `${TI.soVN(pa.kWp, 2)} kWp (${pa.soTam} tấm)` : null),
+        TI.el('dt', {}, 'Tiết kiệm mỗi tháng'), gtHoac(SO(kq.tietKiemNam1) ? tienGon(kq.tietKiemNam1 / 12) : null),
+        TI.el('dt', {}, 'Hoàn vốn dự kiến'), gtHoac(SO(kq.hoanVon) ? `khoảng ${TI.soVN(kq.hoanVon, 1)} năm` : null)),
       thieu.length
         ? TI.el('div', { class: 'the canh-bao nho' },
           TI.el('div', { class: 'co-icon' }, Icon('alert-triangle'), TI.el('b', {}, `Còn thiếu ${thieu.length} mục – chỉ xuất được bản nháp nội bộ`)),
-          TI.el('ul', { class: 'ds-thieu' }, ...thieu.map(t => TI.el('li', {}, t))),
+          // Danh sách dài thì chỉ hiện 4 mục đầu, phần còn lại gập lại (tránh chiếm cả cột tóm tắt).
+          TI.el('ul', { class: 'ds-thieu' }, ...thieu.slice(0, 4).map(t => TI.el('li', {}, t))),
+          thieu.length > 5 ? TI.el('details', { class: 'xem-them' }, TI.el('summary', {}, `Xem thêm ${thieu.length - 4} mục`),
+            TI.el('ul', { class: 'ds-thieu' }, ...thieu.slice(4).map(t => TI.el('li', {}, t))))
+            : thieu.length === 5 ? TI.el('ul', { class: 'ds-thieu' }, TI.el('li', {}, thieu[4])) : null,
           TI.el('div', { class: 'hang' }, TI.el('a', { class: 'lien-ket-icon', href: '#/cai-dat' }, 'Cài đặt', Icon('arrow-right', { co: 16 })),
             TI.el('a', { class: 'lien-ket-icon', href: `#/ho-so/${hs.id}/thong-so` }, 'Thông số', Icon('arrow-right', { co: 16 }))))
         : TI.el('div', { class: 'the dat nho co-icon' }, Icon('circle-check'), 'Đủ số liệu để xuất báo giá gửi khách.'));
