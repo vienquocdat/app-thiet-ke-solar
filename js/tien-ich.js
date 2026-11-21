@@ -25,6 +25,39 @@ const TI = {
     return v === CAN_DIEN || v === undefined || v === null || v === '';
   },
 
+  // Số tiền bằng chữ: 125000000 → "Một trăm hai mươi lăm triệu đồng chẵn"
+  tienBangChu(n) {
+    n = Math.round(Number(n));
+    if (!isFinite(n) || n < 0) return '';
+    if (n === 0) return 'Không đồng';
+    const cs = ['không', 'một', 'hai', 'ba', 'bốn', 'năm', 'sáu', 'bảy', 'tám', 'chín'];
+    const ba = (so, day) => {   // đọc 1 nhóm 3 chữ số; day = đã có nhóm lớn hơn đứng trước
+      const tr = Math.floor(so / 100), ch = Math.floor((so % 100) / 10), dv = so % 10, s = [];
+      if (tr || day) s.push(cs[tr] + ' trăm');
+      if (ch > 1) {
+        s.push(cs[ch] + ' mươi');
+        if (dv === 1) s.push('mốt'); else if (dv === 4) s.push('tư'); else if (dv === 5) s.push('lăm'); else if (dv) s.push(cs[dv]);
+      } else if (ch === 1) {
+        s.push('mười');
+        if (dv === 5) s.push('lăm'); else if (dv) s.push(cs[dv]);
+      } else if (dv) {
+        if (tr || day) s.push('lẻ');
+        s.push(cs[dv]);
+      }
+      return s.join(' ');
+    };
+    const ten = ['', 'nghìn', 'triệu', 'tỷ', 'nghìn tỷ', 'triệu tỷ'];
+    const nhom = [];
+    for (let x = n; x > 0; x = Math.floor(x / 1000)) nhom.push(x % 1000);
+    const phan = [];
+    for (let i = nhom.length - 1; i >= 0; i--) {
+      if (!nhom[i]) continue;
+      phan.push((ba(nhom[i], phan.length > 0) + ' ' + ten[i]).trim());
+    }
+    const chu = phan.join(' ') + (n % 1000 === 0 ? ' đồng chẵn' : ' đồng');
+    return chu.charAt(0).toUpperCase() + chu.slice(1);
+  },
+
   // Hiển thị số kiểu Việt Nam: 1.234.567,5
   soVN(n, toiDaLe = 6) {
     if (TI.laCanDien(n) || isNaN(Number(n))) return '';

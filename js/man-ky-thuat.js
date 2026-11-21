@@ -5,7 +5,8 @@ const ManKyThuat = (() => {
   const CFG = ['tMin', 'tVmpNong', 'rhoDong', 'nguongSutApPhanTram', 'dcAcMin', 'dcAcMax', 'heSoCBDC', 'soChuoiCanCauChi', 'heSoCauChi', 'heSoCBAC'];
   let hs, luuSau, vung, cfg, dsTP, dsINV;
 
-  const so = (x, le = 2) => SO(x) ? TI.soVN(x, le) : CAN_DIEN;
+  const CHUA = 'chưa có';   // chữ hiện ở chỗ thiếu số liệu (trong file du-lieu vẫn là [CẦN ĐIỀN])
+  const so = (x, le = 2) => SO(x) ? TI.soVN(x, le) : CHUA;
 
   async function ve(v, hoSo, hamLuu) {
     hs = hoSo; luuSau = hamLuu; vung = v;
@@ -29,19 +30,20 @@ const ManKyThuat = (() => {
     const { tp, inv, nhomTam } = duLieuVao();
     if (!nhomTam.length) {
       vung.replaceChildren(TI.el('div', { class: 'the trong' }, TI.el('b', {}, 'Chưa có tấm pin nào'),
-        TI.el('p', { class: 'mo' }, 'Cần xếp pin ở thẻ "Xếp pin" trước.'),
-        TI.el('a', { class: 'nut', href: `#/ho-so/${hs.id}/xep-pin` }, 'Sang thẻ Xếp pin')));
+        TI.el('p', { class: 'mo' }, 'Cần xếp pin ở bước Xếp pin trước.'),
+        TI.el('a', { class: 'nut', href: `#/ho-so/${hs.id}/xep-pin` }, 'Sang bước Xếp pin')));
       return;
     }
     const kq = KyThuat.tinh({ tp, inv, cfg, nhomTam, dat: hs.kyThuat, chieuDaiMacDinh: hs.dien.quangDuongDayM, loaiDien: hs.dien.loaiDien });
     vung.replaceChildren(
       veThieu(kq, tp),
-      veInverter(kq, tp, inv),
-      veNhietDo(kq, tp),
-      veChuoi(kq, tp, inv),
-      veCap(kq),
-      veBaoVe(kq, inv),
-      veSoDo(kq, tp, inv));
+      TI.el('div', { class: 'luoi-nhom' },
+        veInverter(kq, tp, inv),
+        veNhietDo(kq, tp),
+        veChuoi(kq, tp, inv),
+        veCap(kq),
+        veBaoVe(kq, inv),
+        veSoDo(kq, tp, inv)));
   }
 
   function doi() { luuSau(); veLai(); }
@@ -49,13 +51,13 @@ const ManKyThuat = (() => {
   // ---------- Thiếu số liệu + kết luận chung ----------
   function veThieu(kq, tp) {
     const ds = [];
-    if (!tp) ds.push('Chưa chọn loại tấm pin (thẻ Xếp pin)');
+    if (!tp) ds.push('Chưa chọn loại tấm pin (bước Xếp pin)');
     if (kq.thieuTP.length && tp) ds.push(`Tấm pin ${tp.model}: ${kq.thieuTP.join(', ')}`);
     if (!dsINV.length) ds.push('Danh mục inverter chưa có model nào');
     else if (hs.kyThuat.inverter && kq.thieuINV.length) ds.push(`Inverter ${hs.kyThuat.inverter}: ${kq.thieuINV.join(', ')}`);
     if (kq.thieuCFG.length) ds.push(`Hằng số: ${kq.thieuCFG.join(', ')}`);
     const the = [];
-    if (ds.length) the.push(TI.el('div', { class: 'the canh-bao nho' }, TI.el('b', {}, `Còn thiếu số liệu (${CAN_DIEN}):`),
+    if (ds.length) the.push(TI.el('div', { class: 'the canh-bao nho' }, TI.el('b', {}, 'Còn thiếu số liệu:'),
       TI.el('ul', { class: 'ds-thieu' }, ...ds.map(t => TI.el('li', {}, t))), TI.el('a', { href: '#/cai-dat', class: 'lien-ket-icon' }, 'Điền trong Cài đặt', Icon('arrow-right', { co: 18 }))));
     if (kq.loi.length) the.push(TI.el('div', { class: 'the loi nho' }, TI.el('b', {}, 'Lỗi thiết kế:'), TI.el('ul', { class: 'ds-thieu' }, ...kq.loi.map(t => TI.el('li', {}, t)))));
     if (kq.canhBao.length) the.push(TI.el('div', { class: 'the canh-bao nho' }, TI.el('b', {}, 'Cảnh báo:'), TI.el('ul', { class: 'ds-thieu' }, ...kq.canhBao.map(t => TI.el('li', {}, t)))));
@@ -73,7 +75,7 @@ const ManKyThuat = (() => {
   function veInverter(kq, tp, inv) {
     const kWpTam = SO(kq.kWp) ? kq.kWp : null;
     const chon = TI.el('select', { onchange: (e) => { hs.kyThuat.inverter = e.target.value || null; doi(); } },
-      TI.el('option', { value: '' }, dsINV.length ? '— chọn inverter —' : `(${CAN_DIEN} danh mục inverter)`),
+      TI.el('option', { value: '' }, dsINV.length ? '— chọn inverter —' : `(${CHUA} danh mục inverter)`),
       ...dsINV.map(d => {
         let goiY = '';
         if (kWpTam && SO(d.congSuatACkW) && SO(cfg.dcAcMin) && SO(cfg.dcAcMax)) {
@@ -86,9 +88,9 @@ const ManKyThuat = (() => {
     const ds = [
       TI.el('label', { class: 'truong' }, TI.el('span', {}, 'Inverter'), chon),
       TI.el('label', { class: 'truong' }, TI.el('span', {}, 'Số lượng inverter'),
-        TI.el('div', { class: 'co-don-vi' }, TI.oSo(hs.kyThuat.soLuong, (n) => { hs.kyThuat.soLuong = n; luuSau(); }, { onchange: veLai }), TI.el('i', {}, 'cái'))),
+        ONhap.hauTo(TI.oSo(hs.kyThuat.soLuong, (n) => { hs.kyThuat.soLuong = n; luuSau(); }, { onchange: veLai }), 'cái')),
       dong('Số tấm', String(kq.soTam)),
-      dong('Công suất DC', SO(kq.kWp) ? `${TI.soVN(kq.kWp, 2)} kWp` : CAN_DIEN),
+      dong('Công suất DC', SO(kq.kWp) ? `${TI.soVN(kq.kWp, 2)} kWp` : CHUA),
     ];
     if (SO(kq.dcAc)) {
       ds.push(dong('Công suất AC', `${TI.soVN(kq.pAC, 2)} kW`),
@@ -155,16 +157,16 @@ const ManKyThuat = (() => {
         TI.el('b', {}, n.ten),
         TI.el('div', { class: 'luoi-o' },
           TI.el('label', { class: 'truong' }, TI.el('span', {}, 'Chiều dài cáp 1 chiều'),
-            TI.el('div', { class: 'co-don-vi' }, TI.oSo(dat.chieuDaiM ?? c.Lm, (x) => { dat.chieuDaiM = x; luuSau(); }, { onchange: veLai, placeholder: CAN_DIEN }), TI.el('i', {}, 'm'))),
+            ONhap.hauTo(TI.oSo(dat.chieuDaiM ?? c.Lm, (x) => { dat.chieuDaiM = x; luuSau(); }, { onchange: veLai, placeholder: 'Nhập chiều dài' }), 'm')),
           TI.el('label', { class: 'truong' }, TI.el('span', {}, 'Tiết diện'),
             TI.el('select', { onchange: (e) => { dat.tietDien = e.target.value ? Number(e.target.value) : null; doi(); } },
               TI.el('option', { value: '' }, `Tự chọn (${SO(c.S) ? TI.soVN(c.S) + ' mm²' : '?'})`),
               ...KyThuat.TIET_DIEN_DC.map(s => TI.el('option', { value: String(s), selected: dat.tietDien === s }, `${s} mm²`))))),
-        SO(c.dU) ? dong('Sụt áp', [`${TI.soVN(c.dU, 2)} V = ${TI.soVN(c.phanTram, 2)}% `, ket(c.dat)], c.dat ? 'dat' : 'khong-dat') : dong('Sụt áp', CAN_DIEN),
+        SO(c.dU) ? dong('Sụt áp', [`${TI.soVN(c.dU, 2)} V = ${TI.soVN(c.phanTram, 2)}% `, ket(c.dat)], c.dat ? 'dat' : 'khong-dat') : dong('Sụt áp', CHUA),
         SO(c.dU) ? congThuc(`ΔU = 2 × ${TI.soVN(c.Lm)} × ${TI.soVN(c.I)} × ${TI.soVN(cfg.rhoDong, 4)} ÷ ${TI.soVN(c.S)} = ${TI.soVN(c.dU, 3)} V; ` +
           `${TI.soVN(c.dU, 3)} ÷ ${TI.soVN(n.vmpChuoi, 1)} V = ${TI.soVN(c.phanTram, 2)}% (ngưỡng ${TI.soVN(cfg.nguongSutApPhanTram)}%)`) : null);
     });
-    ds.push(TI.el('p', { class: 'mo nho' }, 'Chiều dài mặc định lấy từ "Quãng đường đi dây" ở thẻ Thông số; sửa riêng từng mảng nếu khác. Dòng tính theo Imp của chuỗi.'));
+    ds.push(TI.el('p', { class: 'mo nho' }, 'Chiều dài mặc định lấy từ "Quãng đường đi dây" ở bước Thông số; sửa riêng từng mảng nếu khác. Dòng tính theo Imp của chuỗi.'));
     return phan('4. Cáp DC (mỗi chuỗi)', ...ds);
   }
 
@@ -175,15 +177,15 @@ const ManKyThuat = (() => {
     const banDu = hs.dien.banDienDu === 'Có';
     const hang = [
       ['CB DC (mỗi MPPT)', `${b.cbDC.soLuong} cái; ≥ ${so(b.cbDC.dongA, 1)} A; ≥ ${TI.soVN(b.cbDC.dienApV, 0)} V DC`,
-        SO(cfg.heSoCBDC) ? `${TI.soVN(cfg.heSoCBDC)} × Isc ${TI.soVN(tp.iscA)} A × ${Math.max(...kq.nhom.map(n => n.chuoiMoiMPPT))} chuỗi` : `Hệ số CB DC ${CAN_DIEN}`],
-      ['Cầu chì chuỗi', !b.cauChi ? CAN_DIEN : b.cauChi.can ? `Cần; ≥ ${so(b.cauChi.dongA, 1)} A` : 'Không cần (ít chuỗi song song)',
-        !b.cauChi ? `Số chuỗi cần cầu chì ${CAN_DIEN}` : b.cauChi.can && SO(cfg.heSoCauChi) ? `${TI.soVN(cfg.heSoCauChi)} × Isc ${TI.soVN(tp.iscA)} A` : `Cần khi ≥ ${TI.soVN(cfg.soChuoiCanCauChi)} chuỗi/MPPT`],
+        SO(cfg.heSoCBDC) ? `${TI.soVN(cfg.heSoCBDC)} × Isc ${TI.soVN(tp.iscA)} A × ${Math.max(...kq.nhom.map(n => n.chuoiMoiMPPT))} chuỗi` : `Hệ số CB DC ${CHUA}`],
+      ['Cầu chì chuỗi', !b.cauChi ? CHUA : b.cauChi.can ? `Cần; ≥ ${so(b.cauChi.dongA, 1)} A` : 'Không cần (ít chuỗi song song)',
+        !b.cauChi ? `Số chuỗi cần cầu chì ${CHUA}` : b.cauChi.can && SO(cfg.heSoCauChi) ? `${TI.soVN(cfg.heSoCauChi)} × Isc ${TI.soVN(tp.iscA)} A` : `Cần khi ≥ ${TI.soVN(cfg.soChuoiCanCauChi)} chuỗi/MPPT`],
       ['Chống sét lan truyền DC (SPD DC)', `Điện áp làm việc ≥ ${TI.soVN(b.spdDC.dienApV, 0)} V DC`, 'Theo Voc tối đa của chuỗi dài nhất'],
       ['CB AC (mỗi inverter)', `${b.cbAC.soLuong} cái; ≥ ${so(b.cbAC.dongA, 1)} A, ${inv.soPha !== CAN_DIEN ? inv.soPha : '?'}`,
-        SO(b.cbAC.dongA) ? `${TI.soVN(cfg.heSoCBAC)} × ${TI.soVN(inv.dongACmaxA)} A` : `Hệ số CB AC hoặc dòng AC inverter ${CAN_DIEN}`],
+        SO(b.cbAC.dongA) ? `${TI.soVN(cfg.heSoCBAC)} × ${TI.soVN(inv.dongACmaxA)} A` : `Hệ số CB AC hoặc dòng AC inverter ${CHUA}`],
       ['Chống sét lan truyền AC (SPD AC)', inv.soPha !== CAN_DIEN ? inv.soPha : '?', 'Theo điện áp lưới'],
       ['Tiếp địa', 'Khung, vỏ tủ, SPD nối đất', 'Đo điện trở tiếp địa khi nghiệm thu'],
-      ['Chống phát ngược', banDu ? 'Không cần (khách bán điện dư)' : 'Cần (khách không bán điện dư)', hs.dien.banDienDu ? '' : 'Chưa hỏi khách ở thẻ Khảo sát'],
+      ['Chống phát ngược', banDu ? 'Không cần (khách bán điện dư)' : 'Cần (khách không bán điện dư)', hs.dien.banDienDu ? '' : 'Chưa hỏi khách ở bước Khảo sát'],
     ];
     return phan('5. Thiết bị bảo vệ',
       TI.el('table', { class: 'bang-so bang-bao-ve' },
@@ -197,7 +199,7 @@ const ManKyThuat = (() => {
     if (!kq.nhom.length || !inv) return phan('6. Sơ đồ một sợi', TI.el('p', { class: 'mo nho' }, 'Chia chuỗi xong sẽ vẽ sơ đồ.'));
     const svg = soDoSVG(kq, tp, inv);
     return phan('6. Sơ đồ một sợi', TI.el('div', { class: 'so-do', html: svg }),
-      TI.el('div', { class: 'hang' }, TI.el('button', { type: 'button', class: 'nut nho', onclick: () => TI.luuFile(`so-do-mot-soi-${TI.tenFile(hs.khach.ten)}.svg`, svg, 'image/svg+xml') }, 'Tải sơ đồ về máy')));
+      TI.el('div', { class: 'hang' }, TI.el('button', { type: 'button', class: 'nut nho', onclick: () => TI.luuFile(`so-do-mot-soi-${TI.tenFile(hs.khach.ten)}.svg`, svg, 'image/svg+xml') }, ...Icon.chu('download', 'Tải sơ đồ về máy'))));
   }
 
   function soDoSVG(kq, tp, inv) {
@@ -223,14 +225,14 @@ const ManKyThuat = (() => {
     tamO.forEach(([x, yy]) => day(x, yy, x, yTuDC));
     const b = kq.baoVe;
     hop(30, yTuDC, W - 60, 60, ['Tủ DC',
-      `CB DC ≥ ${SO(b.cbDC.dongA) ? TI.soVN(b.cbDC.dongA, 1) : CAN_DIEN} A, ≥ ${TI.soVN(b.cbDC.dienApV, 0)} V × ${b.cbDC.soLuong}`,
-      `SPD DC ≥ ${TI.soVN(b.spdDC.dienApV, 0)} V${b.cauChi && b.cauChi.can ? ` · Cầu chì ≥ ${SO(b.cauChi.dongA) ? TI.soVN(b.cauChi.dongA, 1) : CAN_DIEN} A` : ''}`]);
+      `CB DC ≥ ${SO(b.cbDC.dongA) ? TI.soVN(b.cbDC.dongA, 1) : CHUA} A, ≥ ${TI.soVN(b.cbDC.dienApV, 0)} V × ${b.cbDC.soLuong}`,
+      `SPD DC ≥ ${TI.soVN(b.spdDC.dienApV, 0)} V${b.cauChi && b.cauChi.can ? ` · Cầu chì ≥ ${SO(b.cauChi.dongA) ? TI.soVN(b.cauChi.dongA, 1) : CHUA} A` : ''}`]);
     y = yTuDC + 60;
     day(W / 2, y, W / 2, y + 18); y += 18;
     const yInv = y + 24;
     hop(40, y, W - 80, 48, [`Inverter ${inv.model}`.slice(0, 40), `${kq.soLuong} × ${TI.soVN(inv.congSuatACkW)} kW · ${inv.soPha} · DC/AC ${TI.soVN(kq.dcAc, 2)}`], '#e65100', '#fff6e6');
     y += 48; day(W / 2, y, W / 2, y + 18); y += 18;
-    hop(30, y, W - 60, 46, ['Tủ AC', `CB AC ≥ ${SO(b.cbAC.dongA) ? TI.soVN(b.cbAC.dongA, 1) : CAN_DIEN} A × ${b.cbAC.soLuong} · SPD AC`]);
+    hop(30, y, W - 60, 46, ['Tủ AC', `CB AC ≥ ${SO(b.cbAC.dongA) ? TI.soVN(b.cbAC.dongA, 1) : CHUA} A × ${b.cbAC.soLuong} · SPD AC`]);
     const yTuAC = y;
     y += 46;
     if (hs.dien.banDienDu !== 'Có') {

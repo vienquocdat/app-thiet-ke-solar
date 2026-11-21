@@ -15,6 +15,12 @@
       "giaTri": "[CẦN ĐIỀN]"
     },
     {
+      "ma": "maSoThue",
+      "ten": "Mã số thuế",
+      "kieu": "chu",
+      "giaTri": "[CẦN ĐIỀN]"
+    },
+    {
       "ma": "logo",
       "ten": "File logo",
       "kieu": "chu",
