@@ -1,6 +1,10 @@
 # App thiết kế & báo giá điện mặt trời – TDH Solar
 
-Web app tĩnh (HTML/CSS/JS), chạy trên điện thoại và máy tính, đưa lên GitHub Pages được.
+Web app tĩnh (HTML/CSS/JS), chạy trên điện thoại và máy tính.
+
+**Mở app:** https://vienquocdat.github.io/app-thiet-ke-solar/
+
+Lưu ý: kho này công khai. Không điền giá bán vào `du-lieu/` nếu không muốn người ngoài xem được; nhập giá trong màn hình Cài đặt của app (chỉ lưu trên máy đang dùng). Ảnh khảo sát của khách không đưa lên kho.
 
 ## Mở app trên máy tính để thử
 Trình duyệt không cho đọc các file số liệu khi bấm đúp vào `index.html`, nên cần một máy chủ tạm:
