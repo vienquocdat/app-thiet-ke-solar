@@ -76,11 +76,14 @@ const ManDung3D = (() => {
       TI.el('button', { type: 'button', class: ma === gocDangXem ? 'dang-chon' : '', onclick: (e) => {
         gocDangXem = ma; thanhGoc.querySelectorAll('button').forEach(b => b.classList.toggle('dang-chon', b === e.target)); datGoc(ma);
       } }, ten)));
-    v.replaceChildren(thanhGoc, khung3d,
-      TI.el('div', { class: 'hang' },
-        TI.el('button', { type: 'button', class: 'nut chinh', onclick: chupAnh }, ...Icon.chu('camera', 'Chụp ảnh vào hồ sơ')),
-        TI.el('button', { type: 'button', class: 'nut', onclick: taiAnh }, ...Icon.chu('download', 'Tải ảnh về máy'))),
-      vungThongKe, vungCanhBao, veCaiDat());
+    v.replaceChildren(BoCucVe.dung({
+      khung: khung3d,
+      congCu: TI.el('div', { class: 'cong-cu-ve hang-nut-cong-cu' }, thanhGoc,
+        TI.el('button', { type: 'button', class: 'nut chinh nut-chup', onclick: chupAnh, 'aria-label': 'Chụp ảnh vào hồ sơ' },
+          Icon('camera'), TI.el('span', { class: 'chu-chup' }, 'Chụp ảnh vào hồ sơ'))),
+      ben: [TI.el('div', { class: 'hang' }, TI.el('button', { type: 'button', class: 'nut', onclick: taiAnh }, ...Icon.chu('download', 'Tải ảnh về máy'))),
+        vungThongKe, vungCanhBao, veCaiDat()],
+    }));
 
     try { await napThuVien(); }
     catch (e) { khung3d.replaceChildren(TI.el('div', { class: 'the loi' }, e.message)); return; }

@@ -145,7 +145,7 @@ const TienTrinh = (() => {
       TI.el('div', { class: 'ray-khach' }, TI.el('b', {}, coGT(k.ten) ? k.ten : 'Hồ sơ mới'), phu ? TI.el('small', {}, phu) : null),
       TI.el('ol', { class: 'ray-ds' }, ...ds.map(b => TI.el('li', { 'data-tt': b.tt, 'data-goc': b.goc },
         TI.el('a', { class: 'ray-muc', href: `#/ho-so/${hs.id}/${b.ma}`, 'aria-current': b.tt === 'dang' ? 'step' : null,
-          'aria-label': `Bước ${b.so}: ${b.ten} – ${TEN_TT[b.goc]}. ${b.tom}` },
+          title: `${b.ten} – ${b.tom}`, 'aria-label': `Bước ${b.so}: ${b.ten} – ${TEN_TT[b.goc]}. ${b.tom}` },
           iconTT(b), TI.el('span', { class: 'ray-chu' }, TI.el('span', { class: 'ray-ten' }, b.ten), TI.el('small', {}, b.tom))),
         b.tt === 'dang' ? dsThieu(b, false) : null))),
       TI.el('button', { type: 'button', class: 'nut-chu ray-xem-het', onclick: moBang }, Icon('list'), 'Xem mọi chỗ còn thiếu'));

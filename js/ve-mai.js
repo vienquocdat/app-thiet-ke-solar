@@ -11,7 +11,7 @@ const ManVeMai = (() => {
   const CONG_CU = [['ti-le', 'Tỉ lệ'], ['mai', 'Mảng mái'], ['vat-can', 'Vật cản'], ['kiem-tra', 'Đo kiểm tra']];
 
   let hs, luuSau, nguongLech;
-  let anh = null, cv, ctx, khungCv, vungBang, vungTongHop, oGoiY, nutXongNoi, nutLuiNoi;
+  let anh = null, cv, ctx, khungCv, vungBang, vungCongCu, vungTongHop, oGoiY, nutXongNoi, nutLuiNoi;
   let view = { s: 1, ox: 0, oy: 0 }, kt = { w: 0, h: 0 };
   let congCu = 'ti-le';
   let chon = null;        // hình đang chọn: { nhom, id }
@@ -85,8 +85,9 @@ const ManVeMai = (() => {
     } }, ...Icon.chu('arrow-back-up', 'Lùi'));
     khungCv.append(TI.el('div', { class: 'nut-noi-trai' }, nutXongNoi, nutLuiNoi));
     vungBang = TI.el('div', { class: 'bang-ve' });
+    vungCongCu = TI.el('div', { class: 'cong-cu-ve' });
 
-    v.replaceChildren(veChonAnh(), khungCv, vungBang);
+    v.replaceChildren(BoCucVe.dung({ tren: veChonAnh(), khung: khungCv, congCu: vungCongCu, ben: vungBang }));
     ganSuKien();
     quanSat = new ResizeObserver(() => doiCo());
     quanSat.observe(khungCv);
@@ -111,7 +112,7 @@ const ManVeMai = (() => {
       ...dsAnh.map((a, i) => TI.el('option', { value: a.id, selected: a.id === m().anhNen },
         `Ảnh ${i + 1}: ${tenLoai(ManHoSo.LOAI_ANH, a.loai)}${a.ghiChu ? ' – ' + a.ghiChu : ''}`)));
     return TI.el('div', { class: 'hang-anh-nen' }, chonAnh,
-      TI.el('button', { type: 'button', class: 'nut nho', onclick: () => oFile.click() }, 'Tải ảnh'), oFile);
+      TI.el('button', { type: 'button', class: 'nut nho', onclick: () => oFile.click() }, ...Icon.chu('upload', 'Tải ảnh')), oFile);
   }
 
   function coDuLieuVe() {
@@ -450,7 +451,8 @@ const ManVeMai = (() => {
     else if (congCu === 'kiem-tra') nd = bangKiemTra();
     else nd = bangHinh(congCu === 'mai' ? 'mangMai' : 'vatCan');
     vungTongHop = TI.el('div', { class: 'tong-hop' });
-    vungBang.replaceChildren(thanh, nd, vungTongHop);
+    vungCongCu.replaceChildren(thanh);
+    vungBang.replaceChildren(nd, vungTongHop);
     capNhatTongHop();
     capNhatGoiY();
   }

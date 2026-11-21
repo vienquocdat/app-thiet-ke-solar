@@ -91,7 +91,9 @@ const ManHoSo = (() => {
     const theChon = TienTrinh.BUOC.find(t => t.ma === the) || TienTrinh.BUOC[1];
     const { ray, thuoc } = await TienTrinh.dung(hs, theChon.ma);
     const vungThe = TI.el('div', { class: 'vung-the', 'data-the': theChon.ma });
-    v.replaceChildren(TI.el('div', { class: 'bo-cuc-ho-so' }, ray, TI.el('div', { class: 'cot-chinh' }, thuoc, vungThe)));
+    // Bước có khung vẽ: thu cột bước bên trái thành dải icon để khung vẽ rộng hơn (máy tính).
+    const coKhungVe = ['ve-mai', 'xep-pin', '3d'].includes(theChon.ma);
+    v.replaceChildren(TI.el('div', { class: 'bo-cuc-ho-so', 'data-gon': coKhungVe || null }, ray, TI.el('div', { class: 'cot-chinh' }, thuoc, vungThe)));
 
     if (theChon.ma === 'khao-sat') veKhaoSat(vungThe);
     else if (theChon.ma === 'thong-so') await ManThongSo.ve(vungThe, hs, luuSau);

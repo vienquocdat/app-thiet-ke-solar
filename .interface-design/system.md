@@ -179,3 +179,8 @@ Bảng thuật ngữ (dùng đúng một cách gọi trong toàn app):
 - `ONhap.truong` – nhãn + ô + ghi chú; khi thiếu: chip "Chưa có"/"Chưa đo" và ô viền nét đứt màu nắng.
 - `ONhap.dsThieu` – khung "Còn thiếu N mục", mỗi mục là nút nhảy tới ô; quá 5 mục thì gọn còn 4 + "Xem thêm".
 - Khảo sát và Thông số: máy tính chia nhóm thành 2 cột (`.luoi-nhom`), điện thoại 1 cột.
+
+## 16. Màn có khung vẽ (js/bo-cuc-ve.js)
+- Áp dụng cho Vẽ mái, Xếp pin, 3D: `BoCucVe.dung({ tren, khung, congCu, ben })`.
+- Máy tính: khung vẽ bên trái chiếm phần lớn, cao bằng màn hình; cột phải 340 px gồm phần trên (chọn ảnh), thanh công cụ, bảng thông số cuộn riêng. Cột bước bên trái thu thành dải icon 64 px.
+- Điện thoại: khung vẽ tràn ngang, cao gần kín màn hình; thanh công cụ ghim đáy (cao ~72 px); bảng thông số cuộn xuống dưới khung vẽ.

@@ -9,7 +9,7 @@ const ManXepPin = (() => {
 
   let hs, luuSau, kv = null, cfg, tp, dsTamPin, dsNC = [], loi = new Map();
   let chonId = null, cheDoThem = false;
-  let vungBang, vungTong, oGoiY, nutThem, nutXoay, nutXoa;
+  let vungBang, vungCongCu, vungTong, oGoiY, nutThem, nutXoay, nutXoa;
 
   const SO = XepPin.SO;
   const tamCua = () => hs.xepPin.tam;
@@ -49,7 +49,8 @@ const ManXepPin = (() => {
         TI.el('button', { type: 'button', 'aria-label': 'Vừa khung', onclick: () => kv.vuaKhung() }, Icon('maximize', { co: 22 }))),
       TI.el('div', { class: 'nut-noi-trai' }, nutThem, nutXoay, nutXoa));
     vungBang = TI.el('div', { class: 'bang-ve' });
-    v.replaceChildren(veChonTamPin(), khung, vungBang);
+    vungCongCu = TI.el('div', { class: 'cong-cu-ve hang-nut-cong-cu' });
+    v.replaceChildren(BoCucVe.dung({ khung, congCu: vungCongCu, ben: [veChonTamPin(), vungBang] }));
 
     kv = taoKhungVe(khung, { ve: veMatBang, cham, batDauKeo });
     const tatCa = dsNC.flatMap(nc => nc.P);
@@ -161,7 +162,7 @@ const ManXepPin = (() => {
 
   function capNhatGoiY() {
     if (!oGoiY) return;
-    oGoiY.textContent = !coTheXep() ? 'Thiếu số liệu nên chưa xếp được tấm (xem ô vàng phía trên).'
+    oGoiY.textContent = !coTheXep() ? 'Thiếu số liệu nên chưa xếp được tấm (xem ô vàng trong bảng thông số).'
       : cheDoThem ? 'Chạm vào mái để đặt thêm tấm. Bấm "+ Thêm tấm" lần nữa để thôi.'
         : chonId ? 'Kéo tấm để dời · dùng nút Xoay / Xóa ở dưới'
           : 'Chạm tấm để chọn · kéo tấm để dời · 2 ngón để phóng to';
@@ -238,18 +239,18 @@ const ManXepPin = (() => {
   }
 
   function veBang() {
-    const nd = [
-      TI.el('div', { class: 'hang' },
+    vungCongCu.replaceChildren(
         TI.el('button', { type: 'button', class: 'nut chinh', disabled: !coTheXep(), onclick: () => {
           if (tamCua().length && !confirm('Xếp lại tất cả sẽ xóa cách xếp hiện tại (cả phần đã chỉnh tay). Tiếp tục?')) return;
           for (const nc of dsNC) if (khungNangDu(nc)) tuXepMang(nc);
           chonId = null; sauKhiDoi(); veBang();
           TI.thongBao(`Đã xếp ${tamCua().length} tấm`);
-        } }, 'Tự xếp tất cả các mảng'),
+        } }, ...Icon.chu('solar-panel', 'Tự xếp tất cả')),
         TI.el('button', { type: 'button', class: 'nut', disabled: !tamCua().length, onclick: () => {
           if (!confirm('Xóa hết tấm pin trên mọi mảng?')) return;
           hs.xepPin.tam = []; chonId = null; sauKhiDoi(); veBang();
-        } }, 'Xóa hết')),
+        } }, ...Icon.chu('trash', 'Xóa hết')));
+    const nd = [
       TI.el('p', { class: 'mo nho' }, 'Vạch cam là "cạnh xếp hàng": các hàng tấm chạy song song cạnh này. Mái dốc nên chọn cạnh thấp (máng nước). Nét đứt là đường chừa mép.'),
     ];
     for (const nc of dsNC) nd.push(veCaiDatMang(nc));

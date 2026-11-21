@@ -574,7 +574,59 @@ td.can-dien, .can-dien { color: var(--do); }
 .bg-cam-on { text-align: center; color: #0f3d6e; font-weight: 600; margin-top: 18px; }
 .bg-chan { position: absolute; left: 44px; right: 44px; bottom: 18px; border-top: 1px solid #e3e8ee; padding-top: 6px; font-size: 10.5px; color: #8a96a3; text-align: right; }
 
-/* ---------- Máy tính: khung vẽ cao hơn (đặt cuối để đè giá trị điện thoại) ---------- */
+/* ---------- Bố cục màn có khung vẽ: Vẽ mái, Xếp pin, 3D (js/bo-cuc-ve.js) ----------
+   Đặt cuối file để đè chiều cao khung vẽ mặc định ở trên. */
+/* Điện thoại: khung vẽ tràn ngang, cao gần kín màn hình; thanh công cụ ghim đáy */
+.bo-cuc-ve { --cao-tren: 0px; --cao-thuoc: 92px; --cao-thanh-duoi: 72px; padding-bottom: calc(var(--cao-thanh-duoi) + 16px); }
+.bo-cuc-ve:has(.bcv-tren) { --cao-tren: 58px; }
+.bcv-tren { margin-bottom: 10px; }
+.bcv-tren .hang-anh-nen { margin: 0; }
+.bcv-ve .khung-ve, .bcv-ve .khung-3d {
+  height: calc(100dvh - var(--cao-thanh-tren) - env(safe-area-inset-top) - var(--cao-thuoc) - var(--cao-tren) - var(--cao-thanh-duoi) - env(safe-area-inset-bottom) - 12px);
+  min-height: 340px; margin: 0 -16px; border-radius: 0; border-left: 0; border-right: 0;
+}
+.bcv-cong-cu {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 18;
+  padding: 8px 12px calc(8px + env(safe-area-inset-bottom));
+  background: var(--mat); border-top: 1px solid var(--vien); box-shadow: 0 -4px 12px rgba(11, 42, 74, .08);
+}
+.bcv-cong-cu .phan-doan { margin: 0; }
+.bcv-cong-cu .phan-doan button { min-height: 48px; }
+.hang-nut-cong-cu { display: flex; align-items: center; gap: 8px; }
+.hang-nut-cong-cu > .phan-doan { flex: 1; min-width: 0; }
+.hang-nut-cong-cu > .nut { flex: 1; }
+.nut-chup { flex: none !important; }
+.nut-chup .chu-chup { display: none; }
+.bcv-ben { margin-top: 12px; }
+.bcv-ben > .bang-ve { margin-top: 0; }
+body:has(.bcv-cong-cu) .thong-bao { bottom: calc(var(--cao-thanh-duoi, 72px) + 16px + env(safe-area-inset-bottom)); }
+
+/* Máy tính: khung vẽ chiếm phần lớn bên trái, công cụ + thông số ở cột phải 340 px */
 @media (min-width: 1024px) {
-  .khung-ve, .khung-3d { height: min(calc(100vh - 230px), 820px); }
+  .bo-cuc-ho-so[data-gon] { grid-template-columns: 64px minmax(0, 1fr); gap: 16px; }
+  .bo-cuc-ho-so[data-gon] .ray-buoc { padding: 8px 6px; align-items: stretch; }
+  .bo-cuc-ho-so[data-gon] .ray-khach,
+  .bo-cuc-ho-so[data-gon] .ray-chu,
+  .bo-cuc-ho-so[data-gon] .buoc-thieu { display: none; }
+  .bo-cuc-ho-so[data-gon] .ray-muc { justify-content: center; padding: 12px 0; }
+  .bo-cuc-ho-so[data-gon] .ray-muc .icon { margin: 0; }
+  .bo-cuc-ho-so[data-gon] .ray-xem-het { font-size: 0; gap: 0; justify-content: center; align-self: stretch; margin: 4px 0 0; }
+
+  .bo-cuc-ve {
+    padding-bottom: 0;
+    display: grid; grid-template-columns: minmax(0, 1fr) 340px; grid-template-rows: auto auto minmax(0, 1fr);
+    grid-template-areas: "ve tren" "ve cc" "ve ben"; column-gap: 16px; row-gap: 12px;
+    height: calc(100vh - var(--cao-thanh-tren) - 40px); min-height: 520px;
+  }
+  .bcv-ve { grid-area: ve; min-height: 0; }
+  .bcv-ve .khung-ve, .bcv-ve .khung-3d { height: 100%; min-height: 0; margin: 0; border-radius: var(--bo); border: 1px solid var(--vien); }
+  .bcv-tren { grid-area: tren; margin: 0; }
+  .bcv-cong-cu { grid-area: cc; position: static; padding: 0; background: none; border: 0; box-shadow: none; }
+  .hang-nut-cong-cu { flex-wrap: wrap; }
+  .hang-nut-cong-cu > .phan-doan { flex-basis: 100%; }
+  .nut-chup { flex: 1 !important; }
+  .nut-chup .chu-chup { display: inline; }
+  .bcv-ben { grid-area: ben; margin: 0; min-height: 0; overflow: auto; padding-right: 4px; overscroll-behavior: contain; }
+  .bcv-ben .the:first-child, .bcv-ben > :first-child { margin-top: 0; }
+  .bcv-ben .luoi-o, .bcv-ben .thong-ke-3d { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
 }
