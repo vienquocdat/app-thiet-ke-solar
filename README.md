@@ -25,7 +25,7 @@ Rồi mở http://localhost:8000
 - Dùng **Sao lưu tất cả** / **Nhập file sao lưu** để giữ an toàn hoặc chuyển giữa điện thoại và máy tính.
 
 ## Kiểm thử
-`mau-thu/nha-B.json` là hồ sơ mẫu nhà B, nạp bằng nút **Nạp hồ sơ mẫu nhà B** ở cuối trang danh sách.
+`mau-thu/nha-B.json` là hồ sơ mẫu nhà B, nạp bằng nút **Nạp hồ sơ mẫu nhà B** ở cuối trang danh sách. Nút này chỉ hiện khi mở app kèm `?dev=1` (ví dụ `http://localhost:8000/?dev=1`).
 
 ## Khi cập nhật app
 Tăng số `?v=` trong `index.html` (ví dụ `?v=4` → `?v=5`) để điện thoại tải bản mới, không dùng bản cũ đã lưu tạm.

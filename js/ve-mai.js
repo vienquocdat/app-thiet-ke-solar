@@ -75,14 +75,14 @@ const ManVeMai = (() => {
     oGoiY = TI.el('div', { class: 'goi-y-ve' });
     khungCv = TI.el('div', { class: 'khung-ve' }, cv, oGoiY,
       TI.el('div', { class: 'nut-noi' },
-        TI.el('button', { type: 'button', 'aria-label': 'Phóng to', onclick: () => phong(1.4) }, '+'),
-        TI.el('button', { type: 'button', 'aria-label': 'Thu nhỏ', onclick: () => phong(1 / 1.4) }, '−'),
-        TI.el('button', { type: 'button', 'aria-label': 'Vừa khung', onclick: () => { vuaKhung(); veLai(); } }, '⤢')));
-    nutXongNoi = TI.el('button', { type: 'button', class: 'chinh', hidden: true, onclick: () => { dangThem = false; veBang(); veLai(); } }, '✓ Xong');
+        TI.el('button', { type: 'button', 'aria-label': 'Phóng to', onclick: () => phong(1.4) }, Icon('plus', { co: 22 })),
+        TI.el('button', { type: 'button', 'aria-label': 'Thu nhỏ', onclick: () => phong(1 / 1.4) }, Icon('minus', { co: 22 })),
+        TI.el('button', { type: 'button', 'aria-label': 'Vừa khung', onclick: () => { vuaKhung(); veLai(); } }, Icon('maximize', { co: 22 }))));
+    nutXongNoi = TI.el('button', { type: 'button', class: 'chinh', hidden: true, onclick: () => { dangThem = false; veBang(); veLai(); } }, ...Icon.chu('check', 'Xong'));
     nutLuiNoi = TI.el('button', { type: 'button', hidden: true, onclick: () => {
       const h = layHinh(chon); if (!h) return;
       h.diem.pop(); luuSau(); veBang(); veLai();
-    } }, '↶ Lùi');
+    } }, ...Icon.chu('arrow-back-up', 'Lùi'));
     khungCv.append(TI.el('div', { class: 'nut-noi-trai' }, nutXongNoi, nutLuiNoi));
     vungBang = TI.el('div', { class: 'bang-ve' });
 
@@ -313,8 +313,8 @@ const ManVeMai = (() => {
         tiLe: `Chạm để chấm đầu ${n + 1}/2 của cạnh đã đo bằng thước`,
         nan: `Chạm góc ${n + 1}/4 của hình chữ nhật đã đo (đi vòng 1 chiều)`,
         kiemTra: `Chạm đầu ${n + 1}/2 của cạnh kiểm tra`,
-        mangMai: n >= 3 ? `Chạm để thêm góc (đã có ${n}). Đủ góc thì bấm "✓ Xong"` : `Chạm để chấm góc ${n + 1} của mảng mái`,
-        vatCan: n >= 3 ? `Chạm để thêm góc (đã có ${n}). Đủ góc thì bấm "✓ Xong"` : `Chạm để chấm góc ${n + 1} của vật cản`,
+        mangMai: n >= 3 ? `Chạm để thêm góc (đã có ${n}). Đủ góc thì bấm "Xong"` : `Chạm để chấm góc ${n + 1} của mảng mái`,
+        vatCan: n >= 3 ? `Chạm để thêm góc (đã có ${n}). Đủ góc thì bấm "Xong"` : `Chạm để chấm góc ${n + 1} của vật cản`,
       }[chon.nhom];
     } else chu = 'Kéo để dời ảnh · 2 ngón để phóng to · kéo chấm tròn để chỉnh';
     oGoiY.textContent = chu;

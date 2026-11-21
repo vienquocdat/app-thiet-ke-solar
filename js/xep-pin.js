@@ -39,14 +39,14 @@ const ManXepPin = (() => {
     dungNguCanh();
 
     oGoiY = TI.el('div', { class: 'goi-y-ve' });
-    nutThem = TI.el('button', { type: 'button', onclick: () => { cheDoThem = !cheDoThem; if (cheDoThem) chonId = null; capNhatNut(); kv.veLai(); } }, '+ Thêm tấm');
-    nutXoay = TI.el('button', { type: 'button', hidden: true, onclick: xoayTam }, '⟳ Xoay');
-    nutXoa = TI.el('button', { type: 'button', hidden: true, onclick: xoaTam }, '🗑 Xóa');
+    nutThem = TI.el('button', { type: 'button', onclick: () => { cheDoThem = !cheDoThem; if (cheDoThem) chonId = null; capNhatNut(); kv.veLai(); } }, ...Icon.chu('plus', 'Thêm tấm'));
+    nutXoay = TI.el('button', { type: 'button', hidden: true, onclick: xoayTam }, ...Icon.chu('rotate', 'Xoay'));
+    nutXoa = TI.el('button', { type: 'button', hidden: true, onclick: xoaTam }, ...Icon.chu('trash', 'Xóa'));
     const khung = TI.el('div', { class: 'khung-ve khung-mat-bang' }, oGoiY,
       TI.el('div', { class: 'nut-noi' },
-        TI.el('button', { type: 'button', 'aria-label': 'Phóng to', onclick: () => kv.phong(1.4) }, '+'),
-        TI.el('button', { type: 'button', 'aria-label': 'Thu nhỏ', onclick: () => kv.phong(1 / 1.4) }, '−'),
-        TI.el('button', { type: 'button', 'aria-label': 'Vừa khung', onclick: () => kv.vuaKhung() }, '⤢')),
+        TI.el('button', { type: 'button', 'aria-label': 'Phóng to', onclick: () => kv.phong(1.4) }, Icon('plus', { co: 22 })),
+        TI.el('button', { type: 'button', 'aria-label': 'Thu nhỏ', onclick: () => kv.phong(1 / 1.4) }, Icon('minus', { co: 22 })),
+        TI.el('button', { type: 'button', 'aria-label': 'Vừa khung', onclick: () => kv.vuaKhung() }, Icon('maximize', { co: 22 }))),
       TI.el('div', { class: 'nut-noi-trai' }, nutThem, nutXoay, nutXoa));
     vungBang = TI.el('div', { class: 'bang-ve' });
     v.replaceChildren(veChonTamPin(), khung, vungBang);
@@ -92,7 +92,7 @@ const ManXepPin = (() => {
       thieu.length ? TI.el('div', { class: 'the canh-bao nho' },
         TI.el('b', {}, `Còn thiếu số liệu (${CAN_DIEN}):`),
         TI.el('ul', { class: 'ds-thieu' }, ...thieu.map(t => TI.el('li', {}, t))),
-        TI.el('a', { href: '#/cai-dat' }, 'Điền trong Cài đặt →')) : null);
+        TI.el('a', { href: '#/cai-dat', class: 'lien-ket-icon' }, 'Điền trong Cài đặt', Icon('arrow-right', { co: 18 }))) : null);
   }
 
   // ---------- Vẽ mặt bằng ----------
@@ -330,7 +330,7 @@ const ManXepPin = (() => {
       !tamCua().length ? null : dsLoi.length
         ? TI.el('div', { class: 'the loi nho' }, `${dsLoi.length} tấm lỗi (tô đỏ): `,
           Object.entries(theoLyDo).map(([l, n]) => `${n} tấm ${l}`).join('; '))
-        : TI.el('div', { class: 'the dat nho' }, '✓ Không tấm nào chồng nhau, đè vật cản hay vượt khoảng chừa mép.'));
+        : TI.el('div', { class: 'the dat nho co-icon' }, Icon('circle-check'), 'Không tấm nào chồng nhau, đè vật cản hay vượt khoảng chừa mép.'));
   }
 
   // Dùng cho kiểm thử

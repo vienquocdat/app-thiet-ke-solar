@@ -11,10 +11,10 @@ const ManCaiDat = (() => {
       cacMuc.push(await veMuc(ten, nd, ten === moMuc));
     }
     v.replaceChildren(
-      TI.el('a', { href: '#/', class: 'quay-lai' }, '‹ Danh sách'),
-      TI.el('div', { class: 'the ' + (tongCanDien ? 'canh-bao' : 'dat') },
+      TI.el('div', { class: 'the co-icon ' + (tongCanDien ? 'canh-bao' : 'dat') },
+        Icon(tongCanDien ? 'alert-triangle' : 'circle-check'),
         tongCanDien
-          ? `Còn ${tongCanDien} ô ${CAN_DIEN}. Các phép tính dùng tới ô này sẽ chưa chạy cho tới khi anh điền.`
+          ? `Còn thiếu ${tongCanDien} ô số liệu. Các phép tính dùng tới ô này sẽ chưa chạy cho tới khi anh điền.`
           : 'Đã điền đủ số liệu.'),
       TI.el('p', { class: 'mo nho' }, 'Số thập phân gõ dấu phẩy, ví dụ 0,8. Để trống ô nghĩa là chưa có số liệu.'),
       ...cacMuc);
@@ -70,7 +70,7 @@ const ManCaiDat = (() => {
         ...bang.dong.map((dong, i) => TI.el('div', { class: 'the-dong' },
           TI.el('div', { class: 'hang-giua' }, TI.el('b', {}, `Dòng ${i + 1}`),
             bang.coDinhSoDong ? null : TI.el('button', { type: 'button', class: 'nut-xoa', 'aria-label': 'Xóa dòng',
-              onclick: () => { if (confirm(`Xóa dòng ${i + 1}?`)) { bang.dong.splice(i, 1); daDoi(); veLai(); } } }, '×')),
+              onclick: () => { if (confirm(`Xóa dòng ${i + 1}?`)) { bang.dong.splice(i, 1); daDoi(); veLai(); } } }, Icon('x'))),
           TI.el('div', { class: 'luoi-o' }, ...bang.cot.map(c => TI.el('label', { class: 'truong' },
             TI.el('span', {}, c.ten + (c.donVi ? ` (${c.donVi})` : '')),
             c.chiDoc ? TI.el('b', {}, String(dong[c.ma]))
@@ -80,7 +80,7 @@ const ManCaiDat = (() => {
           for (const c of bang.cot) moi[c.ma] = c.kieu === 'chon' ? c.tuyChon[0] : CAN_DIEN;
           if (bang.cot.some(c => c.ma === 'bac')) moi.bac = bang.dong.length + 1;
           bang.dong.push(moi); daDoi(); veLai();
-        } }, '+ Thêm dòng'));
+        } }, ...Icon.chu('plus', 'Thêm dòng')));
     };
     veLai();
     return khung;

@@ -26,15 +26,18 @@ const ManDanhSach = (() => {
       if (!ds.length) {
         vungDs.replaceChildren(TI.el('div', { class: 'the trong' },
           TI.el('p', {}, 'Chưa có hồ sơ nào.'),
-          TI.el('p', { class: 'mo' }, 'Bấm "+ Hồ sơ mới" để bắt đầu khảo sát, hoặc nạp hồ sơ mẫu nhà B ở cuối trang.')));
+          TI.el('p', { class: 'mo' }, App.cheDoThu
+            ? 'Bấm "Hồ sơ mới" để bắt đầu khảo sát, hoặc nạp hồ sơ mẫu nhà B ở cuối trang.'
+            : 'Bấm "Hồ sơ mới" để bắt đầu khảo sát nhà đầu tiên.')));
         return;
       }
       if (!loc.length) { vungDs.replaceChildren(TI.el('p', { class: 'mo' }, 'Không tìm thấy hồ sơ phù hợp.')); return; }
+      const coGT = (x) => x && x !== CAN_DIEN;
       vungDs.replaceChildren(...loc.map(h => TI.el('a', { class: 'the the-ho-so', href: `#/ho-so/${h.id}/khao-sat` },
         TI.el('div', { class: 'hang-giua' },
-          TI.el('b', {}, h.khach.ten || '(Chưa có tên)'),
+          TI.el('b', {}, coGT(h.khach.ten) ? h.khach.ten : '(Chưa có tên)'),
           TI.el('span', { class: 'nhan nhan-' + h.trangThai }, TRANG_THAI[h.trangThai] || '')),
-        TI.el('div', { class: 'mo' }, [h.khach.dienThoai, h.khach.diaChi].filter(Boolean).join(' · ') || '—'),
+        TI.el('div', { class: 'mo' }, [h.khach.dienThoai, h.khach.diaChi].filter(coGT).join(' · ') || 'Chưa có địa chỉ'),
         TI.el('div', { class: 'mo nho' }, 'Sửa lần cuối: ' + TI.ngayVN(h.ngaySua)))));
     }
 
@@ -45,22 +48,25 @@ const ManDanhSach = (() => {
     for (const ten of DuLieu.DANH_SACH) tongThieu += DuLieu.demCanDien(await DuLieu.lay(ten));
 
     v.replaceChildren(
-      tongThieu ? TI.el('a', { class: 'the canh-bao nho lien-ket-cai-dat', href: '#/cai-dat' },
-        `Số liệu chung còn ${tongThieu} ô ${CAN_DIEN} (thiết bị, giá, giá điện, hằng số). Bấm để điền trong Cài đặt →`) : null,
-      TI.el('div', { class: 'hang' },
-        TI.el('button', { class: 'nut chinh to', onclick: taoHoSoMoi }, '+ Hồ sơ mới')),
-      oTim,
+      tongThieu ? TI.el('a', { class: 'the canh-bao nho lien-ket-cai-dat co-icon', href: '#/cai-dat' },
+        Icon('alert-triangle'),
+        TI.el('span', {}, `Số liệu chung còn thiếu ${tongThieu} ô (thiết bị, giá, giá điện, hằng số). Bấm để điền trong Cài đặt.`),
+        Icon('chevron-right')) : null,
+      TI.el('div', { class: 'hang-cong-cu' },
+        TI.el('button', { class: 'nut chinh to', onclick: taoHoSoMoi }, ...Icon.chu('plus', 'Hồ sơ mới')),
+        oTim),
       TI.el('div', { class: 'mo nho' }, `${ds.length} hồ sơ lưu trên máy này`),
       vungDs,
       TI.el('h3', {}, 'Sao lưu'),
       TI.el('p', { class: 'mo nho' }, 'Dữ liệu chỉ nằm trên máy này. Nên sao lưu thường xuyên, và dùng file sao lưu để chuyển hồ sơ giữa điện thoại và máy tính.'),
       TI.el('div', { class: 'hang' },
-        TI.el('button', { class: 'nut', onclick: saoLuuTatCa, disabled: !ds.length }, 'Sao lưu tất cả'),
-        TI.el('button', { class: 'nut', onclick: () => oFile.click() }, 'Nhập file sao lưu')),
+        TI.el('button', { class: 'nut', onclick: saoLuuTatCa, disabled: !ds.length }, ...Icon.chu('download', 'Sao lưu tất cả')),
+        TI.el('button', { class: 'nut', onclick: () => oFile.click() }, ...Icon.chu('upload', 'Nhập file sao lưu'))),
       oFile,
-      TI.el('h3', {}, 'Kiểm thử'),
-      TI.el('div', { class: 'hang' },
-        TI.el('button', { class: 'nut', onclick: napMauNhaB }, 'Nạp hồ sơ mẫu nhà B')),
+      // Chỉ hiện khi mở app với ?dev=1
+      App.cheDoThu ? TI.el('h3', {}, 'Kiểm thử') : null,
+      App.cheDoThu ? TI.el('div', { class: 'hang' },
+        TI.el('button', { class: 'nut', onclick: napMauNhaB }, 'Nạp hồ sơ mẫu nhà B')) : null,
     );
     veDanhSach();
   }

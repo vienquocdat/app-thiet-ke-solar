@@ -10,14 +10,27 @@ const App = (() => {
     document.title = chu + ' – TDH Solar';
   }
 
+  // Dòng chữ nhỏ dưới tiêu đề (trạng thái lưu của hồ sơ…). Gọi không tham số để xóa.
+  function datPhuDe(...con) {
+    document.getElementById('phu-de-trang').replaceChildren(...con);
+  }
+
+  // Chế độ thử nghiệm: thêm ?dev=1 vào địa chỉ để hiện các nút kiểm thử (nạp hồ sơ mẫu…).
+  const cheDoThu = new URLSearchParams(location.search).get('dev') === '1';
+
   async function dieuHuong() {
     const phan = location.hash.replace(/^#\/?/, '').split('/').filter(Boolean).map(decodeURIComponent);
     const v = vung();
+    const man = phan[0] === 'ho-so' && phan[1] ? 'ho-so' : phan[0] === 'cai-dat' ? 'cai-dat' : 'danh-sach';
+    document.body.dataset.man = man;
+    document.getElementById('nut-lui').hidden = man === 'danh-sach';
+    datPhuDe();
     window.scrollTo(0, 0);
     try {
       await ManHoSo.luuNeuDangCho();
       ManDung3D.huy(); // giải phóng khung 3D cũ (nếu có) trước khi vẽ màn hình mới
-      if (phan[0] === 'ho-so' && phan[1]) await ManHoSo.ve(v, phan[1], phan[2] || 'khao-sat');
+      if (man !== 'ho-so') TienTrinh.roi();
+      if (man === 'ho-so') await ManHoSo.ve(v, phan[1], phan[2] || 'khao-sat');
       else if (phan[0] === 'cai-dat') await ManCaiDat.ve(v, phan[1]);
       else await ManDanhSach.ve(v);
     } catch (e) {
@@ -27,6 +40,7 @@ const App = (() => {
   }
 
   async function khoiDong() {
+    Icon.thayTrong(document);
     try {
       await DuLieu.napGoc();
     } catch (e) {
@@ -41,7 +55,7 @@ const App = (() => {
     dieuHuong();
   }
 
-  return { khoiDong, datTieuDe, dieuHuong };
+  return { khoiDong, datTieuDe, datPhuDe, dieuHuong, cheDoThu };
 })();
 
 App.khoiDong();

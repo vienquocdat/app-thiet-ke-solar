@@ -1,15 +1,5 @@
-// Màn hình 2–3: khung hồ sơ khách (các thẻ) + phiếu khảo sát.
+// Màn hình 2–3: khung hồ sơ khách (thanh tiến trình 7 bước + nội dung bước) + phiếu khảo sát.
 const ManHoSo = (() => {
-  const THE = [
-    { ma: 'thong-so', ten: 'Thông số' },
-    { ma: 'khao-sat', ten: 'Khảo sát' },
-    { ma: 've-mai', ten: 'Vẽ mái', gd: 2 },
-    { ma: 'xep-pin', ten: 'Xếp pin', gd: 3 },
-    { ma: '3d', ten: '3D', gd: 4 },
-    { ma: 'ky-thuat', ten: 'Kỹ thuật', gd: 5 },
-    { ma: 'bao-gia', ten: 'Báo giá', gd: 6 },
-  ];
-
   const CHON = (...ds) => [['', '— chọn —'], ...ds.map(x => Array.isArray(x) ? x : [x, x])];
 
   const NHOM = [
@@ -60,19 +50,21 @@ const ManHoSo = (() => {
 
   let hs = null;
   let henLuu = null;
-  let oHuyHieu = null;
 
-  // Số đỏ trên thẻ "Thông số" = số thông số bắt buộc của nhà này còn thiếu.
-  function capNhatHuyHieu(n) {
-    if (!oHuyHieu) return;
-    oHuyHieu.textContent = n ? String(n) : '✓';
-    oHuyHieu.classList.toggle('du', !n);
-  }
+  // Ô "Thông số" vừa đổi → tính lại thanh tiến trình (tên cũ giữ để các màn hình khác gọi).
+  function capNhatHuyHieu() { TienTrinh.capNhat(); }
+
+  // Trạng thái lưu hiện ở dòng nhỏ dưới tiêu đề trên cùng.
   let oTrangThaiLuu = null;
+  function hienLuu(dangLuu) {
+    if (!oTrangThaiLuu) return;
+    oTrangThaiLuu.classList.toggle('dang-luu', dangLuu);
+    oTrangThaiLuu.replaceChildren(...(dangLuu ? [TI.el('span', {}, 'Đang lưu…')] : Icon.chu('check', 'Đã lưu', { co: 14 })));
+  }
 
   function luuSau() {
     clearTimeout(henLuu);
-    if (oTrangThaiLuu) oTrangThaiLuu.textContent = 'Đang lưu…';
+    hienLuu(true);
     henLuu = setTimeout(luuNgay, 500);
   }
 
@@ -80,31 +72,27 @@ const ManHoSo = (() => {
     clearTimeout(henLuu); henLuu = null;
     if (!hs) return;
     await HoSo.luu(hs);
-    if (oTrangThaiLuu) oTrangThaiLuu.textContent = 'Đã lưu ✓';
+    hienLuu(false);
+    TienTrinh.capNhat();
   }
 
   async function ve(v, id, the) {
     hs = await HoSo.lay(id);
     if (!hs) {
+      TienTrinh.roi();
       v.replaceChildren(TI.el('div', { class: 'the loi' }, 'Không tìm thấy hồ sơ. ', TI.el('a', { href: '#/' }, 'Về danh sách')));
       return;
     }
     App.datTieuDe(hs.khach.ten || 'Hồ sơ mới');
-    oTrangThaiLuu = TI.el('span', { class: 'trang-thai-luu' }, 'Đã lưu ✓');
+    oTrangThaiLuu = TI.el('span', { class: 'trang-thai-luu' });
+    hienLuu(false);
+    App.datPhuDe(oTrangThaiLuu);
 
-    oHuyHieu = TI.el('b', { class: 'huy-hieu' });
-    const thanhThe = TI.el('nav', { class: 'thanh-the' }, ...THE.map(t =>
-      TI.el('a', { href: `#/ho-so/${hs.id}/${t.ma}`, class: t.ma === the ? 'dang-chon' : '' }, t.ten, t.ma === 'thong-so' ? oHuyHieu : null)));
-    capNhatHuyHieu(ManThongSo.demThieu(hs));
+    const theChon = TienTrinh.BUOC.find(t => t.ma === the) || TienTrinh.BUOC[1];
+    const { ray, thuoc } = await TienTrinh.dung(hs, theChon.ma);
+    const vungThe = TI.el('div', { class: 'vung-the', 'data-the': theChon.ma });
+    v.replaceChildren(TI.el('div', { class: 'bo-cuc-ho-so' }, ray, TI.el('div', { class: 'cot-chinh' }, thuoc, vungThe)));
 
-    const vungThe = TI.el('div', {});
-    v.replaceChildren(
-      TI.el('div', { class: 'hang-giua' }, TI.el('a', { href: '#/', class: 'quay-lai' }, '‹ Danh sách'), oTrangThaiLuu),
-      thanhThe, vungThe);
-
-    const theChon = THE.find(t => t.ma === the) || THE[1];
-    const nutThe = thanhThe.querySelector('.dang-chon');
-    if (nutThe) requestAnimationFrame(() => nutThe.scrollIntoView({ block: 'nearest', inline: 'nearest' }));
     if (theChon.ma === 'khao-sat') veKhaoSat(vungThe);
     else if (theChon.ma === 'thong-so') await ManThongSo.ve(vungThe, hs, luuSau);
     else if (theChon.ma === 've-mai') await ManVeMai.ve(vungThe, hs, luuSau);
@@ -112,8 +100,6 @@ const ManHoSo = (() => {
     else if (theChon.ma === '3d') await ManDung3D.ve(vungThe, hs, luuSau);
     else if (theChon.ma === 'ky-thuat') await ManKyThuat.ve(vungThe, hs, luuSau);
     else if (theChon.ma === 'bao-gia') await ManBaoGia.ve(vungThe, hs, luuSau);
-    else vungThe.replaceChildren(TI.el('div', { class: 'the trong' },
-      TI.el('b', {}, theChon.ten), TI.el('p', { class: 'mo' }, `Phần này sẽ làm ở Giai đoạn ${theChon.gd}.`)));
   }
 
   // ---------- Phiếu khảo sát ----------
@@ -135,8 +121,8 @@ const ManHoSo = (() => {
       ...dsNhom,
       TI.el('h3', {}, 'Hồ sơ này'),
       TI.el('div', { class: 'hang' },
-        TI.el('button', { class: 'nut', onclick: saoLuuHoSo }, 'Sao lưu hồ sơ này'),
-        TI.el('button', { class: 'nut nguy-hiem', onclick: xoaHoSo }, 'Xóa hồ sơ')),
+        TI.el('button', { class: 'nut', onclick: saoLuuHoSo }, ...Icon.chu('download', 'Sao lưu hồ sơ này')),
+        TI.el('button', { class: 'nut nguy-hiem', onclick: xoaHoSo }, ...Icon.chu('trash', 'Xóa hồ sơ'))),
       TI.el('p', { class: 'mo nho' }, 'Tạo ngày ' + TI.ngayVN(hs.ngayTao)),
     );
   }
@@ -210,10 +196,10 @@ const ManHoSo = (() => {
           oSo(h.kWh, (n) => { h.kWh = n; luuSau(); tinhTong(); }, { 'aria-label': 'Số điện kWh' }),
           oSo(h.tien, (n) => { h.tien = n; luuSau(); tinhTong(); }, { 'aria-label': 'Tiền điện' }),
           TI.el('button', { type: 'button', class: 'nut-xoa', 'aria-label': 'Xóa tháng này',
-            onclick: () => { hs.dien.hoaDon.splice(i, 1); luuSau(); veLai(); } }, '×'))),
+            onclick: () => { hs.dien.hoaDon.splice(i, 1); luuSau(); veLai(); } }, Icon('x')))),
         TI.el('button', { type: 'button', class: 'nut nho', onclick: () => {
           hs.dien.hoaDon.push({ thang: '', kWh: null, tien: null }); luuSau(); veLai();
-        } }, '+ Thêm tháng'));
+        } }, ...Icon.chu('plus', 'Thêm tháng')));
       tinhTong();
     };
     veLai();
@@ -251,14 +237,14 @@ const ManHoSo = (() => {
             if (!confirm('Xóa ảnh này?')) return;
             await LuuTru.xoa('anh', m.id);
             hs.hienTrang.anh.splice(i, 1); await luuNgay(); veLai();
-          } }, 'Xóa ảnh')));
+          } }, ...Icon.chu('trash', 'Xóa ảnh', { co: 18 }))));
       }
       luoi.replaceChildren(...the);
     };
     veLai();
     return TI.el('div', {},
       TI.el('p', { class: 'mo nho' }, 'Chụp ảnh mái, công tơ, tủ điện, hóa đơn. Ảnh drone chụp thẳng xuống dùng để vẽ mái ở bước sau.'),
-      TI.el('button', { type: 'button', class: 'nut', onclick: () => oFile.click() }, '📷 Thêm ảnh'),
+      TI.el('button', { type: 'button', class: 'nut', onclick: () => oFile.click() }, ...Icon.chu('camera', 'Thêm ảnh')),
       oFile, luoi);
   }
 

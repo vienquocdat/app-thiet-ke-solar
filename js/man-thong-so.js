@@ -107,25 +107,26 @@ const ManThongSo = (() => {
       const nd = await DuLieu.lay(tenFile), n = DuLieu.demCanDien(nd);
       tongChung += n;
       if (n) dongChung.push(TI.el('a', { class: 'muc-hinh lien-ket-cai-dat', href: `#/cai-dat/${tenFile}` },
-        nd.tieuDe, TI.el('small', { class: 'can-dien' }, `${n} ô ${CAN_DIEN}`), '›'));
+        nd.tieuDe, TI.el('small', { class: 'can-dien' }, `${n} ô ${CAN_DIEN}`), Icon('chevron-right', { co: 18 })));
     }
 
     v.replaceChildren(
       oTongSo,
       TI.el('h3', {}, 'Thông số của nhà này'),
-      TI.el('p', { class: 'mo nho' }, 'Ô viền đỏ là còn thiếu. Điền ở đây hay ở các thẻ khác đều như nhau. Chưa có số đo chính xác thì để trống, có rồi điền sau.'),
+      TI.el('p', { class: 'mo nho' }, 'Ô viền vàng nét đứt là còn thiếu.Điền ở đây hay ở các thẻ khác đều như nhau. Chưa có số đo chính xác thì để trống, có rồi điền sau.'),
       ...phanHoSo,
       TI.el('h3', {}, 'Số liệu chung của công ty (Cài đặt)'),
       TI.el('p', { class: 'mo nho' }, 'Dùng cho mọi hồ sơ: thiết bị, giá, giá điện, giờ nắng, hằng số tính toán. Bấm vào từng mục để điền.'),
-      dongChung.length ? TI.el('div', { class: 'danh-sach-hinh' }, ...dongChung) : TI.el('div', { class: 'the dat nho' }, '✓ Đã điền đủ số liệu chung.'));
+      dongChung.length ? TI.el('div', { class: 'danh-sach-hinh' }, ...dongChung) : TI.el('div', { class: 'the dat nho co-icon' }, Icon('circle-check'), 'Đã điền đủ số liệu chung.'));
     capNhatTong(tongChung);
   }
 
   function capNhatTong(tongChung) {
     if (tongChung !== undefined) oTongSo.dataset.chung = tongChung;
     const n = demThieu(hs), c = Number(oTongSo.dataset.chung || 0);
-    oTongSo.replaceChildren(TI.el('div', { class: 'the ' + (n || c ? 'canh-bao' : 'dat') },
-      n || c ? `Còn thiếu: ${n} thông số của nhà này, ${c} ô số liệu chung.` : '✓ Đã đủ thông số.'));
+    oTongSo.replaceChildren(TI.el('div', { class: 'the co-icon ' + (n || c ? 'canh-bao' : 'dat') },
+      Icon(n || c ? 'alert-triangle' : 'circle-check'),
+      n || c ? `Còn thiếu: ${n} thông số của nhà này, ${c} ô số liệu chung.` : 'Đã đủ thông số.'));
     ManHoSo.capNhatHuyHieu(n);
   }
 
@@ -133,7 +134,8 @@ const ManThongSo = (() => {
     const nhan = TI.el('span', {}, o.nhan + (o.dv ? ` (${o.dv})` : '') + (o.batBuoc ? '' : ' – không bắt buộc'));
     let o2;
     if (o.kieu === 'lienKet') {
-      o2 = TI.el('a', { class: 'nut nho' + (o.du ? '' : ' can-dien'), href: `#/ho-so/${hs.id}/${o.the}` }, (o.du ? '✓ ' : '') + (o.ghiChu || 'Mở'));
+      o2 = TI.el('a', { class: 'nut nho' + (o.du ? '' : ' can-dien'), href: `#/ho-so/${hs.id}/${o.the}` },
+        o.du ? Icon('check', { co: 18 }) : null, o.ghiChu || 'Mở', o.du ? null : Icon('chevron-right', { co: 18 }));
       return TI.el('div', { class: 'truong' }, nhan, o2);
     }
     if (o.kieu === 'chon') {
@@ -149,5 +151,5 @@ const ManThongSo = (() => {
     return TI.el('label', { class: 'truong' }, nhan, o2, o.ghiChu ? TI.el('small', { class: 'mo' }, o.ghiChu) : null);
   }
 
-  return { ve, demThieu };
+  return { ve, demThieu, dsO, thieuO: thieu };
 })();

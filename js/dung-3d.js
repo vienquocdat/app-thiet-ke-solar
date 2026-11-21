@@ -78,8 +78,8 @@ const ManDung3D = (() => {
       } }, ten)));
     v.replaceChildren(thanhGoc, khung3d,
       TI.el('div', { class: 'hang' },
-        TI.el('button', { type: 'button', class: 'nut chinh', onclick: chupAnh }, '📷 Chụp ảnh vào hồ sơ'),
-        TI.el('button', { type: 'button', class: 'nut', onclick: taiAnh }, 'Tải ảnh về máy')),
+        TI.el('button', { type: 'button', class: 'nut chinh', onclick: chupAnh }, ...Icon.chu('camera', 'Chụp ảnh vào hồ sơ')),
+        TI.el('button', { type: 'button', class: 'nut', onclick: taiAnh }, ...Icon.chu('download', 'Tải ảnh về máy'))),
       vungThongKe, vungCanhBao, veCaiDat());
 
     try { await napThuVien(); }
@@ -432,7 +432,7 @@ const ManDung3D = (() => {
     vungCanhBao.replaceChildren(...(!canhBao.length ? [] : [TI.el('div', { class: 'the canh-bao nho' },
       TI.el('b', {}, 'Đang vẽ tạm vì thiếu số liệu:'),
       TI.el('ul', { class: 'ds-thieu' }, ...canhBao.map(c => TI.el('li', {}, c))),
-      TI.el('a', { href: `#/ho-so/${hs.id}/thong-so` }, 'Điền ở thẻ Thông số →'))]));
+      TI.el('a', { href: `#/ho-so/${hs.id}/thong-so`, class: 'lien-ket-icon' }, 'Điền ở bước Thông số', Icon('arrow-right', { co: 18 })))]));
   }
 
   let henDung = null;

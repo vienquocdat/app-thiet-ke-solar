@@ -87,12 +87,12 @@ const ManBaoGia = (() => {
       hs.phuongAn.length < 3 ? TI.el('button', { type: 'button', class: 'nut', onclick: () => {
         const moi = structuredClone(hs.phuongAn[hs.phuongAn.length - 1]); moi.id = TI.taoId('pa'); moi.ten = `Phương án ${hs.phuongAn.length + 1}`;
         hs.phuongAn.push(moi); luuSau(); veLai();
-      } }, '+ Thêm phương án (nhân bản phương án cuối)') : null,
+      } }, ...Icon.chu('plus', 'Thêm phương án (nhân bản phương án cuối)')) : null,
       veSoSanh(ketQua),
       veChiTiet(dx),
       TI.el('div', { class: 'hang' },
-        TI.el('button', { type: 'button', class: 'nut', onclick: () => xemTruoc(ketQua, dx) }, '👁 Xem trước báo giá'),
-        TI.el('button', { type: 'button', class: 'nut chinh', onclick: () => xuatPDF(ketQua, dx) }, '📄 Xuất PDF báo giá')),
+        TI.el('button', { type: 'button', class: 'nut', onclick: () => xemTruoc(ketQua, dx) }, ...Icon.chu('eye', 'Xem trước báo giá')),
+        TI.el('button', { type: 'button', class: 'nut chinh', onclick: () => xuatPDF(ketQua, dx) }, ...Icon.chu('file-download', 'Xuất PDF báo giá'))),
       TI.el('p', { class: 'mo nho' }, 'PDF dùng ảnh phối cảnh 3D mới nhất đã chụp ở thẻ 3D và mặt bằng xếp pin của phương án đề xuất.'));
   }
 
@@ -114,7 +114,7 @@ const ManBaoGia = (() => {
     return ds.length ? TI.el('div', { class: 'the canh-bao nho' }, TI.el('b', {}, `Còn thiếu (${CAN_DIEN}) – báo giá sẽ in chữ đỏ ở các chỗ này:`),
       TI.el('ul', { class: 'ds-thieu' }, ...ds.map(t => TI.el('li', {}, t))),
       TI.el('a', { href: '#/cai-dat' }, 'Cài đặt'), ' · ', TI.el('a', { href: `#/ho-so/${hs.id}/thong-so` }, 'Thông số'))
-      : TI.el('div', { class: 'the dat nho' }, '✓ Đủ số liệu để xuất báo giá.');
+      : TI.el('div', { class: 'the dat nho co-icon' }, Icon('circle-check'), 'Đủ số liệu để xuất báo giá.');
   }
 
   function veTheP({ pa, kq, inv }, i) {
@@ -144,7 +144,7 @@ const ManBaoGia = (() => {
         dong('Tiết kiệm năm đầu', tien(kq.tietKiemNam1)),
         dong('Tổng chi phí', tien(kq.chiPhi.tong)),
         dong('Hoàn vốn dự kiến', nam(kq.hoanVon)),
-        dong('Kỹ thuật', kq.kt.loi.length ? `✗ ${kq.kt.loi.length} lỗi` : kq.kt.nhom.length ? '✓ đạt' : 'chưa đủ số liệu', kq.kt.loi.length ? 'khong-dat' : '')),
+        dong('Kỹ thuật', kq.kt.loi.length ? `${kq.kt.loi.length} lỗi` : kq.kt.nhom.length ? 'Đạt' : 'Chưa đủ số liệu', kq.kt.loi.length ? 'khong-dat' : '')),
       kq.kt.loi.length ? TI.el('ul', { class: 'ds-thieu nho can-dien' }, ...kq.kt.loi.map(l => TI.el('li', {}, l))) : null,
       TI.el('div', { class: 'hang' },
         TI.el('label', { class: 'lua-chon' }, TI.el('input', { type: 'radio', name: 'de-xuat', checked: laDX, onchange: () => { hs.baoGia.deXuat = goc.id; doi(); } }), 'Phương án đề xuất (in chi tiết trong báo giá)'),
@@ -171,7 +171,7 @@ const ManBaoGia = (() => {
       ['Hoàn vốn dự kiến', k => nam(k.kq.hoanVon)],
     ];
     return TI.el('table', { class: 'bang-so bang-so-sanh' },
-      TI.el('thead', {}, TI.el('tr', {}, TI.el('th', {}, ''), ...ketQua.map(k => TI.el('th', {}, k.pa.ten + (k.pa.id === hs.baoGia.deXuat ? ' ★' : ''))))),
+      TI.el('thead', {}, TI.el('tr', {}, TI.el('th', {}, ''), ...ketQua.map(k => TI.el('th', {}, k.pa.ten, k.pa.id === hs.baoGia.deXuat ? TI.el('span', { class: 'nhan-de-xuat' }, Icon('star', { co: 14 }), 'Đề xuất') : null)))),
       TI.el('tbody', {}, ...hang.map(([ten, f]) => TI.el('tr', {}, TI.el('td', {}, ten), ...ketQua.map(k => TI.el('td', { class: f(k).includes(CAN_DIEN) ? 'can-dien' : '' }, f(k)))))));
   }
   function veSoSanh(ketQua) {
@@ -355,8 +355,8 @@ const ManBaoGia = (() => {
     const trang = await taoTrang(ketQua, dx);
     const ti = Math.min(1, (window.innerWidth - 24) / 794);
     const lop = TI.el('div', { class: 'lop-xem-truoc' },
-      TI.el('div', { class: 'hang' }, TI.el('button', { type: 'button', class: 'nut', onclick: () => lop.remove() }, '✕ Đóng'),
-        TI.el('button', { type: 'button', class: 'nut chinh', onclick: () => { lop.remove(); xuatPDF(ketQua, dx); } }, '📄 Xuất PDF')),
+      TI.el('div', { class: 'hang' }, TI.el('button', { type: 'button', class: 'nut', onclick: () => lop.remove() }, ...Icon.chu('x', 'Đóng')),
+        TI.el('button', { type: 'button', class: 'nut chinh', onclick: () => { lop.remove(); xuatPDF(ketQua, dx); } }, ...Icon.chu('file-download', 'Xuất PDF'))),
       ...trang.map(t => TI.el('div', { class: 'khung-trang', style: `width:${794 * ti}px;height:${1123 * ti}px` },
         (t.style.transform = `scale(${ti})`, t.style.transformOrigin = '0 0', t))));
     document.body.append(lop);

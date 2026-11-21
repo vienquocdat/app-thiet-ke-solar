@@ -56,15 +56,17 @@ const ManKyThuat = (() => {
     if (kq.thieuCFG.length) ds.push(`Hằng số: ${kq.thieuCFG.join(', ')}`);
     const the = [];
     if (ds.length) the.push(TI.el('div', { class: 'the canh-bao nho' }, TI.el('b', {}, `Còn thiếu số liệu (${CAN_DIEN}):`),
-      TI.el('ul', { class: 'ds-thieu' }, ...ds.map(t => TI.el('li', {}, t))), TI.el('a', { href: '#/cai-dat' }, 'Điền trong Cài đặt →')));
+      TI.el('ul', { class: 'ds-thieu' }, ...ds.map(t => TI.el('li', {}, t))), TI.el('a', { href: '#/cai-dat', class: 'lien-ket-icon' }, 'Điền trong Cài đặt', Icon('arrow-right', { co: 18 }))));
     if (kq.loi.length) the.push(TI.el('div', { class: 'the loi nho' }, TI.el('b', {}, 'Lỗi thiết kế:'), TI.el('ul', { class: 'ds-thieu' }, ...kq.loi.map(t => TI.el('li', {}, t)))));
     if (kq.canhBao.length) the.push(TI.el('div', { class: 'the canh-bao nho' }, TI.el('b', {}, 'Cảnh báo:'), TI.el('ul', { class: 'ds-thieu' }, ...kq.canhBao.map(t => TI.el('li', {}, t)))));
-    if (!ds.length && !kq.loi.length && !kq.canhBao.length && kq.nhom.length) the.push(TI.el('div', { class: 'the dat nho' }, '✓ Thiết kế đạt mọi kiểm tra.'));
+    if (!ds.length && !kq.loi.length && !kq.canhBao.length && kq.nhom.length) the.push(TI.el('div', { class: 'the dat nho co-icon' }, Icon('circle-check'), 'Thiết kế đạt mọi kiểm tra.'));
     return TI.el('div', {}, ...the);
   }
 
   const phan = (tieuDe, ...con) => TI.el('div', { class: 'the phan-kt' }, TI.el('h4', {}, tieuDe), ...con);
   const dong = (nhan, gt, cls = '') => TI.el('div', { class: 'dong-kt ' + cls }, TI.el('span', {}, nhan), TI.el('b', {}, gt));
+  // Dấu đạt / không đạt sau một con số kiểm tra.
+  const ket = (ok) => Icon(ok ? 'check' : 'x', { co: 16, lop: ok ? 'icon-dat' : 'icon-khong-dat' });
   const congThuc = (t) => TI.el('div', { class: 'cong-thuc' }, t);
 
   // ---------- 1. Inverter ----------
@@ -76,7 +78,7 @@ const ManKyThuat = (() => {
         let goiY = '';
         if (kWpTam && SO(d.congSuatACkW) && SO(cfg.dcAcMin) && SO(cfg.dcAcMax)) {
           const r = kWpTam / (d.congSuatACkW * (hs.kyThuat.soLuong || 1));
-          goiY = ` – DC/AC ${TI.soVN(r, 2)}${r >= cfg.dcAcMin && r <= cfg.dcAcMax ? ' ✓' : ' ✗'}`;
+          goiY = ` – DC/AC ${TI.soVN(r, 2)}${r >= cfg.dcAcMin && r <= cfg.dcAcMax ? ' (đạt)' : ' (ngoài khoảng cho phép)'}`;
         }
         return TI.el('option', { value: d.model, selected: d.model === hs.kyThuat.inverter },
           `${d.model} (${SO(d.congSuatACkW) ? TI.soVN(d.congSuatACkW) + ' kW' : '?'}, ${d.loai !== CAN_DIEN ? d.loai : '?'}, ${d.soPha !== CAN_DIEN ? d.soPha : '?'})${goiY}`);
@@ -90,7 +92,7 @@ const ManKyThuat = (() => {
     ];
     if (SO(kq.dcAc)) {
       ds.push(dong('Công suất AC', `${TI.soVN(kq.pAC, 2)} kW`),
-        dong('Tỉ lệ DC/AC', `${TI.soVN(kq.dcAc, 3)} ${kq.dcAcDat ? '✓' : '✗'}`, kq.dcAcDat ? 'dat' : 'khong-dat'),
+        dong('Tỉ lệ DC/AC', [`${TI.soVN(kq.dcAc, 3)} `, ket(kq.dcAcDat)], kq.dcAcDat ? 'dat' : 'khong-dat'),
         congThuc(`DC/AC = ${TI.soVN(kq.kWp, 2)} ÷ ${TI.soVN(kq.pAC, 2)} = ${TI.soVN(kq.dcAc, 3)} (cho phép ${TI.soVN(cfg.dcAcMin)}–${TI.soVN(cfg.dcAcMax)})`));
     }
     if (hs.dien.loaiDien) ds.push(dong('Điện nhà khách', hs.dien.loaiDien === '3-pha' ? '3 pha' : '1 pha'));
@@ -133,12 +135,12 @@ const ManKyThuat = (() => {
             ...lua.map(([gt, t]) => TI.el('option', { value: gt, selected: String(dat.L || '') === gt }, t)))),
         dong('Cách đấu', n.soChuoi ? `${n.soChuoi} chuỗi × ${n.L} tấm${n.thua ? ` (thừa ${n.thua})` : ''}` : 'Không chia được', n.soChuoi && !n.thua ? '' : 'khong-dat'),
         dong('Dùng MPPT', n.soMPPT ? `số ${n.mpptTu}${n.soMPPT > 1 ? '–' + (n.mpptTu + n.soMPPT - 1) : ''} (${n.chuoiMoiMPPT} chuỗi/MPPT)` : '—'),
-        n.L ? dong('Voc tối đa của chuỗi', `${TI.soVN(n.vocMaxChuoi, 1)} V ${n.vocMaxChuoi <= inv.dienApDCMaxV ? '✓' : '✗'} (≤ ${TI.soVN(inv.dienApDCMaxV)} V)`) : null,
-        n.L ? dong('Vmp chuỗi khi nóng', `${TI.soVN(n.vmpNongChuoi, 1)} V ${n.vmpNongChuoi >= inv.mpptMinV ? '✓' : '✗'} (≥ ${TI.soVN(inv.mpptMinV)} V)`) : null,
+        n.L ? dong('Voc tối đa của chuỗi', [`${TI.soVN(n.vocMaxChuoi, 1)} V `, ket(n.vocMaxChuoi <= inv.dienApDCMaxV), ` (≤ ${TI.soVN(inv.dienApDCMaxV)} V)`]) : null,
+        n.L ? dong('Vmp chuỗi khi nóng', [`${TI.soVN(n.vmpNongChuoi, 1)} V `, ket(n.vmpNongChuoi >= inv.mpptMinV), ` (≥ ${TI.soVN(inv.mpptMinV)} V)`]) : null,
         n.L ? dong('Vmp chuỗi (điều kiện chuẩn)', `${TI.soVN(n.vmpChuoi, 1)} V`) : null,
-        n.soChuoi ? dong('Dòng vào 1 MPPT', `${TI.soVN(n.chuoiMoiMPPT * tp.impA, 2)} A ${n.chuoiMoiMPPT * tp.impA <= inv.dongMPPTMaxA ? '✓' : '✗'} (≤ ${TI.soVN(inv.dongMPPTMaxA)} A)`) : null);
+        n.soChuoi ? dong('Dòng vào 1 MPPT', [`${TI.soVN(n.chuoiMoiMPPT * tp.impA, 2)} A `, ket(n.chuoiMoiMPPT * tp.impA <= inv.dongMPPTMaxA), ` (≤ ${TI.soVN(inv.dongMPPTMaxA)} A)`]) : null);
     });
-    ds.push(dong('Tổng MPPT dùng / có', `${kq.mpptDung} / ${kq.mpptCo} ${kq.mpptDung <= kq.mpptCo ? '✓' : '✗'}`, kq.mpptDung <= kq.mpptCo ? '' : 'khong-dat'),
+    ds.push(dong('Tổng MPPT dùng / có', [`${kq.mpptDung} / ${kq.mpptCo} `, ket(kq.mpptDung <= kq.mpptCo)], kq.mpptDung <= kq.mpptCo ? '' : 'khong-dat'),
       TI.el('p', { class: 'mo nho' }, 'Mỗi mảng mái (hướng, độ nghiêng khác nhau) đấu vào MPPT riêng; các chuỗi chung 1 MPPT dài bằng nhau.'));
     return phan('3. Chia chuỗi', ...ds);
   }
@@ -158,7 +160,7 @@ const ManKyThuat = (() => {
             TI.el('select', { onchange: (e) => { dat.tietDien = e.target.value ? Number(e.target.value) : null; doi(); } },
               TI.el('option', { value: '' }, `Tự chọn (${SO(c.S) ? TI.soVN(c.S) + ' mm²' : '?'})`),
               ...KyThuat.TIET_DIEN_DC.map(s => TI.el('option', { value: String(s), selected: dat.tietDien === s }, `${s} mm²`))))),
-        SO(c.dU) ? dong('Sụt áp', `${TI.soVN(c.dU, 2)} V = ${TI.soVN(c.phanTram, 2)}% ${c.dat ? '✓' : '✗'}`, c.dat ? 'dat' : 'khong-dat') : dong('Sụt áp', CAN_DIEN),
+        SO(c.dU) ? dong('Sụt áp', [`${TI.soVN(c.dU, 2)} V = ${TI.soVN(c.phanTram, 2)}% `, ket(c.dat)], c.dat ? 'dat' : 'khong-dat') : dong('Sụt áp', CAN_DIEN),
         SO(c.dU) ? congThuc(`ΔU = 2 × ${TI.soVN(c.Lm)} × ${TI.soVN(c.I)} × ${TI.soVN(cfg.rhoDong, 4)} ÷ ${TI.soVN(c.S)} = ${TI.soVN(c.dU, 3)} V; ` +
           `${TI.soVN(c.dU, 3)} ÷ ${TI.soVN(n.vmpChuoi, 1)} V = ${TI.soVN(c.phanTram, 2)}% (ngưỡng ${TI.soVN(cfg.nguongSutApPhanTram)}%)`) : null);
     });
