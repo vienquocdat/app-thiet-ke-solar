@@ -24,6 +24,7 @@ const App = (() => {
     const man = phan[0] === 'ho-so' && phan[1] ? 'ho-so' : phan[0] === 'cai-dat' ? 'cai-dat' : 'danh-sach';
     document.body.dataset.man = man;
     document.getElementById('nut-lui').hidden = man === 'danh-sach';
+    document.querySelector('.nut-cai-dat').hidden = man === 'cai-dat';
     datPhuDe();
     window.scrollTo(0, 0);
     try {

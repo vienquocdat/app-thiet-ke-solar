@@ -37,6 +37,7 @@ const ManKyThuat = (() => {
     const kq = KyThuat.tinh({ tp, inv, cfg, nhomTam, dat: hs.kyThuat, chieuDaiMacDinh: hs.dien.quangDuongDayM, loaiDien: hs.dien.loaiDien });
     vung.replaceChildren(
       veThieu(kq, tp),
+      veTomTat(kq, inv),
       TI.el('div', { class: 'luoi-nhom' },
         veInverter(kq, tp, inv),
         veNhietDo(kq, tp),
@@ -63,6 +64,18 @@ const ManKyThuat = (() => {
     if (kq.canhBao.length) the.push(TI.el('div', { class: 'the canh-bao nho' }, TI.el('b', {}, 'Cảnh báo:'), TI.el('ul', { class: 'ds-thieu' }, ...kq.canhBao.map(t => TI.el('li', {}, t)))));
     if (!ds.length && !kq.loi.length && !kq.canhBao.length && kq.nhom.length) the.push(TI.el('div', { class: 'the dat nho co-icon' }, Icon('circle-check'), 'Thiết kế đạt mọi kiểm tra.'));
     return TI.el('div', {}, ...the);
+  }
+
+  // Dải tóm tắt: 4 kết quả người tư vấn cần nhìn đầu tiên.
+  function veTomTat(kq, inv) {
+    const o = (nhan, gt, phu) => TI.el('div', { class: 'kt-o' }, TI.el('small', {}, nhan),
+      gt ? TI.el('b', {}, gt) : TI.el('b', { class: 'gt-thieu' }, 'chưa có'), phu ? TI.el('span', {}, phu) : null);
+    const cachDau = kq.nhom.filter(n => n.soChuoi).map(n => `${n.soChuoi} × ${n.L}`).join(' + ');
+    return TI.el('div', { class: 'kt-tom-tat' },
+      o('Công suất DC', SO(kq.kWp) ? `${TI.soVN(kq.kWp, 2)} kWp` : null, `${kq.soTam} tấm`),
+      o('Inverter', inv ? `${inv.model}` : null, inv ? `${kq.soLuong} × ${TI.soVN(inv.congSuatACkW)} kW` : 'chọn ở mục 1'),
+      o('Cách đấu', cachDau ? `${cachDau} tấm` : null, cachDau ? 'chuỗi × tấm mỗi chuỗi' : ''),
+      o('Tỉ lệ DC/AC', SO(kq.dcAc) ? [TI.soVN(kq.dcAc, 2), ' ', ket(kq.dcAcDat)] : null, SO(cfg.dcAcMin) ? `cho phép ${TI.soVN(cfg.dcAcMin)}–${TI.soVN(cfg.dcAcMax)}` : ''));
   }
 
   const phan = (tieuDe, ...con) => TI.el('div', { class: 'the phan-kt' }, TI.el('h4', {}, tieuDe), ...con);

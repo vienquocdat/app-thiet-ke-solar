@@ -25,8 +25,8 @@ const ManXepPin = (() => {
     if (!f || !dsMang.length) {
       v.replaceChildren(TI.el('div', { class: 'the trong' },
         TI.el('b', {}, 'Chưa có mặt bằng mái'),
-        TI.el('p', { class: 'mo' }, 'Cần vẽ ít nhất 1 mảng mái và đặt tỉ lệ ở thẻ "Vẽ mái" trước.'),
-        TI.el('a', { class: 'nut', href: `#/ho-so/${hs.id}/ve-mai` }, 'Sang thẻ Vẽ mái')));
+        TI.el('p', { class: 'mo' }, 'Cần vẽ ít nhất 1 mảng mái và đặt tỉ lệ ở bước Vẽ mái trước.'),
+        TI.el('a', { class: 'nut', href: `#/ho-so/${hs.id}/ve-mai` }, 'Sang bước Vẽ mái')));
       return;
     }
     cfg = {};
@@ -139,7 +139,8 @@ const ManXepPin = (() => {
     for (const nc of dsNC) {
       const n = tamCua().filter(t => t.mang === nc.mang.id).length;
       const [x, y] = kv.S(HH.trongTam(nc.P));
-      chu(ctx, `${nc.mang.ten || 'Mảng mái'}: ${n} tấm`, x, y, MAU_MAI[nc.mang.loai] || '#1f6fbf');
+      // Đặt nhãn lệch lên trên tâm để không che mũi tên hướng dốc ở giữa mảng.
+      chu(ctx, `${nc.mang.ten || 'Mảng mái'}: ${n} tấm`, x, y - 28, MAU_MAI[nc.mang.loai] || '#1f6fbf');
     }
     capNhatGoiY();
   }
@@ -154,10 +155,13 @@ const ManXepPin = (() => {
     ctx.stroke();
   }
 
+  // Nhãn trên nền trắng bo góc để không lẫn với tấm pin và mũi tên bên dưới.
   function chu(ctx, t, x, y, mau) {
-    ctx.font = '600 12px system-ui, sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    ctx.lineWidth = 4; ctx.strokeStyle = 'rgba(255,255,255,.95)'; ctx.strokeText(t, x, y);
-    ctx.fillStyle = mau; ctx.fillText(t, x, y);
+    ctx.font = '600 12px "Be Vietnam Pro", system-ui, sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    const rong = ctx.measureText(t).width + 16;
+    ctx.fillStyle = 'rgba(255,255,255,.94)';
+    ctx.beginPath(); ctx.roundRect(x - rong / 2, y - 11, rong, 22, 6); ctx.fill();
+    ctx.fillStyle = mau; ctx.fillText(t, x, y + 0.5);
   }
 
   function capNhatGoiY() {
@@ -293,9 +297,9 @@ const ManXepPin = (() => {
         so('Số hàng tấm mỗi dãy khung', 'soHangMoiDay', 'hàng'),
         so('Khoảng hở giữa các dãy', 'khoangCachDayM', 'm'),
         so('Khung nhô ra ngoài mép mái', 'nhoRaM', 'm')),
-        TI.el('p', { class: 'mo nho' }, 'Vật cản thấp hơn khung (đã nhập chiều cao ở thẻ Vẽ mái) sẽ không chặn tấm. Số hàng mỗi dãy để trống = xếp liền. Khung nhô ra: để trống = không nhô, tấm vẫn chừa mép như mái thường.'));
+        TI.el('p', { class: 'mo nho' }, 'Vật cản thấp hơn khung (đã nhập chiều cao ở bước Vẽ mái) sẽ không chặn tấm. Số hàng mỗi dãy để trống = xếp liền. Khung nhô ra: để trống = không nhô, tấm vẫn chừa mép như mái thường.'));
     } else {
-      noiDung.push(TI.el('p', { class: 'mo nho' }, `Độ dốc mái: ${SO(m.doDocDo) ? TI.soVN(m.doDocDo) + '°' : 'chưa nhập'} (sửa ở thẻ Vẽ mái).`));
+      noiDung.push(TI.el('p', { class: 'mo nho' }, `Độ dốc mái: ${SO(m.doDocDo) ? TI.soVN(m.doDocDo) + '°' : 'chưa nhập'} (sửa ở bước Vẽ mái).`));
     }
     noiDung.push(TI.el('div', { class: 'hang' },
       TI.el('button', { type: 'button', class: 'nut nho', disabled: !coTheXep() || !khungNangDu(nc), onclick: () => {

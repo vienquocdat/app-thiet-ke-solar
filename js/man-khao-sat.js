@@ -3,24 +3,24 @@ const ManHoSo = (() => {
   const CHON = (...ds) => [['', '— chọn —'], ...ds.map(x => Array.isArray(x) ? x : [x, x])];
 
   const NHOM = [
-    { ten: 'Thông tin khách', truong: [
+    { ten: 'Thông tin khách', cot: 1, truong: [
       { d: 'khach.ten', n: 'Họ tên khách', k: 'chu', bb: true },
       { d: 'khach.dienThoai', n: 'Số điện thoại', k: 'dt' },
       { d: 'khach.zalo', n: 'Zalo (nếu khác số điện thoại)', k: 'dt' },
       { d: 'khach.diaChi', n: 'Địa chỉ lắp đặt', k: 'dia-chi' },
       { d: 'khach.toaDo', n: 'Vị trí GPS của nhà', k: 'toa-do' },
     ] },
-    { ten: 'Hóa đơn và thói quen dùng điện', hoaDon: true, truong: [
+    { ten: 'Hóa đơn và thói quen dùng điện', cot: 1, hoaDon: true, truong: [
       { d: 'dien.phanTramDungBanNgay', n: 'Điện dùng ban ngày khoảng bao nhiêu', k: 'so', dv: '%', bb: true },
       { d: 'dien.banDienDu', n: 'Khách muốn bán điện dư cho EVN?', k: 'chon', tc: CHON('Có', 'Không', 'Chưa rõ'), bb: true },
     ] },
-    { ten: 'Nhu cầu', truong: [
+    { ten: 'Nhu cầu', cot: 1, truong: [
       { d: 'nhuCau.loaiHe', n: 'Loại hệ khách quan tâm', k: 'chon',
         tc: CHON(['hoa-luoi', 'Hòa lưới bám tải'], ['hybrid', 'Hybrid (có pin lưu trữ)'], ['doc-lap', 'Độc lập'], ['chua-ro', 'Chưa rõ, cần tư vấn']) },
       { d: 'nhuCau.nganSach', n: 'Ngân sách dự kiến', k: 'tien' },
       { d: 'nhuCau.mucTieu', n: 'Mục tiêu của khách', k: 'van-ban', gy: 'Giảm tiền điện, dự phòng mất điện, chống nóng mái…' },
     ] },
-    { ten: 'Hiện trạng điện', truong: [
+    { ten: 'Hiện trạng điện', cot: 2, truong: [
       { d: 'dien.loaiDien', n: 'Điện nhà khách', k: 'chon', tc: CHON(['1-pha', '1 pha'], ['3-pha', '3 pha']), bb: true },
       { d: 'dien.viTriCongTo', n: 'Vị trí công tơ', k: 'chu' },
       { d: 'dien.viTriTuDien', n: 'Vị trí tủ điện tổng', k: 'chu' },
@@ -29,7 +29,7 @@ const ManHoSo = (() => {
       { d: 'dien.coWifi', n: 'Có wifi tại chỗ đặt inverter?', k: 'chon', tc: CHON('Có', 'Không', 'Yếu') },
       { d: 'dien.tiepDia', n: 'Hiện trạng tiếp địa', k: 'van-ban' },
     ] },
-    { ten: 'Hiện trạng mái', truong: [
+    { ten: 'Hiện trạng mái', cot: 2, truong: [
       { d: 'hienTrang.huongNha', n: 'Hướng mặt tiền nhà', k: 'chon',
         tc: CHON('Bắc', 'Đông Bắc', 'Đông', 'Đông Nam', 'Nam', 'Tây Nam', 'Tây', 'Tây Bắc') },
       { d: 'hienTrang.gocLaBan', n: 'Góc la bàn mặt tiền (nếu đo)', k: 'so', dv: '°' },
@@ -39,8 +39,8 @@ const ManHoSo = (() => {
       { d: 'hienTrang.loiLenMai', n: 'Lối lên mái', k: 'van-ban' },
       { d: 'hienTrang.ghiChuKhac', n: 'Ghi chú khác về mái', k: 'van-ban' },
     ] },
-    { ten: 'Ảnh khảo sát', anh: true },
-    { ten: 'Ghi chú chung', truong: [{ d: 'ghiChu', n: 'Ghi chú', k: 'van-ban' }] },
+    { ten: 'Ảnh khảo sát', cot: 2, anh: true },
+    { ten: 'Ghi chú chung', cot: 2, truong: [{ d: 'ghiChu', n: 'Ghi chú', k: 'van-ban' }] },
   ];
 
   const LOAI_ANH = [
@@ -141,7 +141,10 @@ const ManHoSo = (() => {
       TI.el('div', { class: 'dau-phieu' },
         TI.el('label', { class: 'truong' }, TI.el('span', { class: 'nhan-truong' }, 'Trạng thái hồ sơ'), chonTrangThai),
         oThieu),
-      TI.el('div', { class: 'luoi-nhom' }, ...dsNhom),
+      // Máy tính: cột trái là khách + điện năng + nhu cầu, cột phải là hiện trạng nhà. Điện thoại: nối 2 cột theo thứ tự.
+      TI.el('div', { class: 'luoi-hai-cot' },
+        TI.el('div', { class: 'cot-nhom' }, ...dsNhom.filter((_, i) => NHOM[i].cot === 1)),
+        TI.el('div', { class: 'cot-nhom' }, ...dsNhom.filter((_, i) => NHOM[i].cot === 2))),
       TI.el('h3', {}, 'Hồ sơ này'),
       TI.el('div', { class: 'hang' },
         TI.el('button', { class: 'nut', onclick: saoLuuHoSo }, ...Icon.chu('download', 'Sao lưu hồ sơ này')),
@@ -297,9 +300,10 @@ const ManHoSo = (() => {
   }
 
   function xemAnh(src) {
-    const lop = TI.el('div', { class: 'lop-xem-anh', onclick: () => lop.remove() },
-      TI.el('img', { src }), TI.el('span', {}, 'Chạm để đóng'));
+    const lop = TI.el('dialog', { class: 'lop-xem-anh', 'aria-label': 'Xem ảnh', onclick: () => lop.close(), onclose: () => lop.remove() },
+      TI.el('img', { src, alt: '' }), TI.el('span', {}, 'Chạm hoặc bấm Esc để đóng'));
     document.body.append(lop);
+    lop.showModal();
   }
 
   async function saoLuuHoSo() {

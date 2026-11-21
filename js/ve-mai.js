@@ -209,7 +209,8 @@ const ManVeMai = (() => {
 
     const M = m(), f = boDoi();
     for (const x of M.mangMai) veDaGiac(x.diem, MAU[x.loai] || MAU['be-tong'], laChon('mangMai', x.id), f, x.ten || 'Mảng mái');
-    for (const x of M.vatCan) veDaGiac(x.diem, MAU.vatCan, laChon('vatCan', x.id), f, tenVatCan(x), { nhanNho: true });
+    // Vật cản nhỏ, đứng sát nhau: chỉ vẽ số tròn, tên và diện tích xem ở danh sách (cùng số) bên bảng.
+    M.vatCan.forEach((x, i) => veDaGiac(x.diem, MAU.vatCan, laChon('vatCan', x.id), f, tenVatCan(x), { soThuTu: i + 1 }));
     if (M.cheDo === 'thang') {
       veDoan(M.tiLe.diem, MAU.tiLe, laChon('tiLe'), M.tiLe.chieuDaiM > 0 ? `${TI.soVN(M.tiLe.chieuDaiM)} m (chuẩn)` : 'cạnh chuẩn');
     } else {
@@ -270,10 +271,30 @@ const ManVeMai = (() => {
         veChu(`${TI.soVN(doDai(f, a, b), 2)} m`, ...trungDiem(S(a), S(b)), mau, 11);
       }
     }
-    if (f && ten !== null && diem.length >= 3) {
+    if (tuy.soThuTu && diem.length >= 3) {
+      veSoTron(tuy.soThuTu, ...HH.trongTam(P));
+    } else if (f && ten !== null && diem.length >= 3) {
       const [x, y] = HH.trongTam(P);
-      veChu(`${ten}\n${TI.soVN(dienTichM2(f, diem), 1)} m²`, x, y, mau, tuy.nhanNho ? 10 : 12);
+      veNhan([ten, `${TI.soVN(dienTichM2(f, diem), 1)} m²`], x, y, mau);
     }
+  }
+
+  // Số tròn màu nắng đánh dấu vật cản (khớp số trong danh sách vật cản).
+  function veSoTron(so, x, y) {
+    ctx.beginPath(); ctx.arc(x, y, 10, 0, Math.PI * 2);
+    ctx.fillStyle = '#FFB020'; ctx.fill(); ctx.lineWidth = 1.5; ctx.strokeStyle = '#0B2A4A'; ctx.stroke();
+    ctx.font = '700 11px "Be Vietnam Pro", system-ui, sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillStyle = '#0B2A4A'; ctx.fillText(String(so), x, y + 0.5);
+  }
+
+  // Nhãn trên nền trắng bo góc: đọc được trên mọi nền ảnh.
+  function veNhan(dong, x, y, mau) {
+    ctx.font = '600 12px "Be Vietnam Pro", system-ui, sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    const cao = 16, rong = Math.max(...dong.map(d => ctx.measureText(d).width)) + 16, tong = dong.length * cao + 8;
+    ctx.fillStyle = 'rgba(255,255,255,.92)';
+    ctx.beginPath(); ctx.roundRect(x - rong / 2, y - tong / 2, rong, tong, 6); ctx.fill();
+    ctx.fillStyle = mau;
+    dong.forEach((d, i) => ctx.fillText(d, x, y - tong / 2 + 4 + cao / 2 + i * cao));
   }
 
   function veDoan(diem, mau, dangChon, nhan) {
@@ -513,11 +534,11 @@ const ManVeMai = (() => {
     const tenHinh = x => laMai ? (x.ten || 'Mảng mái') : tenVatCan(x);
     const mau = x => laMai ? (MAU[x.loai] || MAU['be-tong']) : MAU.vatCan;
     const nd = [];
-    if (!f) nd.push(TI.el('p', { class: 'the canh-bao nho' }, 'Chưa đặt tỉ lệ ở thẻ "Tỉ lệ" nên chưa hiện được mét. Vẫn chấm được.'));
-    nd.push(TI.el('div', { class: 'danh-sach-hinh' }, ...ds.map(x => TI.el('button', {
+    if (!f) nd.push(TI.el('p', { class: 'the canh-bao nho' }, 'Chưa đặt tỉ lệ ở mục "Tỉ lệ" nên chưa hiện được mét. Vẫn chấm được.'));
+    nd.push(TI.el('div', { class: 'danh-sach-hinh' }, ...ds.map((x, i) => TI.el('button', {
       type: 'button', class: 'muc-hinh' + (laChon(nhom, x.id) ? ' dang-chon' : ''),
       onclick: () => { chon = { nhom, id: x.id }; dangThem = false; veBang(); veLai(); },
-    }, TI.el('i', { class: 'cham-mau', style: `background:${mau(x)}` }), tenHinh(x),
+    }, laMai ? TI.el('i', { class: 'cham-mau', style: `background:${mau(x)}` }) : TI.el('span', { class: 'so-tron', 'aria-hidden': 'true' }, String(i + 1)), tenHinh(x),
       TI.el('small', {}, f && x.diem.length >= 3 ? `${TI.soVN(dienTichM2(f, x.diem), 1)} m²` : `${x.diem.length} góc`)))));
 
     nd.push(TI.el('button', { type: 'button', class: 'nut', onclick: () => {
@@ -573,12 +594,11 @@ const ManVeMai = (() => {
     for (const [i, k] of ds.entries()) {
       const dangChonK = laChon('kiemTra', k.id);
       const ket = danhGiaKiemTra(f, k);
-      nd.push(TI.el('div', { class: 'the the-kiem-tra' + (dangChonK ? ' dang-chon' : ''), onclick: (e) => {
-        if (e.target.closest('input,button')) return;
-        chon = { nhom: 'kiemTra', id: k.id }; dangThem = k.diem.length < 2; veBang(); veLai();
-      } },
-        TI.el('div', { class: 'hang-giua' }, TI.el('b', {}, `Cạnh kiểm tra ${i + 1}`),
-          ket ? TI.el('span', { class: 'nhan ' + (ket.dat ? 'nhan-du' : 'nhan-thieu') }, ket.dat ? 'Đạt' : 'Chưa đạt') : null),
+      nd.push(TI.el('div', { class: 'the the-kiem-tra' + (dangChonK ? ' dang-chon' : '') },
+        TI.el('button', { type: 'button', class: 'nut-chon-kt', 'aria-pressed': String(dangChonK), onclick: () => {
+          chon = { nhom: 'kiemTra', id: k.id }; dangThem = k.diem.length < 2; veBang(); veLai();
+        } }, TI.el('b', {}, `Cạnh kiểm tra ${i + 1}`),
+          ket ? TI.el('span', { class: 'nhan ' + (ket.dat ? 'nhan-du' : 'nhan-thieu') }, ket.dat ? 'Đạt' : 'Chưa đạt') : TI.el('span', { class: 'mo nho' }, dangChonK ? 'Đang chọn' : 'Chọn để kẻ trên ảnh')),
         TI.el('label', { class: 'truong' }, TI.el('span', {}, 'Chiều dài đo thật bằng thước'),
           TI.el('div', { class: 'co-don-vi' }, TI.oSo(k.chieuDaiThatM, n => { k.chieuDaiThatM = n; luuSau(); veLai(); }), TI.el('i', {}, 'm'))),
         TI.el('div', { class: 'mo nho' }, ket ? ket.chu : (k.diem.length < 2 ? `Chấm ${k.diem.length}/2 điểm trên ảnh` : 'Chưa đủ dữ liệu (tỉ lệ hoặc chiều dài thật)')),

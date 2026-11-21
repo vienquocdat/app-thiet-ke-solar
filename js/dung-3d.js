@@ -57,8 +57,8 @@ const ManDung3D = (() => {
     if (!f || !dsMang.length) {
       v.replaceChildren(TI.el('div', { class: 'the trong' },
         TI.el('b', {}, 'Chưa có mặt bằng mái'),
-        TI.el('p', { class: 'mo' }, 'Cần vẽ mái và đặt tỉ lệ ở thẻ "Vẽ mái", xếp pin ở thẻ "Xếp pin" trước.'),
-        TI.el('a', { class: 'nut', href: `#/ho-so/${hs.id}/ve-mai` }, 'Sang thẻ Vẽ mái')));
+        TI.el('p', { class: 'mo' }, 'Cần vẽ mái và đặt tỉ lệ ở bước Vẽ mái, xếp pin ở bước Xếp pin trước.'),
+        TI.el('a', { class: 'nut', href: `#/ho-so/${hs.id}/ve-mai` }, 'Sang bước Vẽ mái')));
       return;
     }
     for (const m of dsMang) {
@@ -69,7 +69,7 @@ const ManDung3D = (() => {
     const dsTP = (await DuLieu.lay('tam-pin')).bang.dong;
     tp = hs.xepPin ? dsTP.find(d => d.model === hs.xepPin.maTamPin) || null : null;
 
-    khung3d = TI.el('div', { class: 'khung-3d' }, TI.el('p', { class: 'dang-tai' }, 'Đang tải thư viện 3D…'));
+    khung3d = TI.el('div', { class: 'khung-3d' }, TI.el('div', { class: 'xuong xuong-3d', role: 'status', 'aria-label': 'Đang tải thư viện 3D' }));
     vungCanhBao = TI.el('div', {});
     vungThongKe = TI.el('div', { class: 'thong-ke-3d' });
     const thanhGoc = TI.el('div', { class: 'phan-doan' }, ...GOC.map(([ma, ten]) =>
@@ -255,7 +255,7 @@ const ManDung3D = (() => {
     const coTP = tp && SO(tp.daiMm) && SO(tp.rongMm);
     const dsTam = hs.xepPin ? hs.xepPin.tam : [];
     if (!coTP) canhBao.push('Chưa có kích thước tấm pin (Cài đặt) → chưa vẽ tấm pin.');
-    else if (!dsTam.length) canhBao.push('Chưa xếp tấm pin ở thẻ "Xếp pin".');
+    else if (!dsTam.length) canhBao.push('Chưa xếp tấm pin ở bước Xếp pin.');
     if (coTP) for (const nc of dsNC) {
       const tams = dsTam.filter(t => t.mang === nc.mang.id);
       if (!tams.length) continue;
@@ -417,7 +417,7 @@ const ManDung3D = (() => {
     await LuuTru.ghi('anh', a);
     hs.hienTrang.anh.push({ id: a.id, loai: 'phoi-canh', ghiChu: `Phối cảnh 3D – ${ten}` });
     luuSau();
-    TI.thongBao('Đã lưu ảnh vào hồ sơ (thẻ Khảo sát → Ảnh)');
+    TI.thongBao('Đã lưu ảnh vào hồ sơ (bước Khảo sát → Ảnh khảo sát)');
   }
   async function taiAnh() {
     if (!r) return;
@@ -467,8 +467,35 @@ const ManDung3D = (() => {
     nd.push(TI.el('details', { class: 'nhom' }, TI.el('summary', {}, 'Khối nhà'), TI.el('div', { class: 'nhom-noi-dung' },
       o('Chiều cao nhà (chỉ để hình đẹp)', hs.dung3d.caoNhaM, (n) => { hs.dung3d.caoNhaM = n; }, 'm', 'Để trống thì vẽ tượng trưng 3 m.'))));
     return TI.el('div', {}, TI.el('h3', {}, 'Thông số dựng 3D'),
-      TI.el('p', { class: 'mo nho' }, 'Độ dốc mái, khung nâng, chiều cao vật cản lấy từ thẻ Vẽ mái / Xếp pin / Thông số.'), ...nd);
+      TI.el('p', { class: 'mo nho' }, 'Độ dốc mái, khung nâng, chiều cao vật cản lấy từ các bước Vẽ mái, Xếp pin, Thông số.'), ...nd);
   }
 
-  return { ve, huy, _trangThai: () => ({ thongKe, canhBao, coRenderer: !!r }) };
+  // Dựng ảnh phối cảnh 3D cho đúng một phương án (giữ n tấm đầu của mỗi mảng, cùng thứ tự với mặt bằng trong báo giá).
+  // Dựng ngoài màn hình rồi giải phóng ngay; không lưu gì vào hồ sơ.
+  async function chupTheoPhuongAn(hoSo, soTamMang, W = 900, H = 620) {
+    const ban = structuredClone(hoSo);
+    if (ban.xepPin) {
+      const theoMang = {};
+      for (const t of ban.xepPin.tam) (theoMang[t.mang] = theoMang[t.mang] || []).push(t);
+      ban.xepPin.tam = Object.entries(theoMang).flatMap(([id, ds]) =>
+        ds.sort((a, b) => a.v - b.v || a.u - b.u).slice(0, soTamMang[id] ?? ds.length));
+    }
+    const gocCu = gocDangXem;
+    gocDangXem = 'iso';
+    const vung = TI.el('div', { class: 'giu-trang', style: `width:${W}px` });
+    document.body.append(vung);
+    try {
+      await ve(vung, ban, () => {});
+      if (!r || !khung3d) throw new Error('Không dựng được 3D');
+      khung3d.style.height = H + 'px';
+      r.setSize(W, H, false); cam.aspect = W / H; cam.updateProjectionMatrix();
+      datGoc('iso');
+      await new Promise(ok => requestAnimationFrame(() => requestAnimationFrame(ok)));
+      return anhHienTai();
+    } finally {
+      huy(); vung.remove(); gocDangXem = gocCu;
+    }
+  }
+
+  return { ve, huy, chupTheoPhuongAn, _trangThai: () => ({ thongKe, canhBao, coRenderer: !!r }) };
 })();

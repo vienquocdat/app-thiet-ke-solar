@@ -105,7 +105,7 @@ const KyThuat = (() => {
     }
     kq.mpptDung = mpptDung;
     if (mpptDung > kq.mpptCo) kq.loi.push(`Cần ${mpptDung} MPPT nhưng ${soLuong} inverter chỉ có ${kq.mpptCo} MPPT.`);
-    if (!SO(chieuDaiMacDinh) && kq.nhom.some(n => !SO(n.cap.Lm))) kq.canhBao.push('Chưa có quãng đường đi dây (thẻ Thông số) → chưa tính được sụt áp.');
+    if (!SO(chieuDaiMacDinh) && kq.nhom.some(n => !SO(n.cap.Lm))) kq.canhBao.push('Chưa có quãng đường đi dây (bước Thông số) → chưa tính được sụt áp.');
     kq.vocMaxHeThong = Math.max(0, ...kq.nhom.map(n => n.vocMaxChuoi));
 
     // Thiết bị bảo vệ (hệ số lấy từ Cài đặt, thiếu thì để [CẦN ĐIỀN])

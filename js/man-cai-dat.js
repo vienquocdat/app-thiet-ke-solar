@@ -91,14 +91,21 @@ const ManCaiDat = (() => {
     if (dinhNghia.kieu === 'chon') {
       const s = TI.el('select', { class: gt === CAN_DIEN ? 'can-dien' : '',
         onchange: (e) => { s.classList.toggle('can-dien', e.target.value === CAN_DIEN); khiDoi(e.target.value); } },
-        ...dinhNghia.tuyChon.map(x => TI.el('option', { value: x, selected: x === gt }, x)));
+        ...dinhNghia.tuyChon.map(x => TI.el('option', { value: x, selected: x === gt }, x === CAN_DIEN ? 'Chưa chọn' : x)));
       return s;
+    }
+    // Ô giá (đơn vị bắt đầu bằng "đ"): ô tiền chuẩn Việt Nam – tự chèn dấu chấm, chữ "đ" cố định.
+    if (dinhNghia.kieu === 'so' && /^đ/.test(dinhNghia.donVi || '')) {
+      const khung = ONhap.tien(gt, (n) => { o.classList.toggle('can-dien', n === null); khiDoi(n === null ? CAN_DIEN : n); });
+      const o = khung.querySelector('input');
+      o.classList.toggle('can-dien', gt === CAN_DIEN);
+      return khung;
     }
     const laSo = dinhNghia.kieu === 'so';
     const o = TI.el('input', {
       type: 'text', inputmode: laSo ? 'decimal' : null,
       value: gt === CAN_DIEN ? '' : (laSo ? TI.soVN(gt) : gt ?? ''),
-      placeholder: dinhNghia.goiY ? `${CAN_DIEN} ${dinhNghia.goiY}` : CAN_DIEN,
+      placeholder: dinhNghia.goiY || 'Chưa có số liệu',
       class: gt === CAN_DIEN ? 'can-dien' : '',
     });
     o.addEventListener('input', () => {

@@ -96,10 +96,20 @@ const ManThongSo = (() => {
     const ds = dsO(hs);
     oTongSo = TI.el('div', { class: 'vung-thieu' });
     dsTruong = [];
-    const nhom = [...new Set(ds.map(o => o.nhom))];
+    // Chia thẻ theo từng mảng mái / vật cản để nhãn không phải lặp "Mái bê tông: …" ở mọi dòng.
+    // (Danh sách "Còn thiếu" vẫn dùng tên đầy đủ để biết ô nào của mảng nào.)
+    const vietHoa = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+    const tach = (o) => {
+      const i = o.nhan.indexOf(': ');
+      if (o.nhom === 'Mảng mái') return i > 0 ? { the: o.nhan.slice(0, i), nhan: vietHoa(o.nhan.slice(i + 2)) } : { the: 'Khối nhà', nhan: o.nhan };
+      if (o.nhom === 'Vật cản' && i > 0) return { the: 'Vật cản – chiều cao so với mặt mái', nhan: o.nhan.slice(0, i) };
+      return { the: o.nhom, nhan: o.nhan };
+    };
+    const dsT = ds.map((o, i) => ({ o, id: 'ts-' + i, ...tach(o) }));
+    const nhom = [...new Set(dsT.map(x => x.the))];
     const phanHoSo = nhom.map(ten => TI.el('div', { class: 'the nhom-thong-so' },
       TI.el('h4', {}, ten),
-      ...ds.map((o, i) => [o, i]).filter(([o]) => o.nhom === ten).map(([o, i]) => veO(o, 'ts-' + i))));
+      ...dsT.filter(x => x.the === ten).map(x => veO(x.o, x.id, x.nhan))));
 
     // Số liệu chung trong Cài đặt
     const dongChung = [];
@@ -132,7 +142,7 @@ const ManThongSo = (() => {
     ManHoSo.capNhatHuyHieu(thieuDs.length);
   }
 
-  function veO(o, id) {
+  function veO(o, id, nhanHien = o.nhan) {
     const chuThieu = o.kieu === 'so' && (o.dv === 'm' || o.dv === '°') ? 'Chưa đo' : 'Chưa có';
     let o2;
     if (o.kieu === 'lienKet') {
@@ -148,7 +158,7 @@ const ManThongSo = (() => {
         { placeholder: o.batBuoc ? 'Nhập số đo' : 'Để trống nếu không có' });
       o2 = o.dv ? ONhap.hauTo(oNhap, o.dv) : oNhap;
     }
-    const tr = ONhap.truong({ nhan: o.nhan, id, ghiChu: o.ghiChu && o.kieu !== 'lienKet' ? o.ghiChu : null,
+    const tr = ONhap.truong({ nhan: nhanHien, id, ghiChu: o.ghiChu && o.kieu !== 'lienKet' ? o.ghiChu : null,
       khongBatBuoc: !o.batBuoc, chuThieu, toO: o.kieu !== 'lienKet' }, o2);
     dsTruong.push({ o, id, datThieu: tr.datThieu });
     return tr.el;

@@ -99,10 +99,10 @@ const ManBaoGia = (() => {
         veChiTiet(dx)),
       TI.el('aside', { class: 'bgm-ben' }, veTomTat(dx, thieu),
         TI.el('div', { class: 'bgm-nut-xuat' },
-          TI.el('button', { type: 'button', class: 'nut', onclick: () => xemTruoc(ketQua, dx, thieu) }, ...Icon.chu('eye', 'Xem trước')),
           thieu.length
-            ? TI.el('button', { type: 'button', class: 'nut', onclick: () => xuatPDF(ketQua, dx, thieu) }, ...Icon.chu('file-download', 'Xuất bản nháp'))
-            : TI.el('button', { type: 'button', class: 'nut chinh', onclick: () => xuatPDF(ketQua, dx, thieu) }, ...Icon.chu('file-download', 'Xuất PDF báo giá'))))));
+            ? TI.el('button', { type: 'button', class: 'nut nut-xuat', onclick: () => xuatPDF(ketQua, dx, thieu) }, ...Icon.chu('file-download', 'Xuất bản nháp'))
+            : TI.el('button', { type: 'button', class: 'nut chinh nut-xuat', onclick: () => xuatPDF(ketQua, dx, thieu) }, ...Icon.chu('file-download', 'Xuất PDF báo giá')),
+          TI.el('button', { type: 'button', class: 'nut-chu nut-xem', onclick: () => xemTruoc(ketQua, dx, thieu) }, ...Icon.chu('eye', 'Xem trước các trang'))))));
   }
 
   // Tóm tắt phương án đề xuất + danh sách còn thiếu
@@ -131,11 +131,6 @@ const ManBaoGia = (() => {
         : TI.el('div', { class: 'the dat nho co-icon' }, Icon('circle-check'), 'Đủ số liệu để xuất báo giá gửi khách.'));
   }
 
-  function anh3D() {
-    const ds = hs.hienTrang.anh.filter(a => a.loai === 'phoi-canh');
-    return ds.length ? ds[ds.length - 1].id : null;
-  }
-
   // Những mục bắt buộc phải có trước khi xuất báo giá gửi khách.
   function dsThieuChung() {
     const ds = [];
@@ -146,11 +141,16 @@ const ManBaoGia = (() => {
     }
     if (!coGT(nc.bt.nguon) || !coGT(nc.bt.ngay)) ds.push('Nguồn và ngày áp dụng giá điện EVN (Cài đặt)');
     if (!coGT(nc.nguonNang)) ds.push('Nguồn số giờ nắng (Cài đặt)');
-    if (!anh3D()) ds.push('Ảnh phối cảnh 3D (bấm "Chụp ảnh vào hồ sơ" ở bước 3D)');
     if (!coGT(hs.khach.ten)) ds.push('Tên khách hàng');
     return ds;
   }
-  const dsThieu = (dx) => [...dx.kq.thieu, ...dsThieuChung()];
+  // Phương án đề xuất còn lỗi kỹ thuật hoặc tỉ lệ DC/AC ngoài khoảng cho phép → chưa được gửi khách.
+  function dsLoiKyThuat(dx) {
+    const kt = dx.kq.kt, ds = kt.loi.map(l => `Lỗi kỹ thuật (${dx.pa.ten}): ${l}`);
+    if (SO(kt.dcAc) && kt.dcAcDat === false) ds.push(`Tỉ lệ DC/AC ${TI.soVN(kt.dcAc, 2)} ngoài khoảng cho phép (${dx.pa.ten}) – chọn lại inverter hoặc số tấm`);
+    return ds;
+  }
+  const dsThieu = (dx) => [...dx.kq.thieu, ...dsLoiKyThuat(dx), ...dsThieuChung()];
 
   function veTheP({ pa, kq, inv }, i) {
     const goc = hs.phuongAn[i], laDX = goc.id === hs.baoGia.deXuat;
@@ -335,8 +335,12 @@ const ManBaoGia = (() => {
     }
     for (const n of dsNC) {
       const so = Math.min(pa.soTamMang[n.mang.id] ?? 0, hs.xepPin.tam.filter(t => t.mang === n.mang.id).length);
-      const [x, y] = S(HH.trongTam(n.P)); g.font = '600 13px system-ui, sans-serif'; g.textAlign = 'center';
-      g.lineWidth = 4; g.strokeStyle = '#fff'; g.strokeText(`${n.mang.ten || 'Mảng mái'}: ${so} tấm`, x, y); g.fillStyle = '#b45309'; g.fillText(`${n.mang.ten || 'Mảng mái'}: ${so} tấm`, x, y);
+      const [x, y] = S(HH.trongTam(n.P)), t = `${n.mang.ten || 'Mảng mái'}: ${so} tấm`;
+      g.font = '600 13px "Be Vietnam Pro", system-ui, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
+      const rong = g.measureText(t).width + 16;
+      g.fillStyle = 'rgba(255,255,255,.95)'; g.beginPath(); g.roundRect(x - rong / 2, y - 12, rong, 24, 6); g.fill();
+      g.strokeStyle = '#D5DBE0'; g.lineWidth = 1; g.stroke();
+      g.fillStyle = '#0B2A4A'; g.fillText(t, x, y + 0.5); g.textBaseline = 'alphabetic';
     }
     // Thước tỉ lệ 5 m
     const L = 5 * s; g.strokeStyle = '#222'; g.lineWidth = 2; g.beginPath(); g.moveTo(14, H - 14); g.lineTo(14 + L, H - 14); g.stroke();
@@ -384,9 +388,9 @@ const ManBaoGia = (() => {
     const chiSo = (nhan, gt, phu) => h('div', { class: 'pdf-chi-so' }, h('small', {}, nhan), h('b', {}, gt === null ? thieu() : gt), phu ? h('span', {}, phu) : null);
 
     // Ảnh
+    // Ảnh 3D dựng lại theo đúng số tấm của phương án đề xuất (ảnh chụp tay ở bước 3D có thể khác số tấm).
     let anhPC = null;
-    const idPC = anh3D();
-    if (idPC) { const a = await LuuTru.lay('anh', idPC); anhPC = a && a.dataURL; }
+    try { anhPC = await ManDung3D.chupTheoPhuongAn(hs, pa.soTamMang); } catch (e) { console.warn('Không dựng được 3D cho báo giá:', e); }
     const anhMB = anhMatBang(pa);
     const bd = kq.SL ? veBieuDo(document.createElement('canvas'), kq.SL, 700, 250).toDataURL('image/png') : null;
 
@@ -405,7 +409,7 @@ const ManBaoGia = (() => {
         chiSo('Tiết kiệm mỗi tháng', SO(kq.tietKiemNam1) ? tienGon(kq.tietKiemNam1 / 12) : null, 'trung bình năm đầu'),
         chiSo('Hoàn vốn dự kiến', SO(kq.hoanVon) ? `${TI.soVN(kq.hoanVon, 1)} năm` : null, SO(kq.chiPhi.tong) ? `vốn ${tienGon(kq.chiPhi.tong)}` : '')),
       h('div', { class: 'pdf-hai-anh' },
-        h('figure', {}, anhPC ? h('img', { src: anhPC, alt: '' }) : h('div', { class: 'pdf-anh-trong' }, 'Ảnh phối cảnh 3D: ', thieu()), h('figcaption', {}, 'Phối cảnh 3D')),
+        h('figure', {}, anhPC ? h('img', { src: anhPC, alt: '' }) : h('div', { class: 'pdf-anh-trong' }, 'Không dựng được ảnh 3D (cần kết nối mạng)'), h('figcaption', {}, `Phối cảnh 3D – ${pa.soTam} tấm`)),
         h('figure', {}, h('img', { src: anhMB, alt: '' }), h('figcaption', {}, 'Mặt bằng xếp tấm pin'))),
       h('p', { class: 'pdf-ghi-chu' }, 'Hình minh họa dựng theo số đo khảo sát; vị trí tấm có thể điều chỉnh nhỏ khi thi công.'));
 
@@ -420,7 +424,6 @@ const ManBaoGia = (() => {
         ['Inverter', dx.inv ? `${dx.inv.model} × ${pa.soLuong || 1} (${TI.soVN(dx.inv.congSuatACkW)} kW, ${dx.inv.loai}, ${dx.inv.soPha})` : thieu()],
         ['Pin lưu trữ', pa.pin && pa.pin.model ? `${pa.pin.model} × ${pa.pin.soLuong || 1}` : 'Không'],
         ['Cách lắp', nc.mang.filter(m => pa.soTamMang[m.id]).map(m => `${m.ten}: ${m.kieuLap === 'khung-nang' ? 'khung nâng' : 'áp mái'}`).join('; ')],
-        ['Tỉ lệ DC/AC', SO(kq.kt.dcAc) ? TI.soVN(kq.kt.dcAc, 2) : thieu()],
       ]),
       muc(4, 'Sản lượng điện dự kiến 12 tháng'),
       bd ? h('img', { class: 'pdf-bieu-do', src: bd, alt: '' }) : h('div', { class: 'pdf-anh-trong' }, 'Biểu đồ sản lượng: ', thieu()),
@@ -477,13 +480,14 @@ const ManBaoGia = (() => {
     if (document.fonts && document.fonts.ready) await document.fonts.ready;
     const trang = await taoTrang(ketQua, dx, thieu.length > 0);
     const ti = Math.min(1, (window.innerWidth - 24) / 794);
-    const lop = TI.el('div', { class: 'lop-xem-truoc' },
-      TI.el('div', { class: 'hang' }, TI.el('button', { type: 'button', class: 'nut', onclick: () => lop.remove() }, ...Icon.chu('x', 'Đóng')),
-        TI.el('button', { type: 'button', class: 'nut chinh', onclick: () => { lop.remove(); xuatPDF(ketQua, dx, thieu); } },
+    const lop = TI.el('dialog', { class: 'lop-xem-truoc', 'aria-label': 'Xem trước báo giá', onclose: () => lop.remove() },
+      TI.el('div', { class: 'hang' }, TI.el('button', { type: 'button', class: 'nut', onclick: () => lop.close() }, ...Icon.chu('x', 'Đóng')),
+        TI.el('button', { type: 'button', class: 'nut chinh', onclick: () => { lop.close(); xuatPDF(ketQua, dx, thieu); } },
           ...Icon.chu('file-download', thieu.length ? 'Xuất bản nháp' : 'Xuất PDF'))),
       ...trang.map(t => TI.el('div', { class: 'khung-trang', style: `width:${794 * ti}px;height:${1123 * ti}px` },
         (t.style.transform = `scale(${ti})`, t.style.transformOrigin = '0 0', t))));
     document.body.append(lop);
+    lop.showModal();
   }
 
   async function napThuVien() {
