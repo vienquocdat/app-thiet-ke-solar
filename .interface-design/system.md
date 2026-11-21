@@ -170,3 +170,12 @@ Bảng thuật ngữ (dùng đúng một cách gọi trong toàn app):
 | Phương án | gói, option |
 | Báo giá | bảng giá |
 | Số liệu chung (trong Cài đặt) | dữ liệu gốc |
+
+## 15. Ô nhập dùng chung (js/o-nhap.js)
+- `ONhap.thang` – ô chọn "Tháng 11/2026" (36 tháng gần nhất), lưu `YYYY-MM`.
+- `ONhap.tien` – tự chèn dấu chấm nghìn, căn phải, chữ "đ" cố định cuối ô; gõ tắt `85k`, `1tr2`, `1,5tr`, `2 tỷ`.
+- `ONhap.dienThoai` – hiện `0912 345 678`, lưu chữ số; đủ 10 số thì hiện nút Gọi / Zalo.
+- `ONhap.diaChi` – Tỉnh/Thành phố (34 đơn vị từ 01/07/2025) → Phường/Xã (gõ tay, gợi ý tên đã nhập ở hồ sơ khác) → số nhà, đường, thôn/xóm; ghép lại vào `khach.diaChi`.
+- `ONhap.truong` – nhãn + ô + ghi chú; khi thiếu: chip "Chưa có"/"Chưa đo" và ô viền nét đứt màu nắng.
+- `ONhap.dsThieu` – khung "Còn thiếu N mục", mỗi mục là nút nhảy tới ô; quá 5 mục thì gọn còn 4 + "Xem thêm".
+- Khảo sát và Thông số: máy tính chia nhóm thành 2 cột (`.luoi-nhom`), điện thoại 1 cột.

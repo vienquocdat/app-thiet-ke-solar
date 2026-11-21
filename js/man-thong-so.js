@@ -13,7 +13,7 @@ const ManThongSo = (() => {
       tc: [['', '— chọn —'], ['1-pha', '1 pha'], ['3-pha', '3 pha']],
       lay: () => hs.dien.loaiDien, dat: (v) => { hs.dien.loaiDien = v; } });
     const coHoaDon = hs.dien.hoaDon.some(h => SO(h.kWh) && h.kWh > 0);
-    lk('Khảo sát', 'Số điện (kWh) ít nhất 1 tháng hóa đơn', coHoaDon, 'khao-sat', coHoaDon ? 'Đã có' : 'Nhập ở thẻ Khảo sát → Hóa đơn');
+    lk('Khảo sát', 'Số điện (kWh) ít nhất 1 tháng hóa đơn', coHoaDon, 'khao-sat', coHoaDon ? 'Đã có' : 'Nhập ở bước Khảo sát → Hóa đơn');
     ds.push({ nhom: 'Khảo sát', nhan: 'Điện dùng ban ngày khoảng bao nhiêu', dv: '%', kieu: 'so', batBuoc: true,
       lay: () => hs.dien.phanTramDungBanNgay, dat: (n) => { hs.dien.phanTramDungBanNgay = n; }, ghiChu: 'Dùng tính tiền tiết kiệm (Báo giá)' });
     ds.push({ nhom: 'Khảo sát', nhan: 'Khách muốn bán điện dư cho EVN?', kieu: 'chon', batBuoc: true,
@@ -25,13 +25,13 @@ const ManThongSo = (() => {
     // --- Tỉ lệ mái ---
     const M = hs.mai;
     if (!M || !M.anhNen) {
-      lk('Tỉ lệ mái', 'Ảnh mái và tỉ lệ', false, 've-mai', 'Chưa chọn ảnh mái ở thẻ Vẽ mái');
+      lk('Tỉ lệ mái', 'Ảnh mái và tỉ lệ', false, 've-mai', 'Chưa chọn ảnh mái ở bước Vẽ mái');
     } else if (M.cheDo === 'thang') {
-      if (M.tiLe.diem.length < 2) lk('Tỉ lệ mái', 'Kẻ cạnh chuẩn trên ảnh', false, 've-mai', 'Kẻ ở thẻ Vẽ mái → Tỉ lệ');
+      if (M.tiLe.diem.length < 2) lk('Tỉ lệ mái', 'Kẻ cạnh chuẩn trên ảnh', false, 've-mai', 'Kẻ ở bước Vẽ mái → Tỉ lệ');
       ds.push({ nhom: 'Tỉ lệ mái', nhan: 'Chiều dài thật của cạnh chuẩn (đo bằng thước)', dv: 'm', kieu: 'so', batBuoc: true,
         lay: () => M.tiLe.chieuDaiM, dat: (n) => { M.tiLe.chieuDaiM = n; } });
     } else {
-      if (M.nan.diem.length < 4) lk('Tỉ lệ mái', 'Chấm 4 góc hình chữ nhật chuẩn trên ảnh', false, 've-mai', 'Chấm ở thẻ Vẽ mái → Tỉ lệ');
+      if (M.nan.diem.length < 4) lk('Tỉ lệ mái', 'Chấm 4 góc hình chữ nhật chuẩn trên ảnh', false, 've-mai', 'Chấm ở bước Vẽ mái → Tỉ lệ');
       ds.push({ nhom: 'Tỉ lệ mái', nhan: 'Cạnh A (góc 1→2) đo bằng thước', dv: 'm', kieu: 'so', batBuoc: true,
         lay: () => M.nan.canhA, dat: (n) => { M.nan.canhA = n; } });
       ds.push({ nhom: 'Tỉ lệ mái', nhan: 'Cạnh B (góc 2→3) đo bằng thước', dv: 'm', kieu: 'so', batBuoc: true,
@@ -41,7 +41,7 @@ const ManThongSo = (() => {
     if (M) {
       // --- Mảng mái ---
       const dsMang = M.mangMai.filter(m => m.diem.length >= 3);
-      if (!dsMang.length) lk('Mảng mái', 'Vẽ ít nhất 1 mảng mái', false, 've-mai', 'Vẽ ở thẻ Vẽ mái → Mảng mái');
+      if (!dsMang.length) lk('Mảng mái', 'Vẽ ít nhất 1 mảng mái', false, 've-mai', 'Vẽ ở bước Vẽ mái → Mảng mái');
       dsMang.forEach((m, i) => {
         const ten = m.ten || 'Mảng mái';
         if (!m.xep) m.xep = XepPin.caiDatMacDinh(m, m.diem);
@@ -89,66 +89,69 @@ const ManThongSo = (() => {
   const thieu = (o) => o.kieu === 'lienKet' ? !o.du : o.kieu === 'so' ? !SO(o.lay()) : !o.lay();
   function demThieu(hs) { return dsO(hs).filter(o => o.batBuoc && thieu(o)).length; }
 
-  let hs, luuSau, oTongSo;
+  let hs, luuSau, oTongSo, dsTruong = [], tongChung = 0;
 
   async function ve(v, hoSo, hamLuu) {
     hs = hoSo; luuSau = hamLuu;
     const ds = dsO(hs);
-    oTongSo = TI.el('div', {});
+    oTongSo = TI.el('div', { class: 'vung-thieu' });
+    dsTruong = [];
     const nhom = [...new Set(ds.map(o => o.nhom))];
-    const phanHoSo = nhom.map(ten => TI.el('div', { class: 'the' },
+    const phanHoSo = nhom.map(ten => TI.el('div', { class: 'the nhom-thong-so' },
       TI.el('h4', {}, ten),
-      ...ds.filter(o => o.nhom === ten).map(veO)));
+      ...ds.map((o, i) => [o, i]).filter(([o]) => o.nhom === ten).map(([o, i]) => veO(o, 'ts-' + i))));
 
     // Số liệu chung trong Cài đặt
     const dongChung = [];
-    let tongChung = 0;
+    tongChung = 0;
     for (const tenFile of DuLieu.DANH_SACH) {
       const nd = await DuLieu.lay(tenFile), n = DuLieu.demCanDien(nd);
       tongChung += n;
       if (n) dongChung.push(TI.el('a', { class: 'muc-hinh lien-ket-cai-dat', href: `#/cai-dat/${tenFile}` },
-        nd.tieuDe, TI.el('small', { class: 'can-dien' }, `${n} ô ${CAN_DIEN}`), Icon('chevron-right', { co: 18 })));
+        nd.tieuDe, TI.el('small', { class: 'nhan nhan-thieu' }, `${n} ô chưa điền`), Icon('chevron-right', { co: 18 })));
     }
 
     v.replaceChildren(
       oTongSo,
       TI.el('h3', {}, 'Thông số của nhà này'),
-      TI.el('p', { class: 'mo nho' }, 'Ô viền vàng nét đứt là còn thiếu.Điền ở đây hay ở các thẻ khác đều như nhau. Chưa có số đo chính xác thì để trống, có rồi điền sau.'),
-      ...phanHoSo,
+      TI.el('p', { class: 'mo nho' }, 'Ô viền vàng nét đứt là còn thiếu. Điền ở đây hay ở các bước khác đều như nhau. Chưa có số đo chính xác thì để trống, có rồi điền sau.'),
+      TI.el('div', { class: 'luoi-nhom' }, ...phanHoSo),
       TI.el('h3', {}, 'Số liệu chung của công ty (Cài đặt)'),
       TI.el('p', { class: 'mo nho' }, 'Dùng cho mọi hồ sơ: thiết bị, giá, giá điện, giờ nắng, hằng số tính toán. Bấm vào từng mục để điền.'),
-      dongChung.length ? TI.el('div', { class: 'danh-sach-hinh' }, ...dongChung) : TI.el('div', { class: 'the dat nho co-icon' }, Icon('circle-check'), 'Đã điền đủ số liệu chung.'));
-    capNhatTong(tongChung);
+      dongChung.length ? TI.el('div', { class: 'danh-sach-hinh luoi-chung' }, ...dongChung) : TI.el('div', { class: 'the dat nho co-icon' }, Icon('circle-check'), 'Đã điền đủ số liệu chung.'));
+    capNhatTong();
   }
 
-  function capNhatTong(tongChung) {
-    if (tongChung !== undefined) oTongSo.dataset.chung = tongChung;
-    const n = demThieu(hs), c = Number(oTongSo.dataset.chung || 0);
-    oTongSo.replaceChildren(TI.el('div', { class: 'the co-icon ' + (n || c ? 'canh-bao' : 'dat') },
-      Icon(n || c ? 'alert-triangle' : 'circle-check'),
-      n || c ? `Còn thiếu: ${n} thông số của nhà này, ${c} ô số liệu chung.` : 'Đã đủ thông số.'));
-    ManHoSo.capNhatHuyHieu(n);
+  // Tính lại: đánh dấu ô thiếu + danh sách "Còn thiếu N mục" (bấm để nhảy tới ô).
+  function capNhatTong() {
+    const thieuDs = dsTruong.filter(t => { const x = t.o.batBuoc && thieu(t.o); t.datThieu(x); return x; });
+    oTongSo.replaceChildren(
+      ONhap.dsThieu(thieuDs.map(t => ({ id: t.id, nhan: t.o.nhan })), 'Nhà này còn thiếu'),
+      tongChung ? TI.el('a', { class: 'chip-canh-bao', href: '#/cai-dat' }, Icon('alert-triangle', { co: 18 }),
+        `${tongChung} ô số liệu chung chưa điền`, Icon('chevron-right', { co: 16 })) : null);
+    ManHoSo.capNhatHuyHieu(thieuDs.length);
   }
 
-  function veO(o) {
-    const nhan = TI.el('span', {}, o.nhan + (o.dv ? ` (${o.dv})` : '') + (o.batBuoc ? '' : ' – không bắt buộc'));
+  function veO(o, id) {
+    const chuThieu = o.kieu === 'so' && (o.dv === 'm' || o.dv === '°') ? 'Chưa đo' : 'Chưa có';
     let o2;
     if (o.kieu === 'lienKet') {
-      o2 = TI.el('a', { class: 'nut nho' + (o.du ? '' : ' can-dien'), href: `#/ho-so/${hs.id}/${o.the}` },
+      o2 = TI.el('a', { class: 'nut' + (o.du ? '' : ' can-dien'), href: `#/ho-so/${hs.id}/${o.the}` },
         o.du ? Icon('check', { co: 18 }) : null, o.ghiChu || 'Mở', o.du ? null : Icon('chevron-right', { co: 18 }));
-      return TI.el('div', { class: 'truong' }, nhan, o2);
-    }
-    if (o.kieu === 'chon') {
-      o2 = TI.el('select', { class: thieu(o) ? 'can-dien' : '', onchange: (e) => {
-        o.dat(e.target.value); e.target.classList.toggle('can-dien', !e.target.value); luuSau();
+    } else if (o.kieu === 'chon') {
+      o2 = TI.el('select', { onchange: (e) => {
+        o.dat(e.target.value); luuSau();
         if (o.veLai) App.dieuHuong(); else capNhatTong();
       } }, ...o.tc.map(([gt, ten]) => TI.el('option', { value: gt, selected: (o.lay() || '') === gt }, ten)));
     } else {
-      const oNhap = TI.oSo(o.lay(), (n) => { o.dat(n); luuSau(); oNhap.classList.toggle('can-dien', o.batBuoc && n === null); capNhatTong(); },
-        { placeholder: o.batBuoc ? CAN_DIEN : 'để trống nếu không có', class: o.batBuoc && thieu(o) ? 'can-dien' : '' });
-      o2 = TI.el('div', { class: 'co-don-vi' }, oNhap, o.dv ? TI.el('i', {}, o.dv) : null);
+      const oNhap = TI.oSo(o.lay(), (n) => { o.dat(n); luuSau(); capNhatTong(); },
+        { placeholder: o.batBuoc ? 'Nhập số đo' : 'Để trống nếu không có' });
+      o2 = o.dv ? ONhap.hauTo(oNhap, o.dv) : oNhap;
     }
-    return TI.el('label', { class: 'truong' }, nhan, o2, o.ghiChu ? TI.el('small', { class: 'mo' }, o.ghiChu) : null);
+    const tr = ONhap.truong({ nhan: o.nhan, id, ghiChu: o.ghiChu && o.kieu !== 'lienKet' ? o.ghiChu : null,
+      khongBatBuoc: !o.batBuoc, chuThieu, toO: o.kieu !== 'lienKet' }, o2);
+    dsTruong.push({ o, id, datThieu: tr.datThieu });
+    return tr.el;
   }
 
   return { ve, demThieu, dsO, thieuO: thieu };

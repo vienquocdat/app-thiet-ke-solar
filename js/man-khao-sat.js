@@ -4,28 +4,28 @@ const ManHoSo = (() => {
 
   const NHOM = [
     { ten: 'Thông tin khách', truong: [
-      { d: 'khach.ten', n: 'Họ tên khách', k: 'chu' },
+      { d: 'khach.ten', n: 'Họ tên khách', k: 'chu', bb: true },
       { d: 'khach.dienThoai', n: 'Số điện thoại', k: 'dt' },
       { d: 'khach.zalo', n: 'Zalo (nếu khác số điện thoại)', k: 'dt' },
-      { d: 'khach.diaChi', n: 'Địa chỉ lắp đặt', k: 'van-ban' },
+      { d: 'khach.diaChi', n: 'Địa chỉ lắp đặt', k: 'dia-chi' },
       { d: 'khach.toaDo', n: 'Vị trí GPS của nhà', k: 'toa-do' },
     ] },
     { ten: 'Hóa đơn và thói quen dùng điện', hoaDon: true, truong: [
-      { d: 'dien.phanTramDungBanNgay', n: 'Điện dùng ban ngày khoảng bao nhiêu', k: 'so', dv: '%' },
-      { d: 'dien.banDienDu', n: 'Khách muốn bán điện dư cho EVN?', k: 'chon', tc: CHON('Có', 'Không', 'Chưa rõ') },
+      { d: 'dien.phanTramDungBanNgay', n: 'Điện dùng ban ngày khoảng bao nhiêu', k: 'so', dv: '%', bb: true },
+      { d: 'dien.banDienDu', n: 'Khách muốn bán điện dư cho EVN?', k: 'chon', tc: CHON('Có', 'Không', 'Chưa rõ'), bb: true },
     ] },
     { ten: 'Nhu cầu', truong: [
       { d: 'nhuCau.loaiHe', n: 'Loại hệ khách quan tâm', k: 'chon',
         tc: CHON(['hoa-luoi', 'Hòa lưới bám tải'], ['hybrid', 'Hybrid (có pin lưu trữ)'], ['doc-lap', 'Độc lập'], ['chua-ro', 'Chưa rõ, cần tư vấn']) },
-      { d: 'nhuCau.nganSach', n: 'Ngân sách dự kiến', k: 'so', dv: 'đ' },
+      { d: 'nhuCau.nganSach', n: 'Ngân sách dự kiến', k: 'tien' },
       { d: 'nhuCau.mucTieu', n: 'Mục tiêu của khách', k: 'van-ban', gy: 'Giảm tiền điện, dự phòng mất điện, chống nóng mái…' },
     ] },
     { ten: 'Hiện trạng điện', truong: [
-      { d: 'dien.loaiDien', n: 'Điện nhà khách', k: 'chon', tc: CHON(['1-pha', '1 pha'], ['3-pha', '3 pha']) },
+      { d: 'dien.loaiDien', n: 'Điện nhà khách', k: 'chon', tc: CHON(['1-pha', '1 pha'], ['3-pha', '3 pha']), bb: true },
       { d: 'dien.viTriCongTo', n: 'Vị trí công tơ', k: 'chu' },
       { d: 'dien.viTriTuDien', n: 'Vị trí tủ điện tổng', k: 'chu' },
       { d: 'dien.viTriInverter', n: 'Chỗ đặt inverter dự kiến', k: 'chu' },
-      { d: 'dien.quangDuongDayM', n: 'Quãng đường đi dây từ mái đến inverter', k: 'so', dv: 'm' },
+      { d: 'dien.quangDuongDayM', n: 'Quãng đường đi dây từ mái đến inverter', k: 'so', dv: 'm', bb: true },
       { d: 'dien.coWifi', n: 'Có wifi tại chỗ đặt inverter?', k: 'chon', tc: CHON('Có', 'Không', 'Yếu') },
       { d: 'dien.tiepDia', n: 'Hiện trạng tiếp địa', k: 'van-ban' },
     ] },
@@ -103,13 +103,32 @@ const ManHoSo = (() => {
   }
 
   // ---------- Phiếu khảo sát ----------
+  const SO = (x) => typeof x === 'number' && isFinite(x);
+  const coGT = (x) => x !== null && x !== undefined && x !== '' && x !== CAN_DIEN;
+  const idTruong = (d) => 'ks-' + d.replace(/\./g, '-');
+
+  // Các mục bắt buộc của phiếu: { id, nhan, thieu(), datThieu() }
+  let dsBatBuoc = [];
+  let oThieu = null;
+
+  function capNhatThieu() {
+    if (!oThieu) return;
+    const thieu = dsBatBuoc.filter(m => { const t = m.thieu(); m.datThieu(t); return t; });
+    oThieu.replaceChildren(ONhap.dsThieu(thieu.map(m => ({ id: m.id, nhan: m.nhan }))));
+  }
+
+  function doi() { luuSau(); capNhatThieu(); }
+
   function veKhaoSat(v) {
+    dsBatBuoc = [];
+    oThieu = TI.el('div', { class: 'vung-thieu' });
+    const mayTinh = window.matchMedia('(min-width: 1024px)').matches;
     const dsNhom = NHOM.map((nhom, i) => {
       const noiDung = [];
       if (nhom.hoaDon) noiDung.push(veHoaDon());
       for (const t of nhom.truong || []) noiDung.push(veTruong(t));
       if (nhom.anh) noiDung.push(veAnh());
-      return TI.el('details', { class: 'nhom', open: i < 2 },
+      return TI.el('details', { class: 'nhom', open: mayTinh || i < 2 },
         TI.el('summary', {}, nhom.ten), TI.el('div', { class: 'nhom-noi-dung' }, ...noiDung));
     });
 
@@ -117,70 +136,95 @@ const ManHoSo = (() => {
       ...Object.entries(TRANG_THAI).map(([ma, ten]) => TI.el('option', { value: ma, selected: hs.trangThai === ma }, ten)));
 
     v.replaceChildren(
-      TI.el('label', { class: 'truong' }, TI.el('span', {}, 'Trạng thái hồ sơ'), chonTrangThai),
-      ...dsNhom,
+      TI.el('div', { class: 'dau-phieu' },
+        TI.el('label', { class: 'truong' }, TI.el('span', { class: 'nhan-truong' }, 'Trạng thái hồ sơ'), chonTrangThai),
+        oThieu),
+      TI.el('div', { class: 'luoi-nhom' }, ...dsNhom),
       TI.el('h3', {}, 'Hồ sơ này'),
       TI.el('div', { class: 'hang' },
         TI.el('button', { class: 'nut', onclick: saoLuuHoSo }, ...Icon.chu('download', 'Sao lưu hồ sơ này')),
         TI.el('button', { class: 'nut nguy-hiem', onclick: xoaHoSo }, ...Icon.chu('trash', 'Xóa hồ sơ'))),
       TI.el('p', { class: 'mo nho' }, 'Tạo ngày ' + TI.ngayVN(hs.ngayTao)),
     );
+    capNhatThieu();
+    goiYPhuongXa();
+  }
+
+  // Gợi ý tên phường/xã đã nhập ở các hồ sơ khác.
+  async function goiYPhuongXa() {
+    const ds = await HoSo.danhSach();
+    const dl = document.getElementById('goi-y-phuong-xa');
+    if (!dl) return;
+    const ten = [...new Set(ds.map(h => h.khach.diaChiCT && h.khach.diaChiCT.phuongXa).filter(Boolean))];
+    dl.replaceChildren(...ten.map(t => TI.el('option', { value: t })));
   }
 
   function veTruong(t) {
     const gt = TI.layTheoDuong(hs, t.d);
+    const dat = (x) => { TI.datTheoDuong(hs, t.d, x); doi(); };
     let o;
     if (t.k === 'chon') {
-      o = TI.el('select', { onchange: (e) => { TI.datTheoDuong(hs, t.d, e.target.value); luuSau(); } },
+      o = TI.el('select', { onchange: (e) => dat(e.target.value) },
         ...t.tc.map(([ma, ten]) => TI.el('option', { value: ma, selected: (gt || '') === ma }, ten)));
     } else if (t.k === 'van-ban') {
-      o = TI.el('textarea', { rows: 2, placeholder: t.gy || '', value: gt || '',
-        oninput: (e) => { TI.datTheoDuong(hs, t.d, e.target.value); luuSau(); } });
+      o = TI.el('textarea', { rows: 2, placeholder: t.gy || '', value: coGT(gt) ? gt : '', oninput: (e) => dat(e.target.value) });
     } else if (t.k === 'so') {
-      o = oSo(gt, (n) => { TI.datTheoDuong(hs, t.d, n); luuSau(); });
+      o = TI.oSo(gt, dat, { placeholder: 'Nhập số' });
+      if (t.dv) o = ONhap.hauTo(o, t.dv);
+    } else if (t.k === 'tien') {
+      o = ONhap.tien(gt, dat);
+    } else if (t.k === 'dt') {
+      o = ONhap.dienThoai(gt, dat);
+    } else if (t.k === 'dia-chi') {
+      o = ONhap.diaChi(hs.khach, doi);
     } else if (t.k === 'toa-do') {
-      return veToaDo(t);
+      o = veToaDo();
     } else {
-      o = TI.el('input', { type: t.k === 'dt' ? 'tel' : 'text', value: gt || '', placeholder: t.gy || '',
+      o = TI.el('input', { type: 'text', value: coGT(gt) ? gt : '', placeholder: t.gy || '',
+        autocomplete: t.d === 'khach.ten' ? 'name' : 'off',
         oninput: (e) => {
-          TI.datTheoDuong(hs, t.d, e.target.value);
           if (t.d === 'khach.ten') App.datTieuDe(e.target.value || 'Hồ sơ mới');
-          luuSau();
+          dat(e.target.value);
         } });
     }
-    return TI.el('label', { class: 'truong' },
-      TI.el('span', {}, t.n), t.dv ? TI.el('div', { class: 'co-don-vi' }, o, TI.el('i', {}, t.dv)) : o);
+    const id = idTruong(t.d);
+    const tr = ONhap.truong({ nhan: t.n, id, ghiChu: t.k === 'tien' ? 'Gõ tắt được: 85k, 1tr2, 1,5tr' : null }, o);
+    if (t.bb) {
+      const thieu = () => { const x = TI.layTheoDuong(hs, t.d); return t.k === 'so' ? !SO(x) : !coGT(x); };
+      dsBatBuoc.push({ id, nhan: t.n, thieu, datThieu: tr.datThieu });
+    }
+    return tr.el;
   }
 
-  const oSo = TI.oSo;
-
-  function veToaDo(t) {
+  function veToaDo() {
     const hien = TI.el('span', { class: 'mo' });
     const capNhat = () => {
       const td = hs.khach.toaDo;
       hien.replaceChildren(td ? TI.el('a', { href: `https://www.google.com/maps?q=${td.lat},${td.lng}`, target: '_blank', rel: 'noopener' },
-        `${td.lat.toFixed(6)}, ${td.lng.toFixed(6)}`) : 'Chưa lấy');
+        `${TI.soVN(td.lat, 6)}, ${TI.soVN(td.lng, 6)}`) : 'Chưa lấy vị trí');
     };
     capNhat();
-    const nut = TI.el('button', { type: 'button', class: 'nut nho', onclick: () => {
+    const datNut = (chu) => nut.replaceChildren(...Icon.chu('map-pin', chu));
+    const nut = TI.el('button', { type: 'button', class: 'nut', onclick: () => {
       if (!navigator.geolocation) { alert('Máy không hỗ trợ lấy vị trí.'); return; }
-      nut.disabled = true; nut.textContent = 'Đang lấy…';
+      nut.disabled = true; datNut('Đang lấy…');
       navigator.geolocation.getCurrentPosition(
-        (p) => { hs.khach.toaDo = { lat: p.coords.latitude, lng: p.coords.longitude, saiSoM: Math.round(p.coords.accuracy) }; luuSau(); capNhat(); nut.disabled = false; nut.textContent = 'Lấy lại vị trí'; },
-        (e) => { alert('Không lấy được vị trí: ' + e.message); nut.disabled = false; nut.textContent = 'Lấy vị trí hiện tại'; },
+        (p) => { hs.khach.toaDo = { lat: p.coords.latitude, lng: p.coords.longitude, saiSoM: Math.round(p.coords.accuracy) }; luuSau(); capNhat(); nut.disabled = false; datNut('Lấy lại vị trí'); },
+        (e) => { alert('Không lấy được vị trí: ' + e.message); nut.disabled = false; datNut('Lấy vị trí hiện tại'); },
         { enableHighAccuracy: true, timeout: 15000 });
-    } }, 'Lấy vị trí hiện tại');
-    return TI.el('div', { class: 'truong' }, TI.el('span', {}, t.n), TI.el('div', { class: 'hang-giua' }, hien, nut));
+    } });
+    datNut(hs.khach.toaDo ? 'Lấy lại vị trí' : 'Lấy vị trí hiện tại');
+    return TI.el('div', { class: 'hang-giua hang-gps' }, hien, nut);
   }
 
-  // ---------- Hóa đơn điện ----------
+  // ---------- Hóa đơn điện: mỗi tháng 1 thẻ (tháng · số điện · tiền) ----------
   function veHoaDon() {
     const khung = TI.el('div', { class: 'hoa-don' });
     const tong = TI.el('div', { class: 'mo nho' });
 
     const tinhTong = () => {
-      const ds = hs.dien.hoaDon.filter(h => typeof h.kWh === 'number');
-      const dsTien = hs.dien.hoaDon.filter(h => typeof h.tien === 'number');
+      const ds = hs.dien.hoaDon.filter(h => SO(h.kWh));
+      const dsTien = hs.dien.hoaDon.filter(h => SO(h.tien));
       tong.textContent = ds.length
         ? `Trung bình: ${TI.soVN(ds.reduce((s, h) => s + h.kWh, 0) / ds.length, 0)} kWh/tháng` +
           (dsTien.length ? ` · ${TI.soVN(dsTien.reduce((s, h) => s + h.tien, 0) / dsTien.length, 0)} đ/tháng` : '')
@@ -189,21 +233,23 @@ const ManHoSo = (() => {
 
     const veLai = () => {
       khung.replaceChildren(
-        TI.el('div', { class: 'hoa-don-dong dau' }, TI.el('span', {}, 'Tháng'), TI.el('span', {}, 'Số điện (kWh)'), TI.el('span', {}, 'Tiền (đ)'), TI.el('span', {})),
-        ...hs.dien.hoaDon.map((h, i) => TI.el('div', { class: 'hoa-don-dong' },
-          TI.el('input', { type: 'month', value: h.thang || '', 'aria-label': 'Tháng',
-            onchange: (e) => { h.thang = e.target.value; luuSau(); } }),
-          oSo(h.kWh, (n) => { h.kWh = n; luuSau(); tinhTong(); }, { 'aria-label': 'Số điện kWh' }),
-          oSo(h.tien, (n) => { h.tien = n; luuSau(); tinhTong(); }, { 'aria-label': 'Tiền điện' }),
-          TI.el('button', { type: 'button', class: 'nut-xoa', 'aria-label': 'Xóa tháng này',
-            onclick: () => { hs.dien.hoaDon.splice(i, 1); luuSau(); veLai(); } }, Icon('x')))),
-        TI.el('button', { type: 'button', class: 'nut nho', onclick: () => {
+        ...hs.dien.hoaDon.map((h, i) => TI.el('div', { class: 'hoa-don-the' },
+          ONhap.thang(h.thang || '', (gt) => { h.thang = gt; luuSau(); }, { class: 'o-thang', 'aria-label': `Tháng hóa đơn ${i + 1}` }),
+          TI.el('button', { type: 'button', class: 'nut-xoa', 'aria-label': `Xóa hóa đơn ${i + 1}`,
+            onclick: () => { hs.dien.hoaDon.splice(i, 1); doi(); veLai(); } }, Icon('trash')),
+          ONhap.hauTo(TI.oSo(h.kWh, (n) => { h.kWh = n; doi(); tinhTong(); }, { 'aria-label': 'Số điện (kWh)', placeholder: 'Số điện' }), 'kWh'),
+          ONhap.tien(h.tien, (n) => { h.tien = n; luuSau(); tinhTong(); }, { 'aria-label': 'Tiền điện', placeholder: 'Tiền điện' }))),
+        TI.el('button', { type: 'button', class: 'nut', onclick: () => {
           hs.dien.hoaDon.push({ thang: '', kWh: null, tien: null }); luuSau(); veLai();
         } }, ...Icon.chu('plus', 'Thêm tháng')));
       tinhTong();
     };
     veLai();
-    return TI.el('div', {}, khung, tong);
+    const tr = ONhap.truong({ nhan: 'Hóa đơn điện các tháng gần nhất', id: 'ks-hoa-don', chuThieu: 'Chưa có số điện', toO: false },
+      TI.el('div', {}, khung, tong));
+    dsBatBuoc.push({ id: 'ks-hoa-don', nhan: 'Số điện ít nhất 1 tháng hóa đơn',
+      thieu: () => !hs.dien.hoaDon.some(x => SO(x.kWh) && x.kWh > 0), datThieu: tr.datThieu });
+    return tr.el;
   }
 
   // ---------- Ảnh ----------

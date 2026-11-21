@@ -45,6 +45,10 @@ const TienTrinh = (() => {
       if (!coGT(hs.khach.ten)) thieu.push({ chu: 'Họ tên khách', href: h('khao-sat') });
       if (!hs.dien.loaiDien) thieu.push({ chu: 'Điện 1 pha hay 3 pha', href: h('khao-sat') });
       if (!hs.dien.hoaDon.some(x => SO(x.kWh) && x.kWh > 0)) thieu.push({ chu: 'Số điện ít nhất 1 tháng hóa đơn', href: h('khao-sat') });
+      // Cùng danh sách bắt buộc với phiếu khảo sát (man-khao-sat.js, các trường có bb: true)
+      if (!SO(hs.dien.phanTramDungBanNgay)) thieu.push({ chu: 'Điện dùng ban ngày khoảng bao nhiêu', href: h('khao-sat') });
+      if (!hs.dien.banDienDu) thieu.push({ chu: 'Khách muốn bán điện dư cho EVN?', href: h('khao-sat') });
+      if (!SO(hs.dien.quangDuongDayM)) thieu.push({ chu: 'Quãng đường đi dây từ mái đến inverter', href: h('khao-sat') });
       const daLam = coGT(hs.khach.ten) || coGT(hs.khach.dienThoai) || hs.dien.hoaDon.some(x => SO(x.kWh));
       kq['khao-sat'] = { xong: !thieu.length, daLam, thieu, tom: thieu.length ? `Thiếu ${thieu.length} mục` : 'Đủ' };
     }
@@ -136,7 +140,7 @@ const TienTrinh = (() => {
 
   function veRay(ds) {
     const k = hs.khach;
-    const phu = [k.dienThoai, k.diaChi].filter(coGT).join(' · ');
+    const phu = [coGT(k.dienThoai) ? TI.dienThoaiVN(k.dienThoai) : '', k.diaChi].filter(coGT).join(' · ');
     oRay.replaceChildren(
       TI.el('div', { class: 'ray-khach' }, TI.el('b', {}, coGT(k.ten) ? k.ten : 'Hồ sơ mới'), phu ? TI.el('small', {}, phu) : null),
       TI.el('ol', { class: 'ray-ds' }, ...ds.map(b => TI.el('li', { 'data-tt': b.tt, 'data-goc': b.goc },
