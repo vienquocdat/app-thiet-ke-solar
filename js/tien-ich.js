@@ -59,6 +59,21 @@ const TI = {
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
   },
 
+  // Ngày giờ theo giờ máy: "21/11/2026 19:45"
+  ngayGioVN(iso) {
+    if (!iso) return '';
+    const d = new Date(iso);
+    if (isNaN(d)) return TI.ngayVN(iso);
+    const p = (n) => String(n).padStart(2, '0');
+    return `${p(d.getDate())}/${p(d.getMonth() + 1)}/${d.getFullYear()} ${p(d.getHours())}:${p(d.getMinutes())}`;
+  },
+
+  // Số điện thoại 10 số hiển thị "0912 345 678"; số khác giữ nguyên.
+  dienThoaiVN(s) {
+    const so = String(s || '').replace(/\D/g, '');
+    return so.length === 10 ? `${so.slice(0, 4)} ${so.slice(4, 7)} ${so.slice(7)}` : String(s || '');
+  },
+
   ngayVN(iso) {
     if (!iso) return '';
     const [y, m, d] = iso.slice(0, 10).split('-');

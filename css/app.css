@@ -91,10 +91,69 @@ h4 { margin: 4px 0 8px; font-size: 16px; font-weight: 600; }
 .mo.nho { font-size: 13px; }
 .dang-tai { text-align: center; color: var(--chu-phu); padding: 40px 0; }
 
-/* Danh sách hồ sơ: điện thoại 1 cột thẻ, máy tính nhiều cột */
-.hang-cong-cu { display: flex; flex-direction: column; gap: 8px; margin: 8px 0 4px; }
-.hang-cong-cu .o-tim { margin: 0; }
-.danh-sach { display: grid; grid-template-columns: minmax(0, 1fr); gap: 0 12px; }
+/* ---------- Danh sách hồ sơ: điện thoại = thẻ, máy tính = bảng ---------- */
+.dem-ho-so { font-size: 13px; color: var(--chu-phu); margin: 0 0 8px; }
+.dau-danh-sach-viec { display: flex; align-items: center; gap: 12px; order: -1; }
+.dau-danh-sach-viec:empty { display: none; }
+.chip-canh-bao {
+  display: inline-flex; align-items: center; gap: 6px; min-height: 36px; padding: 4px 8px 4px 10px;
+  border-radius: var(--bo-o); background: var(--nang-nhat); color: var(--nang-chu);
+  font-size: 13px; font-weight: 600; text-decoration: none; white-space: nowrap;
+}
+.chip-canh-bao .icon:first-child { color: var(--nang-dam); }
+.chip-canh-bao:hover { background: #FFE8A8; }
+.thanh-tim-loc { display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px; }
+.o-tim-boc { position: relative; }
+.o-tim-boc > .icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--chu-mo); pointer-events: none; }
+.o-tim-boc .o-tim { margin: 0; padding-left: 42px; }
+.loc-trang-thai { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; margin: 0 -16px; padding: 0 16px; }
+.loc-trang-thai::-webkit-scrollbar { display: none; }
+.chip-loc {
+  flex: none; display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 0 12px;
+  border: 1.5px solid var(--vien-dam); border-radius: 999px; background: var(--mat); color: var(--khung);
+  font: inherit; font-size: 14px; font-weight: 500; cursor: pointer; white-space: nowrap;
+}
+.chip-loc:hover { background: var(--be-tong); }
+.chip-loc[aria-pressed="true"] { background: var(--khung); border-color: var(--khung); color: #fff; }
+.chip-so { font-size: 12px; font-weight: 600; min-width: 20px; padding: 0 6px; border-radius: 999px; background: var(--be-tong); color: var(--chu-phu); text-align: center; line-height: 20px; }
+.chip-loc[aria-pressed="true"] .chip-so { background: rgba(255, 255, 255, .18); color: #fff; }
+
+.ds-the-ho-so { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; }
+.ds-the-ho-so .the { margin: 0; }
+.the-ho-so { padding: 14px; }
+.the-ho-so-dau { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 4px; }
+.the-ho-so-dau b { font-size: 16px; font-weight: 600; }
+.the-ho-so-dong { font-size: 14px; color: var(--chu-phu); line-height: 1.45; }
+.the-ho-so-chan { display: flex; justify-content: space-between; gap: 8px; margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--vien); font-size: 13px; color: var(--chu-mo); }
+.the-ho-so-chan .cs { color: var(--khung); font-weight: 600; }
+
+.khung-bang-ho-so { display: none; }
+.bang-ho-so { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 14px; }
+.bang-ho-so th {
+  position: sticky; top: var(--cao-thanh-tren); z-index: 2; background: var(--be-tong);
+  text-align: left; font-size: 12.5px; font-weight: 600; color: var(--chu-phu);
+  padding: 10px 14px; border-bottom: 1px solid var(--vien-dam); white-space: nowrap;
+}
+.bang-ho-so td { padding: 12px 14px; border-bottom: 1px solid var(--vien); background: var(--mat); vertical-align: middle; }
+.bang-ho-so tbody tr { cursor: pointer; }
+.bang-ho-so tbody tr:hover td { background: #F9FAF8; }
+.bang-ho-so tbody tr:first-child td:first-child { border-top-left-radius: 0; }
+.bang-ho-so .so { text-align: right; white-space: nowrap; }
+.bang-ho-so .cot-ten a { color: var(--khung); font-weight: 600; text-decoration: none; }
+.bang-ho-so .cot-ten a:hover { text-decoration: underline; }
+.bang-ho-so .cot-dt, .bang-ho-so .cot-ngay { white-space: nowrap; color: var(--chu-phu); }
+.bang-ho-so .cot-dia-chi { color: var(--chu-phu); max-width: 340px; }
+.o-trong { color: var(--chu-tat); }
+
+/* Điện thoại: nút "Hồ sơ mới" ghim đáy cho dễ bấm bằng ngón cái */
+@media (max-width: 639px) {
+  .nut-ho-so-moi {
+    position: fixed; left: 16px; right: 16px; bottom: calc(12px + env(safe-area-inset-bottom)); z-index: 18;
+    min-height: 52px; font-size: 16px; box-shadow: var(--bong-noi);
+  }
+  body[data-man="danh-sach"] main { padding-bottom: 96px; }
+  body[data-man="danh-sach"] .thong-bao { bottom: calc(80px + env(safe-area-inset-bottom)); }
+}
 
 /* Hồ sơ: cột bước (máy tính) + cột chính */
 .bo-cuc-ho-so { display: block; }
@@ -178,10 +237,11 @@ li[data-tt="dang"] .icon-buoc { color: var(--khung); }
 
 /* ---------- Máy tính ---------- */
 @media (min-width: 640px) {
-  .hang-cong-cu { flex-direction: row; align-items: center; }
-  .hang-cong-cu .nut.to { flex: none; }
-  .hang-cong-cu .o-tim { flex: 1; }
-  .danh-sach { grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); }
+  .thanh-tim-loc { flex-direction: row; align-items: center; flex-wrap: wrap; }
+  .o-tim-boc { flex: 0 1 380px; }
+  .loc-trang-thai { margin: 0; padding: 0; flex-wrap: wrap; order: 2; flex-basis: 100%; }
+  .dau-danh-sach-viec { order: 1; margin-left: auto; }
+  .ds-the-ho-so { grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); }
   .nut-cai-dat .chu-nut { display: inline; }
   .nut-cai-dat { padding: 0 12px; }
 }
@@ -199,6 +259,8 @@ li[data-tt="dang"] .icon-buoc { color: var(--khung); }
   .ray-khach small { font-size: 13px; color: var(--chu-mo); }
   .ray-xem-het { align-self: flex-start; margin: 4px 2px 0; }
   .thuoc { display: none; }
+  .khung-bang-ho-so { display: block; border: 1px solid var(--vien); border-radius: 12px; overflow: clip; background: var(--mat); }
+  .ds-the-ho-so { display: none; }
   /* Thẻ dạng form: giới hạn bề ngang cho dễ đọc; thẻ có khung vẽ: dùng hết */
   .vung-the:not([data-the="ve-mai"]):not([data-the="xep-pin"]):not([data-the="3d"]) { max-width: 980px; }
   .bang-truot { margin: auto; border-radius: 14px; max-height: 80vh; }
