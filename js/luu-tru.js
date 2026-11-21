@@ -130,12 +130,15 @@ const HoSo = (() => {
   }
 
   // Nhập file sao lưu. Ảnh mẫu có thể chỉ ghi đường dẫn (duongDan) → tải về rồi lưu.
+  // Ảnh mẫu không có (vd bản đưa lên mạng không kèm ảnh) thì bỏ qua ảnh đó, vẫn nhập hồ sơ.
   async function nhapSaoLuu(du) {
     kiemTraFile(du);
+    du.anhThieu = 0;
     for (const a of du.anh || []) {
       if (!a.dataURL && a.duongDan) {
-        const r = await fetch(a.duongDan);
-        if (!r.ok) throw new Error('Không tải được ảnh ' + a.duongDan);
+        let r = null;
+        try { r = await fetch(a.duongDan); } catch (e) { r = null; }
+        if (!r || !r.ok) { du.anhThieu++; continue; }
         a.dataURL = await TI.blobSangDataURL(await r.blob());
         delete a.duongDan;
       }

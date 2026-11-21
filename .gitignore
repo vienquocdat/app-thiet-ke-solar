@@ -1,1 +1,6 @@
 .DS_Store
+
+# Ảnh drone mẫu của nhà khách: chỉ giữ trên máy, không đưa lên kho công khai
+mau-thu/*.webp
+mau-thu/*.jpg
+mau-thu/*.png

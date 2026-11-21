@@ -84,7 +84,7 @@ const ManDanhSach = (() => {
       if (!confirm(`Các hồ sơ sau đã có trên máy và sẽ bị GHI ĐÈ bằng bản trong file:\n${ten}\n\nTiếp tục?`)) return 0;
     }
     const n = await HoSo.nhapSaoLuu(du);
-    TI.thongBao(`Đã nhập ${n} hồ sơ`);
+    TI.thongBao(`Đã nhập ${n} hồ sơ` + (du.anhThieu ? ` (thiếu ${du.anhThieu} ảnh mẫu, không có trên bản này)` : ''));
     App.dieuHuong();
     return n;
   }
