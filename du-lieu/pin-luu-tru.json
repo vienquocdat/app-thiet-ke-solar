@@ -4,14 +4,43 @@
   "bang": {
     "tieuDe": "Các loại pin lưu trữ",
     "cot": [
-      { "ma": "model", "ten": "Model", "kieu": "chu" },
-      { "ma": "dungLuongKWh", "ten": "Dung lượng", "donVi": "kWh", "kieu": "so" },
-      { "ma": "dienApV", "ten": "Điện áp", "donVi": "V", "kieu": "so" },
-      { "ma": "inverterTuongThich", "ten": "Inverter tương thích", "kieu": "chu" },
-      { "ma": "gia", "ten": "Giá", "donVi": "đ", "kieu": "so" }
+      {
+        "ma": "model",
+        "ten": "Model",
+        "kieu": "chu"
+      },
+      {
+        "ma": "dungLuongKWh",
+        "ten": "Dung lượng",
+        "donVi": "kWh",
+        "kieu": "so"
+      },
+      {
+        "ma": "dienApV",
+        "ten": "Điện áp",
+        "donVi": "V",
+        "kieu": "so"
+      },
+      {
+        "ma": "inverterTuongThich",
+        "ten": "Inverter tương thích",
+        "kieu": "chu"
+      },
+      {
+        "ma": "gia",
+        "ten": "Giá",
+        "donVi": "đ",
+        "kieu": "so"
+      }
     ],
     "dong": [
-      { "model": "[CẦN ĐIỀN]", "dungLuongKWh": "[CẦN ĐIỀN]", "dienApV": "[CẦN ĐIỀN]", "inverterTuongThich": "[CẦN ĐIỀN]", "gia": "[CẦN ĐIỀN]" }
+      {
+        "model": "JAIXI 16kWh",
+        "dungLuongKWh": 16,
+        "dienApV": 51.2,
+        "inverterTuongThich": "GoodWe 20kW 3 pha GW20KT-DT",
+        "gia": "[CẦN ĐIỀN]"
+      }
     ]
   }
 }

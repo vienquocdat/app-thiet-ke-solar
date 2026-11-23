@@ -2,8 +2,8 @@
   "tieuDe": "Giờ nắng đỉnh theo tháng",
   "moTa": "Đơn vị kWh/m²/ngày, lấy từ PVGIS hoặc Global Solar Atlas. Ghi rõ nguồn.",
   "truong": [
-    { "ma": "khuVuc", "ten": "Khu vực", "kieu": "chu", "giaTri": "[CẦN ĐIỀN]" },
-    { "ma": "nguon", "ten": "Nguồn số liệu", "kieu": "chu", "giaTri": "[CẦN ĐIỀN]" }
+    { "ma": "khuVuc", "ten": "Khu vực", "kieu": "chu", "giaTri": "Thanh Hoá" },
+    { "ma": "nguon", "ten": "Nguồn số liệu", "kieu": "chu", "giaTri": "Công văn số 364/EVN-KDMBĐ ngày 20/01/2026 của Tập đoàn Điện lực Việt Nam" }
   ],
   "bang": {
     "tieuDe": "12 tháng",
@@ -13,18 +13,18 @@
       { "ma": "gioNangDinh", "ten": "Giờ nắng đỉnh", "donVi": "kWh/m²/ngày", "kieu": "so" }
     ],
     "dong": [
-      { "thang": 1, "gioNangDinh": "[CẦN ĐIỀN]" },
-      { "thang": 2, "gioNangDinh": "[CẦN ĐIỀN]" },
-      { "thang": 3, "gioNangDinh": "[CẦN ĐIỀN]" },
-      { "thang": 4, "gioNangDinh": "[CẦN ĐIỀN]" },
-      { "thang": 5, "gioNangDinh": "[CẦN ĐIỀN]" },
-      { "thang": 6, "gioNangDinh": "[CẦN ĐIỀN]" },
-      { "thang": 7, "gioNangDinh": "[CẦN ĐIỀN]" },
-      { "thang": 8, "gioNangDinh": "[CẦN ĐIỀN]" },
-      { "thang": 9, "gioNangDinh": "[CẦN ĐIỀN]" },
-      { "thang": 10, "gioNangDinh": "[CẦN ĐIỀN]" },
-      { "thang": 11, "gioNangDinh": "[CẦN ĐIỀN]" },
-      { "thang": 12, "gioNangDinh": "[CẦN ĐIỀN]" }
+      { "thang": 1, "gioNangDinh": 2.58 },
+      { "thang": 2, "gioNangDinh": 2.01 },
+      { "thang": 3, "gioNangDinh": 2.46 },
+      { "thang": 4, "gioNangDinh": 3.33 },
+      { "thang": 5, "gioNangDinh": 4.96 },
+      { "thang": 6, "gioNangDinh": 5.38 },
+      { "thang": 7, "gioNangDinh": 5.32 },
+      { "thang": 8, "gioNangDinh": 4.64 },
+      { "thang": 9, "gioNangDinh": 4.46 },
+      { "thang": 10, "gioNangDinh": 3.63 },
+      { "thang": 11, "gioNangDinh": 3.42 },
+      { "thang": 12, "gioNangDinh": 2.66 }
     ]
   }
 }
