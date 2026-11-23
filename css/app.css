@@ -863,3 +863,26 @@ body:has(.bcv-cong-cu) .thong-bao { bottom: calc(var(--cao-thanh-duoi, 72px) + 1
   .tn-pa b { font-size: 17px; }
   .tn-ghim > span { font-size: 13px; }
 }
+.tn-ds-pa { display: flex; flex-direction: column; gap: 8px; margin: 10px 0 12px; }
+.tn-hang-pa { display: grid; grid-template-columns: minmax(96px, auto) 1fr; gap: 4px 14px; align-items: center; width: 100%;
+  padding: 10px 14px; border: 1.5px solid var(--vien); border-radius: 10px; background: var(--mat); color: var(--khung);
+  font: inherit; text-align: left; min-height: 56px; }
+button.tn-hang-pa { cursor: pointer; transition: border-color 120ms, background-color 120ms; }
+button.tn-hang-pa:hover { border-color: var(--vien-dam); }
+.tn-hang-pa.dang-chon { border-color: var(--la); background: var(--la-nhat); }
+.tn-hang-pa.goc { background: var(--be-tong); }
+.tn-hang-pa.tat { opacity: .6; }
+.tn-hp-trai, .tn-hp-phai { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.tn-hp-trai b { font-size: 15px; }
+.tn-hp-pin { font-size: 13px; font-weight: 600; color: var(--nang-chu); }
+.tn-hang-pa.dang-chon .tn-hp-pin { color: var(--la); }
+.tn-hp-phai b { font-size: 18px; font-variant-numeric: tabular-nums; }
+.tn-hp-phai b em { font-style: normal; font-size: 13px; font-weight: 500; color: var(--chu-mo); margin-left: 2px; }
+.tn-hang-pa.dang-chon .tn-hp-phai b { color: var(--la); }
+.tn-hp-phai span { font-size: 12.5px; color: var(--chu-phu); }
+.tn-dong-khac { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 500; }
+.tn-dong-khac .o-hau-to { max-width: 130px; }
+@media (max-width: 639px) {
+  .tn-hang-pa { grid-template-columns: 1fr; }
+  .tn-hp-trai { flex-direction: row; align-items: baseline; gap: 8px; }
+}
