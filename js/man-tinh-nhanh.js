@@ -10,7 +10,7 @@ const ManTinhNhanh = (() => {
   const NGAY = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 
   // Giữ lại số đã nhập khi quay lại màn này (không lưu vào máy).
-  const st = { cheDo: 'tien', tien: null, kWh: null, thang: 0, dienTich: null, d: 50, banDu: false, model: null, huong: 'nam', kWpMuon: null };
+  const st = { cheDo: 'tien', tien: null, kWh: null, thang: 0, dienTich: null, d: 50, banDu: false, model: null, huong: 'nam', kWpMuon: null, pin: false };
 
   // Hướng mái → hệ số sản lượng so với mái hướng Nam (số lấy trong Cài đặt → Cấu hình).
   const HUONG = [
@@ -20,7 +20,7 @@ const ManTinhNhanh = (() => {
     { ma: 'bac', ten: 'Bắc', cauHinh: 'heSoHuongBacPhanTram', phu: 'không khuyến khích' },
   ];
 
-  let nc = null, vungKQ = null, oGhim = null;
+  let nc = null, vungKQ = null, oGhim = null, congTacPin = null;
 
   const tienGon = (x) => !SO(x) ? null : Math.abs(x) >= 1e9 ? `${TI.soVN(x / 1e9, 2)} tỷ đ`
     : Math.abs(x) >= 1e6 ? `${TI.soVN(x / 1e6, 2)} triệu đ` : `${TI.soVN(Math.round(x / 1000), 0)} nghìn đ`;
@@ -34,6 +34,8 @@ const ManTinhNhanh = (() => {
       m2kWp: await DuLieu.giaTri('cau-hinh', 'dienTichMaiMoiKWp'),
       giaMua: await DuLieu.giaTri('cau-hinh', 'giaMuaDienDu'),
       dsTP: tp.bang.dong.filter(d => coGT(d.model)),
+      dsPin: (await DuLieu.lay('pin-luu-tru')).bang.dong.filter(d => coGT(d.model) && SO(d.dungLuongKWh) && d.dungLuongKWh > 0),
+      hieuSuatPin: await DuLieu.giaTri('cau-hinh', 'hieuSuatPinLuuTruPhanTram'),
       huong: Object.fromEntries(await Promise.all(HUONG.map(async h => [h.ma, await DuLieu.giaTri('cau-hinh', h.cauHinh)]))),
     };
   }
@@ -66,32 +68,67 @@ const ManTinhNhanh = (() => {
     if (!(C > 0)) return { thieu: [], chuaNhap: true };
     const d = st.d / 100, W = tp.congSuatW;
     const pshTB = nc.nang.reduce((s, h, i) => s + h * NGAY[i], 0) / 365;
-    const tiLeBu = st.banDu ? 1 : d;
-    const kWpHD = C * tiLeBu / (30 * pshTB * nc.PR * hs);
     const kWpMai = SO(st.dienTich) && st.dienTich > 0 && SO(nc.m2kWp) && nc.m2kWp > 0 ? st.dienTich / nc.m2kWp : null;
     const toiDaMai = kWpMai !== null ? Math.floor(kWpMai * 1000 / W) : Infinity;
     const theoMuon = SO(st.kWpMuon) && st.kWpMuon > 0;
-    let soTam = Math.max(1, Math.round((theoMuon ? st.kWpMuon : kWpHD) * 1000 / W));
-    if (!theoMuon) soTam = Math.min(soTam, toiDaMai);
-    const vuotMai = theoMuon && soTam > toiDaMai;
-    const kWp = soTam * W / 1000;
-    const SL = TaiChinh.sanLuongThang(kWp, nc.nang, nc.PR).map(x => x * hs);
     const truoc = TaiChinh.tienDien(C, nc.bt);
     const coGiaMua = SO(nc.giaMua);
-    const thang = SL.map((sl, i) => {
-      const td = TaiChinh.tuDung(sl, C, d, 0, 0, NGAY[i]);
-      const giamHD = truoc - TaiChinh.tienDien(C - td, nc.bt);
-      const du = sl - td, ban = st.banDu && coGiaMua ? du * nc.giaMua : 0;
-      return { sl, td, du, giamHD, ban, giam: giamHD + ban };
-    });
-    const nam = thang.reduce((s, t) => s + t.giam, 0);
-    const chon = st.thang ? thang[st.thang - 1] : null;
-    const giam = chon ? chon.giam : nam / 12;
+    const demNgay = C * (1 - d) / 30;   // điện dùng ban đêm mỗi ngày (kWh)
+
+    // 1 phương án: tiLeBu = phần điện tháng cần tấm pin tạo ra; pinKWh = dung lượng pin (0 = không pin)
+    function phuongAn(tiLeBu, pinKWh, hsPin) {
+      const kWpHD = C * tiLeBu / (30 * pshTB * nc.PR * hs);
+      let soTam = Math.max(1, Math.round((theoMuon ? st.kWpMuon : kWpHD) * 1000 / W));
+      if (!theoMuon) soTam = Math.min(soTam, toiDaMai);
+      const kWp = soTam * W / 1000;
+      const SL = TaiChinh.sanLuongThang(kWp, nc.nang, nc.PR).map(x => x * hs);
+      const thang = SL.map((sl, i) => {
+        const banNgay = Math.min(sl, C * d);
+        const td = TaiChinh.tuDung(sl, C, d, pinKWh, hsPin, NGAY[i]);
+        const quaPin = td - banNgay;
+        const du = Math.max(0, sl - banNgay - (pinKWh > 0 ? quaPin / hsPin : 0));
+        const giamHD = truoc - TaiChinh.tienDien(C - td, nc.bt);
+        const ban = st.banDu && coGiaMua ? du * nc.giaMua : 0;
+        return { sl, td, du, quaPin, pinDu: quaPin >= C * (1 - d) - 0.5, giamHD, ban, giam: giamHD + ban };
+      });
+      const nam = thang.reduce((s, t) => s + t.giam, 0);
+      const chon = st.thang ? thang[st.thang - 1] : null;
+      return {
+        kWpHD, soTam, kWp, SL, thang, nam, pinKWh, vuotMai: theoMuon && soTam > toiDaMai,
+        giam: chon ? chon.giam : nam / 12,
+        giamHD: chon ? chon.giamHD : thang.reduce((s, t) => s + t.giamHD, 0) / 12,
+        dtTam: soTam * tp.daiMm * tp.rongMm / 1e6, SLnam: SL.reduce((s, x) => s + x, 0),
+        duNam: thang.reduce((s, t) => s + t.du, 0),
+      };
+    }
+
+    const khongPin = phuongAn(st.banDu ? 1 : d, 0, 0);
+
+    // Pin gợi ý: loại nhỏ nhất trong danh mục đủ cho điện ban đêm 1 ngày; không loại nào đủ thì ghép nhiều bộ loại lớn nhất.
+    let pin = null, thieuPin = [];
+    if (d < 1 && demNgay > 0) {
+      if (!nc.dsPin.length) thieuPin.push('Danh mục pin lưu trữ (model, dung lượng)');
+      if (!SO(nc.hieuSuatPin) || nc.hieuSuatPin <= 0) thieuPin.push('Hiệu suất sạc–xả pin lưu trữ (Cài đặt → Cấu hình)');
+      if (nc.dsPin.length) {
+        const ds = [...nc.dsPin].sort((a, b) => a.dungLuongKWh - b.dungLuongKWh);
+        const vua = ds.find(p => p.dungLuongKWh >= demNgay);
+        const lon = ds[ds.length - 1];
+        pin = vua ? { model: vua.model, moiBo: vua.dungLuongKWh, soLuong: 1 }
+          : { model: lon.model, moiBo: lon.dungLuongKWh, soLuong: Math.ceil(demNgay / lon.dungLuongKWh) };
+        pin.kWh = pin.moiBo * pin.soLuong;
+      }
+    }
+    let coPin = null;
+    if (pin && !thieuPin.length) {
+      const hsPin = nc.hieuSuatPin / 100;
+      coPin = phuongAn(Math.max(st.banDu ? 1 : 0, d + (1 - d) / hsPin), pin.kWh, hsPin);
+      coPin.thangThieu = coPin.thang.map((t, i) => t.pinDu ? null : i + 1).filter(Boolean);
+    }
+    const dungPin = st.pin && coPin;
+    const pa = dungPin ? coPin : khongPin;
     return {
-      thieu: [], C, d, tp, kWpHD, kWpMai, soTam, kWp, hs, tenHuong, theoMuon, vuotMai, SL, thang, truoc, nam, giam,
-      giamHD: chon ? chon.giamHD : thang.reduce((s, t) => s + t.giamHD, 0) / 12,
-      dtTam: soTam * tp.daiMm * tp.rongMm / 1e6, SLnam: SL.reduce((s, x) => s + x, 0),
-      duNam: thang.reduce((s, t) => s + t.du, 0), coGiaMua,
+      thieu: [], C, d, tp, kWpMai, hs, tenHuong, theoMuon, truoc, coGiaMua, demNgay,
+      khongPin, coPin, pin, thieuPin, dungPin, ...pa,
     };
   }
 
@@ -156,6 +193,8 @@ const ManTinhNhanh = (() => {
     const oMuon = TI.oSo(st.kWpMuon, (n) => { st.kWpMuon = n; capNhat(); }, { placeholder: 'Ví dụ 5', 'aria-label': 'Công suất muốn lắp' });
     const congTac = TI.el('input', { type: 'checkbox', role: 'switch', class: 'tn-cong-tac', checked: st.banDu,
       onchange: (e) => { st.banDu = e.target.checked; capNhat(); } });
+    congTacPin = TI.el('input', { type: 'checkbox', role: 'switch', class: 'tn-cong-tac', checked: st.pin,
+      onchange: (e) => { st.pin = e.target.checked; capNhat(); } });
     const chonTam = nc.dsTP.length > 1 ? TI.el('label', { class: 'truong' }, TI.el('span', { class: 'nhan-truong' }, 'Loại tấm pin'),
       TI.el('select', { onchange: (e) => { st.model = e.target.value; capNhat(); } },
         ...nc.dsTP.map(t => TI.el('option', { value: t.model, selected: t.model === st.model }, `${t.model}${SO(t.congSuatW) ? ` – ${TI.soVN(t.congSuatW)} W` : ''}`)))) : null;
@@ -176,7 +215,8 @@ const ManTinhNhanh = (() => {
       TI.el('label', { class: 'truong' }, TI.el('span', { class: 'nhan-truong' }, 'Công suất muốn lắp ', TI.el('span', { class: 'mo' }, '(bỏ trống = theo gợi ý)')),
         TI.el('div', { class: 'tn-o-ngan' }, ONhap.hauTo(oMuon, 'kWp'))),
       chonTam,
-      TI.el('label', { class: 'tn-dong-cong-tac' }, congTac, TI.el('span', {}, 'Đăng ký bán điện dư lên lưới')));
+      TI.el('label', { class: 'tn-dong-cong-tac' }, congTac, TI.el('span', {}, 'Đăng ký bán điện dư lên lưới')),
+      TI.el('label', { class: 'tn-dong-cong-tac' }, congTacPin, TI.el('span', {}, 'Dùng pin lưu trữ ', TI.el('span', { class: 'mo' }, '(cất điện dư ban ngày để dùng ban đêm)'))));
     doiCheDo(st.cheDo);
     return khung;
   }
@@ -215,7 +255,7 @@ const ManTinhNhanh = (() => {
 
     const tenKy = st.thang ? `tháng ${st.thang}` : 'trung bình';
     const coBan = st.banDu && kq.coGiaMua;
-    const nhanLon = coBan ? `Tiền điện giảm + tiền bán điện dư (${tenKy})` : `Tiền điện giảm ${tenKy}`;
+    const nhanLon = (coBan ? `Tiền điện giảm + tiền bán điện dư (${tenKy})` : `Tiền điện giảm ${tenKy}`) + (kq.dungPin ? ', có pin lưu trữ' : '');
     const sau = Math.max(0, kq.truoc - kq.giamHD);
     const phanTram = kq.truoc > 0 ? sau / kq.truoc : 0;
     const thanh = (nhan, tien, ti, lop) => TI.el('div', { class: 'tn-thanh' }, TI.el('span', {}, nhan),
@@ -234,6 +274,7 @@ const ManTinhNhanh = (() => {
         TI.el('div', { class: 'tn-so-lon' }, TI.el('b', {}, tienGon(kq.giam)), TI.el('span', {}, '/tháng')),
         TI.el('span', { class: 'tn-dau-phu' }, 'Cả năm khoảng ', TI.el('b', {}, tienGon(kq.nam)),
           st.banDu ? (kq.coGiaMua ? ' (gồm tiền bán điện dư)' : ' (chưa gồm tiền bán điện dư: thiếu giá mua trong Cài đặt)') : '')),
+      vePin(kq, tenKy),
       TI.el('div', { class: 'the tn-so-sanh' },
         thanh(st.thang ? `Hóa đơn tháng ${st.thang} hiện tại` : 'Hóa đơn hiện tại', kq.truoc, 1, 'truoc'),
         thanh(`Sau khi lắp (${tenKy})`, sau, phanTram, 'sau')),
@@ -252,12 +293,56 @@ const ManTinhNhanh = (() => {
           TI.el('li', {}, `kWp theo hóa đơn = kWh/tháng × ${st.banDu ? '100%' : `${st.d}% (điện dùng ban ngày)`} ÷ (30 × giờ nắng đỉnh TB năm × PR ${TI.soVN(nc.PR)} × hệ số hướng mái).`),
           TI.el('li', {}, `Sản lượng tháng = kWp × giờ nắng đỉnh của tháng × PR × số ngày (giống báo giá) × hệ số hướng mái ${kq.tenHuong} ${TI.soVN(kq.hs * 100)}%.`),
           TI.el('li', {}, st.banDu ? 'Điện mặt trời thay phần dùng ban ngày; phần dư bán lên lưới theo giá mua trong Cài đặt.' : 'Điện mặt trời chỉ thay phần dùng ban ngày; phần dư không tính tiền (chống phát ngược).'),
+          kq.coPin ? TI.el('li', {}, `Có pin: tấm pin tính đủ cho cả ban đêm (bù hao sạc–xả, hiệu suất ${TI.soVN(nc.hieuSuatPin)}%). Pin chỉ sạc từ điện dư ban ngày, mỗi ngày xả tối đa bằng dung lượng pin và không quá điện dùng ban đêm (giống báo giá).`) : null,
+          TI.el('li', {}, 'Màn này chỉ ước tính tiền điện giảm so với khi chưa lắp; chi phí và thời gian hoàn vốn xem ở phần báo giá.'),
           TI.el('li', {}, 'Đây là ước tính nhanh; số chính xác xem ở báo giá sau khi khảo sát, vẽ mái và xếp pin.'))),
       TI.el('div', { class: 'hang tn-hanh-dong' },
         TI.el('button', { type: 'button', class: 'nut chinh', onclick: () => taoHoSo(kq) }, ...Icon.chu('plus', 'Tạo hồ sơ khách từ số liệu này'))));
 
     oGhim.replaceChildren(TI.el('div', {}, TI.el('small', {}, coBan ? `Giảm + bán dư (${tenKy})` : `Giảm ${tenKy}`), TI.el('b', {}, `${tienGon(kq.giam)}/tháng`)),
-      TI.el('span', {}, `${TI.soVN(kq.kWp, 2)} kWp · ${kq.soTam} tấm`));
+      TI.el('span', {}, `${TI.soVN(kq.kWp, 2)} kWp · ${kq.soTam} tấm${kq.dungPin ? ` · pin ${TI.soVN(kq.pin.kWh)} kWh` : ''}`));
+  }
+
+  // Khối pin lưu trữ: gợi ý (khi dùng ban ngày dưới 80%) hoặc so sánh 2 phương án (khi bật pin).
+  function vePin(kq, tenKy) {
+    const tenPin = kq.pin ? `${kq.pin.soLuong > 1 ? `${kq.pin.soLuong} × ` : ''}${kq.pin.model}` : '';
+    const batPin = () => { st.pin = true; if (congTacPin) congTacPin.checked = true; capNhat(); };
+    const thieuPin = () => TI.el('div', { class: 'the canh-bao' },
+      TI.el('div', { class: 'co-icon' }, Icon('alert-triangle'), TI.el('b', {}, 'Chưa tính được phương án có pin')),
+      TI.el('ul', { class: 'ds-thieu' }, ...kq.thieuPin.map(t => TI.el('li', {}, t))),
+      TI.el('a', { class: 'lien-ket-icon', href: '#/cai-dat' }, 'Điền trong Cài đặt', Icon('arrow-right', { co: 18 })));
+
+    if (!st.pin) {
+      if (!(st.d < 80) || !kq.pin) return null;
+      return TI.el('div', { class: 'the tn-goi-y-pin' },
+        TI.el('div', { class: 'co-icon' }, Icon('bolt'), TI.el('div', {},
+          TI.el('b', {}, 'Nên cân nhắc pin lưu trữ'),
+          TI.el('p', {}, `Khách dùng ban ngày ${st.d}%, ban đêm khoảng ${TI.soVN(kq.demNgay, 1)} kWh mỗi ngày. Pin gợi ý: ${tenPin} (${TI.soVN(kq.pin.kWh)} kWh)`,
+            kq.coPin ? `, tiền điện giảm thêm khoảng ${tienGon(kq.coPin.giam - kq.khongPin.giam)}/tháng.` : '.'))),
+        TI.el('button', { type: 'button', class: 'nut nho', onclick: batPin }, 'Xem phương án có pin'));
+    }
+    if (!kq.pin && !kq.thieuPin.length) return TI.el('div', { class: 'the trong' },
+      TI.el('p', { class: 'mo' }, 'Khách dùng hết điện ban ngày nên không cần pin lưu trữ.'));
+    if (!kq.coPin) return thieuPin();
+
+    const a = kq.khongPin, b = kq.coPin;
+    const cot = (ten, pa, phu, lop) => TI.el('div', { class: 'tn-pa ' + lop },
+      TI.el('small', {}, ten),
+      TI.el('b', {}, tienGon(pa.giam), TI.el('em', {}, '/tháng')),
+      TI.el('span', {}, `${TI.soVN(pa.kWp, 2)} kWp · ${pa.soTam} tấm`),
+      phu ? TI.el('span', {}, phu) : null);
+    const thangThieu = b.thangThieu.length
+      ? `Tháng ${b.thangThieu.join(', ')} ít nắng: pin không đủ đầy cho cả đêm.`
+      : 'Pin đủ điện cho ban đêm quanh năm.';
+    return TI.el('div', { class: 'the tn-2-pa' },
+      TI.el('h4', {}, `So sánh tiền điện giảm (${tenKy})`),
+      TI.el('div', { class: 'tn-2-cot' },
+        cot('Không pin', a, null, ''),
+        cot('Có pin lưu trữ', b, kq.pin.soLuong > 1 ? `Pin ${tenPin} · ${TI.soVN(kq.pin.kWh)} kWh` : `Pin ${tenPin}`, 'co-pin')),
+      TI.el('p', { class: 'tn-them' }, 'Có pin giảm thêm khoảng ', TI.el('b', {}, `${tienGon(b.giam - a.giam)}/tháng`),
+        ' (cả năm ', TI.el('b', {}, tienGon(b.nam - a.nam)), ')'),
+      TI.el('p', { class: 'mo nho' }, thangThieu, b.vuotMai || (!kq.theoMuon && kq.kWpMai !== null && b.kWp < b.kWpHD - 0.01)
+        ? ' Mái không đủ chỗ cho số tấm cần thêm khi có pin, nên pin không được sạc đầy.' : ''));
   }
 
   // Biểu đồ cột 12 tháng (SVG), tháng đang chọn tô đậm.
@@ -284,7 +369,7 @@ const ManTinhNhanh = (() => {
     hs.dien.hoaDon = [{ thang: '', kWh: Math.round(kq.C), tien: st.cheDo === 'tien' && SO(st.tien) ? st.tien : Math.round(kq.truoc) }];
     hs.dien.phanTramDungBanNgay = st.d;
     hs.dien.banDienDu = st.banDu ? 'Có' : 'Không';
-    hs.ghiChu = `Tính nhanh: ${kq.theoMuon ? 'muốn lắp' : 'gợi ý'} ${TI.soVN(kq.kWp, 2)} kWp (${kq.soTam} tấm ${kq.tp.model}), mái hướng ${kq.tenHuong}${SO(st.dienTich) ? `, mái lắp được khoảng ${TI.soVN(st.dienTich, 0)} m²` : ''}.`;
+    hs.ghiChu = `Tính nhanh: ${kq.theoMuon ? 'muốn lắp' : 'gợi ý'} ${TI.soVN(kq.kWp, 2)} kWp (${kq.soTam} tấm ${kq.tp.model}), mái hướng ${kq.tenHuong}${kq.dungPin ? `, có pin lưu trữ ${kq.pin.soLuong > 1 ? `${kq.pin.soLuong} × ` : ''}${kq.pin.model} (${TI.soVN(kq.pin.kWh)} kWh)` : ''}${SO(st.dienTich) ? `, mái lắp được khoảng ${TI.soVN(st.dienTich, 0)} m²` : ''}.`;
     await HoSo.luu(hs);
     TI.thongBao('Đã tạo hồ sơ mới từ số liệu tính nhanh');
     location.hash = `#/ho-so/${hs.id}/khao-sat`;
