@@ -17,7 +17,8 @@ const KyThuat = (() => {
 
   // Phần chỉ cần tấm pin + cấu hình
   function nhietDo(tp, cfg) {
-    const beta = tp.heSoNhietVoc / 100;
+    // Hệ số nhiệt Voc của tấm pin silic luôn âm; lỡ gõ thiếu dấu trừ (0,25) vẫn hiểu là −0,25 để không tính sai Voc lúc lạnh.
+    const beta = -Math.abs(tp.heSoNhietVoc) / 100;
     return {
       beta,
       vocMax: tp.vocV * (1 + beta * (cfg.tMin - 25)),

@@ -19,7 +19,7 @@
       { "ma": "gia", "ten": "Giá", "donVi": "đ/tấm", "kieu": "so" }
     ],
     "dong": [
-      { "model": "[CẦN ĐIỀN]", "congSuatW": "[CẦN ĐIỀN]", "daiMm": "[CẦN ĐIỀN]", "rongMm": "[CẦN ĐIỀN]", "vocV": "[CẦN ĐIỀN]", "iscA": "[CẦN ĐIỀN]", "vmpV": "[CẦN ĐIỀN]", "impA": "[CẦN ĐIỀN]", "heSoNhietVoc": "[CẦN ĐIỀN]", "gia": "[CẦN ĐIỀN]" }
+      { "model": "JA Solar 625W hai mặt kính", "congSuatW": 625, "daiMm": 2382, "rongMm": 1134, "vocV": 48.7, "iscA": 16.15, "vmpV": 40.45, "impA": 15.45, "heSoNhietVoc": -0.25, "gia": "[CẦN ĐIỀN]" }
     ]
   }
 }
