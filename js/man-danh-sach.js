@@ -128,6 +128,7 @@ const ManDanhSach = (() => {
           tongThieu ? TI.el('a', { class: 'chip-canh-bao', href: '#/cai-dat',
             'aria-label': `Số liệu chung còn thiếu ${tongThieu} ô. Mở Cài đặt để điền.` },
             Icon('alert-triangle', { co: 18 }), `${tongThieu} ô số liệu chưa điền`, Icon('chevron-right', { co: 16 })) : null,
+          TI.el('a', { class: 'nut nut-tinh-nhanh', href: '#/tinh-nhanh' }, ...Icon.chu('bolt', 'Tính nhanh')),
           TI.el('button', { class: 'nut chinh nut-ho-so-moi', onclick: taoHoSoMoi }, ...Icon.chu('plus', 'Hồ sơ mới')))),
       oDem,
       vungDs,

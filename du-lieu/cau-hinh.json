@@ -133,6 +133,22 @@
       "kieu": "so",
       "giaTri": 3,
       "ghiChu": "Theo tiêu chí nghiệm thu Giai đoạn 2"
+    },
+    {
+      "ma": "dienTichMaiMoiKWp",
+      "ten": "Diện tích mái cần cho 1 kWp (Tính nhanh)",
+      "donVi": "m²/kWp",
+      "kieu": "so",
+      "giaTri": "[CẦN ĐIỀN]",
+      "ghiChu": "Gồm cả khoảng chừa mép và lối đi; dùng ở màn Tính nhanh để đổi diện tích mái ra công suất"
+    },
+    {
+      "ma": "giaMuaDienDu",
+      "ten": "Giá EVN mua điện dư",
+      "donVi": "đ/kWh",
+      "kieu": "so",
+      "giaTri": "[CẦN ĐIỀN]",
+      "ghiChu": "Theo quy định hiện hành; dùng ở màn Tính nhanh khi khách đăng ký bán điện dư"
     }
   ]
 }

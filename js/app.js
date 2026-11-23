@@ -2,6 +2,7 @@
 //   #/                       → danh sách hồ sơ
 //   #/ho-so/<mã>/<thẻ>       → hồ sơ khách (thẻ: khao-sat, ve-mai, xep-pin, 3d, ky-thuat, bao-gia)
 //   #/cai-dat[/<tên file>]   → cài đặt (mở sẵn mục của file đó)
+//   #/tinh-nhanh             → tính nhanh tiền điện tiết kiệm (chưa cần hồ sơ)
 const App = (() => {
   const vung = () => document.getElementById('noi-dung');
 
@@ -21,7 +22,8 @@ const App = (() => {
   async function dieuHuong() {
     const phan = location.hash.replace(/^#\/?/, '').split('/').filter(Boolean).map(decodeURIComponent);
     const v = vung();
-    const man = phan[0] === 'ho-so' && phan[1] ? 'ho-so' : phan[0] === 'cai-dat' ? 'cai-dat' : 'danh-sach';
+    const man = phan[0] === 'ho-so' && phan[1] ? 'ho-so' : phan[0] === 'cai-dat' ? 'cai-dat'
+      : phan[0] === 'tinh-nhanh' ? 'tinh-nhanh' : 'danh-sach';
     document.body.dataset.man = man;
     document.getElementById('nut-lui').hidden = man === 'danh-sach';
     document.querySelector('.nut-cai-dat').hidden = man === 'cai-dat';
@@ -32,7 +34,8 @@ const App = (() => {
       ManDung3D.huy(); // giải phóng khung 3D cũ (nếu có) trước khi vẽ màn hình mới
       if (man !== 'ho-so') TienTrinh.roi();
       if (man === 'ho-so') await ManHoSo.ve(v, phan[1], phan[2] || 'khao-sat');
-      else if (phan[0] === 'cai-dat') await ManCaiDat.ve(v, phan[1]);
+      else if (man === 'cai-dat') await ManCaiDat.ve(v, phan[1]);
+      else if (man === 'tinh-nhanh') await ManTinhNhanh.ve(v);
       else await ManDanhSach.ve(v);
     } catch (e) {
       console.error(e);
