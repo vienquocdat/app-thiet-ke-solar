@@ -95,6 +95,22 @@
       "ghiChu": "Chỉ dùng cho phương án có pin lưu trữ"
     },
     {
+      "ma": "doXaSauPinPhanTram",
+      "ten": "Độ xả sâu pin lưu trữ (DoD)",
+      "donVi": "%",
+      "kieu": "so",
+      "giaTri": "[CẦN ĐIỀN]",
+      "ghiChu": "Phần dung lượng pin được phép dùng, theo datasheet. Dùng ở màn Tính nhanh để gợi ý dung lượng pin; để trống thì coi như dùng hết 100%"
+    },
+    {
+      "ma": "buocLamTronPinKWh",
+      "ten": "Làm tròn dung lượng pin gợi ý lên bội số của",
+      "donVi": "kWh",
+      "kieu": "so",
+      "giaTri": 5,
+      "ghiChu": "Màn Tính nhanh: ví dụ cần 9,5 kWh, bước 5 → gợi ý pin 10 kWh"
+    },
+    {
       "ma": "chuaMepMaiTonM",
       "ten": "Khoảng chừa mép – mái tôn",
       "donVi": "m",

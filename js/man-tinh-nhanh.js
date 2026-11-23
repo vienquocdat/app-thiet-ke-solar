@@ -34,7 +34,8 @@ const ManTinhNhanh = (() => {
       m2kWp: await DuLieu.giaTri('cau-hinh', 'dienTichMaiMoiKWp'),
       giaMua: await DuLieu.giaTri('cau-hinh', 'giaMuaDienDu'),
       dsTP: tp.bang.dong.filter(d => coGT(d.model)),
-      dsPin: (await DuLieu.lay('pin-luu-tru')).bang.dong.filter(d => coGT(d.model) && SO(d.dungLuongKWh) && d.dungLuongKWh > 0),
+      doXaSau: await DuLieu.giaTri('cau-hinh', 'doXaSauPinPhanTram'),
+      buocPin: await DuLieu.giaTri('cau-hinh', 'buocLamTronPinKWh'),
       hieuSuatPin: await DuLieu.giaTri('cau-hinh', 'hieuSuatPinLuuTruPhanTram'),
       huong: Object.fromEntries(await Promise.all(HUONG.map(async h => [h.ma, await DuLieu.giaTri('cau-hinh', h.cauHinh)]))),
     };
@@ -104,24 +105,21 @@ const ManTinhNhanh = (() => {
 
     const khongPin = phuongAn(st.banDu ? 1 : d, 0, 0);
 
-    // Pin gợi ý: loại nhỏ nhất trong danh mục đủ cho điện ban đêm 1 ngày; không loại nào đủ thì ghép nhiều bộ loại lớn nhất.
+    // Pin gợi ý theo tính toán (không lấy từ danh mục): đủ cho điện ban đêm 1 ngày, chia độ xả sâu, làm tròn lên.
     let pin = null, thieuPin = [];
     if (d < 1 && demNgay > 0) {
-      if (!nc.dsPin.length) thieuPin.push('Danh mục pin lưu trữ (model, dung lượng)');
       if (!SO(nc.hieuSuatPin) || nc.hieuSuatPin <= 0) thieuPin.push('Hiệu suất sạc–xả pin lưu trữ (Cài đặt → Cấu hình)');
-      if (nc.dsPin.length) {
-        const ds = [...nc.dsPin].sort((a, b) => a.dungLuongKWh - b.dungLuongKWh);
-        const vua = ds.find(p => p.dungLuongKWh >= demNgay);
-        const lon = ds[ds.length - 1];
-        pin = vua ? { model: vua.model, moiBo: vua.dungLuongKWh, soLuong: 1 }
-          : { model: lon.model, moiBo: lon.dungLuongKWh, soLuong: Math.ceil(demNgay / lon.dungLuongKWh) };
-        pin.kWh = pin.moiBo * pin.soLuong;
-      }
+      const coDoD = SO(nc.doXaSau) && nc.doXaSau > 0 && nc.doXaSau <= 100;
+      const dod = coDoD ? nc.doXaSau / 100 : 1;
+      const buoc = SO(nc.buocPin) && nc.buocPin > 0 ? nc.buocPin : 1;
+      const can = demNgay / dod;
+      const kWh = Math.ceil(can / buoc - 1e-9) * buoc;
+      pin = { can, kWh, dungDuoc: kWh * dod, coDoD, dod, buoc };
     }
     let coPin = null;
     if (pin && !thieuPin.length) {
       const hsPin = nc.hieuSuatPin / 100;
-      coPin = phuongAn(Math.max(st.banDu ? 1 : 0, d + (1 - d) / hsPin), pin.kWh, hsPin);
+      coPin = phuongAn(Math.max(st.banDu ? 1 : 0, d + (1 - d) / hsPin), pin.dungDuoc, hsPin);
       coPin.thangThieu = coPin.thang.map((t, i) => t.pinDu ? null : i + 1).filter(Boolean);
     }
     const dungPin = st.pin && coPin;
@@ -293,7 +291,7 @@ const ManTinhNhanh = (() => {
           TI.el('li', {}, `kWp theo hóa đơn = kWh/tháng × ${st.banDu ? '100%' : `${st.d}% (điện dùng ban ngày)`} ÷ (30 × giờ nắng đỉnh TB năm × PR ${TI.soVN(nc.PR)} × hệ số hướng mái).`),
           TI.el('li', {}, `Sản lượng tháng = kWp × giờ nắng đỉnh của tháng × PR × số ngày (giống báo giá) × hệ số hướng mái ${kq.tenHuong} ${TI.soVN(kq.hs * 100)}%.`),
           TI.el('li', {}, st.banDu ? 'Điện mặt trời thay phần dùng ban ngày; phần dư bán lên lưới theo giá mua trong Cài đặt.' : 'Điện mặt trời chỉ thay phần dùng ban ngày; phần dư không tính tiền (chống phát ngược).'),
-          kq.coPin ? TI.el('li', {}, `Có pin: tấm pin tính đủ cho cả ban đêm (bù hao sạc–xả, hiệu suất ${TI.soVN(nc.hieuSuatPin)}%). Pin chỉ sạc từ điện dư ban ngày, mỗi ngày xả tối đa bằng dung lượng pin và không quá điện dùng ban đêm (giống báo giá).`) : null,
+          kq.coPin ? TI.el('li', {}, `Có pin: tấm pin tính đủ cho cả ban đêm (bù hao sạc–xả, hiệu suất ${TI.soVN(nc.hieuSuatPin)}%). Pin chỉ sạc từ điện dư ban ngày, mỗi ngày xả tối đa bằng phần dung lượng được dùng (theo độ xả sâu) và không quá điện dùng ban đêm (giống báo giá).`) : null,
           TI.el('li', {}, 'Màn này chỉ ước tính tiền điện giảm so với khi chưa lắp; chi phí và thời gian hoàn vốn xem ở phần báo giá.'),
           TI.el('li', {}, 'Đây là ước tính nhanh; số chính xác xem ở báo giá sau khi khảo sát, vẽ mái và xếp pin.'))),
       TI.el('div', { class: 'hang tn-hanh-dong' },
@@ -305,7 +303,8 @@ const ManTinhNhanh = (() => {
 
   // Khối pin lưu trữ: gợi ý (khi dùng ban ngày dưới 80%) hoặc so sánh 2 phương án (khi bật pin).
   function vePin(kq, tenKy) {
-    const tenPin = kq.pin ? `${kq.pin.soLuong > 1 ? `${kq.pin.soLuong} × ` : ''}${kq.pin.model}` : '';
+    const tenPin = kq.pin ? `khoảng ${TI.soVN(kq.pin.kWh)} kWh` : '';
+    const cachTinhPin = kq.pin ? `Cần ${TI.soVN(kq.pin.can, 1)} kWh = ${TI.soVN(kq.demNgay, 1)} kWh ban đêm${kq.pin.coDoD ? ` ÷ độ xả sâu ${TI.soVN(kq.pin.dod * 100)}%` : ' (chưa có độ xả sâu trong Cài đặt, coi như dùng hết 100%)'}, làm tròn lên bội số ${TI.soVN(kq.pin.buoc)} kWh.` : '';
     const batPin = () => { st.pin = true; if (congTacPin) congTacPin.checked = true; capNhat(); };
     const thieuPin = () => TI.el('div', { class: 'the canh-bao' },
       TI.el('div', { class: 'co-icon' }, Icon('alert-triangle'), TI.el('b', {}, 'Chưa tính được phương án có pin')),
@@ -317,7 +316,7 @@ const ManTinhNhanh = (() => {
       return TI.el('div', { class: 'the tn-goi-y-pin' },
         TI.el('div', { class: 'co-icon' }, Icon('bolt'), TI.el('div', {},
           TI.el('b', {}, 'Nên cân nhắc pin lưu trữ'),
-          TI.el('p', {}, `Khách dùng ban ngày ${st.d}%, ban đêm khoảng ${TI.soVN(kq.demNgay, 1)} kWh mỗi ngày. Pin gợi ý: ${tenPin} (${TI.soVN(kq.pin.kWh)} kWh)`,
+          TI.el('p', {}, `Khách dùng ban ngày ${st.d}%, ban đêm khoảng ${TI.soVN(kq.demNgay, 1)} kWh mỗi ngày. Pin gợi ý ${tenPin}`,
             kq.coPin ? `, tiền điện giảm thêm khoảng ${tienGon(kq.coPin.giam - kq.khongPin.giam)}/tháng.` : '.'))),
         TI.el('button', { type: 'button', class: 'nut nho', onclick: batPin }, 'Xem phương án có pin'));
     }
@@ -338,7 +337,8 @@ const ManTinhNhanh = (() => {
       TI.el('h4', {}, `So sánh tiền điện giảm (${tenKy})`),
       TI.el('div', { class: 'tn-2-cot' },
         cot('Không pin', a, null, ''),
-        cot('Có pin lưu trữ', b, kq.pin.soLuong > 1 ? `Pin ${tenPin} · ${TI.soVN(kq.pin.kWh)} kWh` : `Pin ${tenPin}`, 'co-pin')),
+        cot('Có pin lưu trữ', b, `Pin ${tenPin}`, 'co-pin')),
+      TI.el('p', { class: 'mo nho' }, cachTinhPin),
       TI.el('p', { class: 'tn-them' }, 'Có pin giảm thêm khoảng ', TI.el('b', {}, `${tienGon(b.giam - a.giam)}/tháng`),
         ' (cả năm ', TI.el('b', {}, tienGon(b.nam - a.nam)), ')'),
       TI.el('p', { class: 'mo nho' }, thangThieu, b.vuotMai || (!kq.theoMuon && kq.kWpMai !== null && b.kWp < b.kWpHD - 0.01)
@@ -369,7 +369,7 @@ const ManTinhNhanh = (() => {
     hs.dien.hoaDon = [{ thang: '', kWh: Math.round(kq.C), tien: st.cheDo === 'tien' && SO(st.tien) ? st.tien : Math.round(kq.truoc) }];
     hs.dien.phanTramDungBanNgay = st.d;
     hs.dien.banDienDu = st.banDu ? 'Có' : 'Không';
-    hs.ghiChu = `Tính nhanh: ${kq.theoMuon ? 'muốn lắp' : 'gợi ý'} ${TI.soVN(kq.kWp, 2)} kWp (${kq.soTam} tấm ${kq.tp.model}), mái hướng ${kq.tenHuong}${kq.dungPin ? `, có pin lưu trữ ${kq.pin.soLuong > 1 ? `${kq.pin.soLuong} × ` : ''}${kq.pin.model} (${TI.soVN(kq.pin.kWh)} kWh)` : ''}${SO(st.dienTich) ? `, mái lắp được khoảng ${TI.soVN(st.dienTich, 0)} m²` : ''}.`;
+    hs.ghiChu = `Tính nhanh: ${kq.theoMuon ? 'muốn lắp' : 'gợi ý'} ${TI.soVN(kq.kWp, 2)} kWp (${kq.soTam} tấm ${kq.tp.model}), mái hướng ${kq.tenHuong}${kq.dungPin ? `, có pin lưu trữ khoảng ${TI.soVN(kq.pin.kWh)} kWh` : ''}${SO(st.dienTich) ? `, mái lắp được khoảng ${TI.soVN(st.dienTich, 0)} m²` : ''}.`;
     await HoSo.luu(hs);
     TI.thongBao('Đã tạo hồ sơ mới từ số liệu tính nhanh');
     location.hash = `#/ho-so/${hs.id}/khao-sat`;
