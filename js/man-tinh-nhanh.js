@@ -304,7 +304,7 @@ const ManTinhNhanh = (() => {
   // Khối pin lưu trữ: gợi ý (khi dùng ban ngày dưới 80%) hoặc so sánh 2 phương án (khi bật pin).
   function vePin(kq, tenKy) {
     const tenPin = kq.pin ? `khoảng ${TI.soVN(kq.pin.kWh)} kWh` : '';
-    const cachTinhPin = kq.pin ? `Cần ${TI.soVN(kq.pin.can, 1)} kWh = ${TI.soVN(kq.demNgay, 1)} kWh ban đêm${kq.pin.coDoD ? ` ÷ độ xả sâu ${TI.soVN(kq.pin.dod * 100)}%` : ' (chưa có độ xả sâu trong Cài đặt, coi như dùng hết 100%)'}, làm tròn lên bội số ${TI.soVN(kq.pin.buoc)} kWh.` : '';
+    const cachTinhPin = kq.pin ? `Cần ${TI.soVN(kq.pin.can, 1)} kWh = ${TI.soVN(kq.demNgay, 1)} kWh ban đêm${kq.pin.coDoD ? ` ÷ độ xả sâu ${TI.soVN(kq.pin.dod * 100)}%` : ' (chưa có độ xả sâu trong Cài đặt, coi như dùng hết 100%)'}, ${kq.pin.buoc === 1 ? 'làm tròn lên số nguyên' : `làm tròn lên bội số ${TI.soVN(kq.pin.buoc)} kWh`}.` : '';
     const batPin = () => { st.pin = true; if (congTacPin) congTacPin.checked = true; capNhat(); };
     const thieuPin = () => TI.el('div', { class: 'the canh-bao' },
       TI.el('div', { class: 'co-icon' }, Icon('alert-triangle'), TI.el('b', {}, 'Chưa tính được phương án có pin')),

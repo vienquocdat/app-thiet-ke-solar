@@ -107,8 +107,8 @@
       "ten": "Làm tròn dung lượng pin gợi ý lên bội số của",
       "donVi": "kWh",
       "kieu": "so",
-      "giaTri": 5,
-      "ghiChu": "Màn Tính nhanh: ví dụ cần 9,5 kWh, bước 5 → gợi ý pin 10 kWh"
+      "giaTri": 1,
+      "ghiChu": "Màn Tính nhanh: 1 = làm tròn lên số nguyên (cần 9,5 kWh → gợi ý 10 kWh; cần đúng 9 kWh thì giữ 9)"
     },
     {
       "ma": "chuaMepMaiTonM",
