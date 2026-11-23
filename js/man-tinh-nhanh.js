@@ -172,7 +172,7 @@ const ManTinhNhanh = (() => {
       TI.el('div', { class: 'truong' }, TI.el('span', { class: 'nhan-truong' }, 'Điện dùng ban ngày khoảng ', nhanD), chonD, keoD,
         TI.el('small', { class: 'ghi-chu' }, '100%: điện mặt trời được dùng hết trong nhà, tối đa bằng điện dùng cả tháng. Nhà vắng người ban ngày chọn 70% hoặc 50% (hoặc kéo chỉnh): phần còn lại thành điện dư.')),
       TI.el('label', { class: 'truong' }, TI.el('span', { class: 'nhan-truong' }, 'Hướng mái'), chonHuong,
-        TI.el('small', { class: 'ghi-chu' }, 'Sản lượng so với mái hướng Nam; hệ số chỉnh trong Cài đặt → Cấu hình.')),
+        TI.el('small', { class: 'ghi-chu' }, 'Sản lượng so với mái hướng Nam, theo PVGIS cho Thanh Hóa, mái nghiêng khoảng 15°. Hệ số sửa được trong Cài đặt → Cấu hình.')),
       TI.el('label', { class: 'truong' }, TI.el('span', { class: 'nhan-truong' }, 'Công suất muốn lắp ', TI.el('span', { class: 'mo' }, '(bỏ trống = theo gợi ý)')),
         TI.el('div', { class: 'tn-o-ngan' }, ONhap.hauTo(oMuon, 'kWp'))),
       chonTam,

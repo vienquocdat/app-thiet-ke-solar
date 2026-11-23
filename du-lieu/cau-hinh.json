@@ -156,31 +156,31 @@
       "donVi": "%",
       "kieu": "so",
       "giaTri": 100,
-      "ghiChu": "Theo công cụ tính của EVN Hà Nội (dienmattroimainha.evnhanoi.vn); so với mái hướng Nam. Xem lại cho Thanh Hóa nếu có số PVGIS."
+      "ghiChu": "PVGIS 5.2 (dữ liệu ERA5), TP Thanh Hóa 19,81°B 105,78°Đ, mái nghiêng 15°, so với mái hướng Nam (Nam ≈ 1.155 kWh/kWp/năm). Tham khảo: nghiêng 10° là 99/97/94%, nghiêng 20° là 98/95/88% (ĐN-TN / Đông-Tây / Bắc). Lấy ngày 23/11/2026."
     },
     {
       "ma": "heSoHuongDongNamTayNamPhanTram",
       "ten": "Sản lượng mái hướng Đông Nam / Tây Nam (Tính nhanh)",
       "donVi": "%",
       "kieu": "so",
-      "giaTri": 95,
-      "ghiChu": "Theo công cụ tính của EVN Hà Nội (dienmattroimainha.evnhanoi.vn); so với mái hướng Nam. Xem lại cho Thanh Hóa nếu có số PVGIS."
+      "giaTri": 99,
+      "ghiChu": "PVGIS 5.2 (dữ liệu ERA5), TP Thanh Hóa 19,81°B 105,78°Đ, mái nghiêng 15°, so với mái hướng Nam (Nam ≈ 1.155 kWh/kWp/năm). Tham khảo: nghiêng 10° là 99/97/94%, nghiêng 20° là 98/95/88% (ĐN-TN / Đông-Tây / Bắc). Lấy ngày 23/11/2026."
     },
     {
       "ma": "heSoHuongDongTayPhanTram",
       "ten": "Sản lượng mái hướng Đông / Tây (Tính nhanh)",
       "donVi": "%",
       "kieu": "so",
-      "giaTri": 87,
-      "ghiChu": "Theo công cụ tính của EVN Hà Nội (dienmattroimainha.evnhanoi.vn); so với mái hướng Nam. Xem lại cho Thanh Hóa nếu có số PVGIS."
+      "giaTri": 96,
+      "ghiChu": "PVGIS 5.2 (dữ liệu ERA5), TP Thanh Hóa 19,81°B 105,78°Đ, mái nghiêng 15°, so với mái hướng Nam (Nam ≈ 1.155 kWh/kWp/năm). Tham khảo: nghiêng 10° là 99/97/94%, nghiêng 20° là 98/95/88% (ĐN-TN / Đông-Tây / Bắc). Lấy ngày 23/11/2026."
     },
     {
       "ma": "heSoHuongBacPhanTram",
       "ten": "Sản lượng mái hướng Bắc (Tính nhanh)",
       "donVi": "%",
       "kieu": "so",
-      "giaTri": 77,
-      "ghiChu": "Theo công cụ tính của EVN Hà Nội (dienmattroimainha.evnhanoi.vn); so với mái hướng Nam. Xem lại cho Thanh Hóa nếu có số PVGIS."
+      "giaTri": 91,
+      "ghiChu": "PVGIS 5.2 (dữ liệu ERA5), TP Thanh Hóa 19,81°B 105,78°Đ, mái nghiêng 15°, so với mái hướng Nam (Nam ≈ 1.155 kWh/kWp/năm). Tham khảo: nghiêng 10° là 99/97/94%, nghiêng 20° là 98/95/88% (ĐN-TN / Đông-Tây / Bắc). Lấy ngày 23/11/2026."
     }
   ]
 }
