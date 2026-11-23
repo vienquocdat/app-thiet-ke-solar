@@ -6,13 +6,13 @@
       "ma": "nguon",
       "ten": "Nguồn (văn bản / đường link)",
       "kieu": "chu",
-      "giaTri": "[CẦN ĐIỀN]"
+      "giaTri": "Quyết định 2892/QĐ-BCT của Bộ Công Thương (biểu giá bán lẻ điện sinh hoạt 5 bậc)"
     },
     {
       "ma": "ngayApDung",
       "ten": "Ngày áp dụng",
       "kieu": "chu",
-      "giaTri": "[CẦN ĐIỀN]"
+      "giaTri": "01/11/2026"
     },
     {
       "ma": "daGomVAT",
@@ -23,14 +23,15 @@
         "Đã gồm VAT",
         "Chưa gồm VAT"
       ],
-      "giaTri": "[CẦN ĐIỀN]"
+      "giaTri": "Chưa gồm VAT"
     },
     {
       "ma": "thueVATPhanTram",
       "ten": "Thuế VAT cộng thêm (nếu đơn giá chưa gồm VAT)",
       "donVi": "%",
       "kieu": "so",
-      "giaTri": "[CẦN ĐIỀN]"
+      "giaTri": 8,
+      "ghiChu": "VAT 8% áp dụng đến hết 31/12/2026; sau ngày đó kiểm tra lại mức thuế"
     }
   ],
   "bang": {
@@ -64,9 +65,33 @@
     "dong": [
       {
         "bac": 1,
-        "tuKWh": "[CẦN ĐIỀN]",
-        "denKWh": "[CẦN ĐIỀN]",
-        "donGia": "[CẦN ĐIỀN]"
+        "tuKWh": 0,
+        "denKWh": 100,
+        "donGia": 1901
+      },
+      {
+        "bac": 2,
+        "tuKWh": 101,
+        "denKWh": 200,
+        "donGia": 2289
+      },
+      {
+        "bac": 3,
+        "tuKWh": 201,
+        "denKWh": 400,
+        "donGia": 2894
+      },
+      {
+        "bac": 4,
+        "tuKWh": 401,
+        "denKWh": 700,
+        "donGia": 3456
+      },
+      {
+        "bac": 5,
+        "tuKWh": 701,
+        "denKWh": 0,
+        "donGia": 3844
       }
     ]
   }
