@@ -10,7 +10,15 @@ const ManTinhNhanh = (() => {
   const NGAY = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 
   // Giữ lại số đã nhập khi quay lại màn này (không lưu vào máy).
-  const st = { cheDo: 'tien', tien: null, kWh: null, thang: 0, dienTich: null, d: 50, banDu: false, model: null };
+  const st = { cheDo: 'tien', tien: null, kWh: null, thang: 0, dienTich: null, d: 50, banDu: false, model: null, huong: 'nam', kWpMuon: null };
+
+  // Hướng mái → hệ số sản lượng so với mái hướng Nam (số lấy trong Cài đặt → Cấu hình).
+  const HUONG = [
+    { ma: 'nam', ten: 'Nam', cauHinh: 'heSoHuongNamPhanTram' },
+    { ma: 'dn-tn', ten: 'Đông Nam / Tây Nam', cauHinh: 'heSoHuongDongNamTayNamPhanTram' },
+    { ma: 'dong-tay', ten: 'Đông / Tây', cauHinh: 'heSoHuongDongTayPhanTram' },
+    { ma: 'bac', ten: 'Bắc', cauHinh: 'heSoHuongBacPhanTram', phu: 'không khuyến khích' },
+  ];
 
   let nc = null, vungKQ = null, oGhim = null;
 
@@ -26,6 +34,7 @@ const ManTinhNhanh = (() => {
       m2kWp: await DuLieu.giaTri('cau-hinh', 'dienTichMaiMoiKWp'),
       giaMua: await DuLieu.giaTri('cau-hinh', 'giaMuaDienDu'),
       dsTP: tp.bang.dong.filter(d => coGT(d.model)),
+      huong: Object.fromEntries(await Promise.all(HUONG.map(async h => [h.ma, await DuLieu.giaTri('cau-hinh', h.cauHinh)]))),
     };
   }
 
@@ -47,19 +56,26 @@ const ManTinhNhanh = (() => {
     const tp = nc.dsTP.find(d => d.model === st.model) || nc.dsTP[0] || null;
     if (!tp) thieu.push('Danh mục tấm pin');
     else if (!SO(tp.congSuatW) || !SO(tp.daiMm) || !SO(tp.rongMm)) thieu.push(`Công suất / kích thước tấm ${tp.model}`);
+    const hsHuong = nc.huong[st.huong];
+    const tenHuong = HUONG.find(h => h.ma === st.huong).ten;
+    if (!SO(hsHuong) || hsHuong <= 0) thieu.push(`Hệ số sản lượng mái hướng ${tenHuong}`);
     if (thieu.length) return { thieu };
+    const hs = hsHuong / 100;
 
     const C = st.cheDo === 'tien' ? kWhTuTien(st.tien, nc.bt) : (SO(st.kWh) ? st.kWh : 0);
     if (!(C > 0)) return { thieu: [], chuaNhap: true };
     const d = st.d / 100, W = tp.congSuatW;
     const pshTB = nc.nang.reduce((s, h, i) => s + h * NGAY[i], 0) / 365;
     const tiLeBu = st.banDu ? 1 : d;
-    const kWpHD = C * tiLeBu / (30 * pshTB * nc.PR);
+    const kWpHD = C * tiLeBu / (30 * pshTB * nc.PR * hs);
     const kWpMai = SO(st.dienTich) && st.dienTich > 0 && SO(nc.m2kWp) && nc.m2kWp > 0 ? st.dienTich / nc.m2kWp : null;
-    let soTam = Math.max(1, Math.round(kWpHD * 1000 / W));
-    if (kWpMai !== null) soTam = Math.min(soTam, Math.floor(kWpMai * 1000 / W));
+    const toiDaMai = kWpMai !== null ? Math.floor(kWpMai * 1000 / W) : Infinity;
+    const theoMuon = SO(st.kWpMuon) && st.kWpMuon > 0;
+    let soTam = Math.max(1, Math.round((theoMuon ? st.kWpMuon : kWpHD) * 1000 / W));
+    if (!theoMuon) soTam = Math.min(soTam, toiDaMai);
+    const vuotMai = theoMuon && soTam > toiDaMai;
     const kWp = soTam * W / 1000;
-    const SL = TaiChinh.sanLuongThang(kWp, nc.nang, nc.PR);
+    const SL = TaiChinh.sanLuongThang(kWp, nc.nang, nc.PR).map(x => x * hs);
     const truoc = TaiChinh.tienDien(C, nc.bt);
     const coGiaMua = SO(nc.giaMua);
     const thang = SL.map((sl, i) => {
@@ -72,7 +88,7 @@ const ManTinhNhanh = (() => {
     const chon = st.thang ? thang[st.thang - 1] : null;
     const giam = chon ? chon.giam : nam / 12;
     return {
-      thieu: [], C, d, tp, kWpHD, kWpMai, soTam, kWp, SL, thang, truoc, nam, giam,
+      thieu: [], C, d, tp, kWpHD, kWpMai, soTam, kWp, hs, tenHuong, theoMuon, vuotMai, SL, thang, truoc, nam, giam,
       giamHD: chon ? chon.giamHD : thang.reduce((s, t) => s + t.giamHD, 0) / 12,
       dtTam: soTam * tp.daiMm * tp.rongMm / 1e6, SLnam: SL.reduce((s, x) => s + x, 0),
       duNam: thang.reduce((s, t) => s + t.du, 0), coGiaMua,
@@ -126,7 +142,18 @@ const ManTinhNhanh = (() => {
 
     // 3. Tùy chỉnh
     const nhanD = TI.el('b', {}, `${st.d}%`);
-    const keoD = thanhKeo(10, 100, 5, st.d, (n) => { st.d = n; nhanD.textContent = `${n}%`; capNhat(); }, 'Tỉ lệ điện dùng ban ngày');
+    const datD = (n) => {
+      st.d = n; nhanD.textContent = `${n}%`; keoD.value = n;
+      chonD.querySelectorAll('button').forEach(b => { const on = Number(b.dataset.d) === n; b.classList.toggle('dang-chon', on); b.setAttribute('aria-pressed', String(on)); });
+      capNhat();
+    };
+    const keoD = thanhKeo(10, 100, 5, st.d, datD, 'Tỉ lệ điện dùng ban ngày');
+    const chonD = TI.el('div', { class: 'phan-doan tn-chon-d', role: 'group', 'aria-label': 'Chọn nhanh tỉ lệ dùng ban ngày' },
+      ...[100, 70, 50].map(n => TI.el('button', { type: 'button', 'data-d': n, class: st.d === n ? 'dang-chon' : '', 'aria-pressed': String(st.d === n), onclick: () => datD(n) }, `${n}%`)));
+    const chonHuong = TI.el('select', { onchange: (e) => { st.huong = e.target.value; capNhat(); } },
+      ...HUONG.map(h => { const v = nc.huong[h.ma];
+        return TI.el('option', { value: h.ma, selected: st.huong === h.ma }, `${h.ten}${SO(v) ? ` (≈ ${TI.soVN(v)}%${h.phu ? `, ${h.phu}` : ''})` : ' (chưa có hệ số)'}`); }));
+    const oMuon = TI.oSo(st.kWpMuon, (n) => { st.kWpMuon = n; capNhat(); }, { placeholder: 'Ví dụ 5', 'aria-label': 'Công suất muốn lắp' });
     const congTac = TI.el('input', { type: 'checkbox', role: 'switch', class: 'tn-cong-tac', checked: st.banDu,
       onchange: (e) => { st.banDu = e.target.checked; capNhat(); } });
     const chonTam = nc.dsTP.length > 1 ? TI.el('label', { class: 'truong' }, TI.el('span', { class: 'nhan-truong' }, 'Loại tấm pin'),
@@ -142,8 +169,12 @@ const ManTinhNhanh = (() => {
       TI.el('div', { class: 'tn-hang-keo' }, keoMai, TI.el('div', { class: 'tn-o' }, ONhap.hauTo(oMai, 'm²'))),
       goiYMai,
       TI.el('h3', { class: 'tn-buoc' }, TI.el('span', { class: 'so-tron' }, '3'), 'Tùy chỉnh thêm'),
-      TI.el('div', { class: 'truong' }, TI.el('span', { class: 'nhan-truong' }, 'Điện dùng ban ngày khoảng ', nhanD), keoD,
-        TI.el('small', { class: 'ghi-chu' }, 'Giả định, chỉnh theo thói quen của khách: nhà có người ở nhà ban ngày thì cao, đi làm cả ngày thì thấp.')),
+      TI.el('div', { class: 'truong' }, TI.el('span', { class: 'nhan-truong' }, 'Điện dùng ban ngày khoảng ', nhanD), chonD, keoD,
+        TI.el('small', { class: 'ghi-chu' }, '100%: điện mặt trời được dùng hết trong nhà, tối đa bằng điện dùng cả tháng. Nhà vắng người ban ngày chọn 70% hoặc 50% (hoặc kéo chỉnh): phần còn lại thành điện dư.')),
+      TI.el('label', { class: 'truong' }, TI.el('span', { class: 'nhan-truong' }, 'Hướng mái'), chonHuong,
+        TI.el('small', { class: 'ghi-chu' }, 'Sản lượng so với mái hướng Nam; hệ số chỉnh trong Cài đặt → Cấu hình.')),
+      TI.el('label', { class: 'truong' }, TI.el('span', { class: 'nhan-truong' }, 'Công suất muốn lắp ', TI.el('span', { class: 'mo' }, '(bỏ trống = theo gợi ý)')),
+        TI.el('div', { class: 'tn-o-ngan' }, ONhap.hauTo(oMuon, 'kWp'))),
       chonTam,
       TI.el('label', { class: 'tn-dong-cong-tac' }, congTac, TI.el('span', {}, 'Đăng ký bán điện dư lên lưới')));
     doiCheDo(st.cheDo);
@@ -191,7 +222,9 @@ const ManTinhNhanh = (() => {
       TI.el('div', { class: 'tn-ray' }, TI.el('i', { class: lop, style: `width:${Math.max(2, Math.round(ti * 100))}%` })),
       TI.el('b', {}, tienGon(tien)));
     const o = (nhan, gt, phu) => TI.el('div', { class: 'kt-o' }, TI.el('small', {}, nhan), TI.el('b', {}, gt), phu ? TI.el('span', {}, phu) : null);
-    const giaiThich = kq.kWpMai !== null
+    const giaiThich = kq.theoMuon
+      ? `Theo công suất muốn lắp ${TI.soVN(st.kWpMuon, 2)} kWp, làm tròn theo số tấm (gợi ý theo hóa đơn ${TI.soVN(kq.kWpHD, 1)} kWp).`
+      : kq.kWpMai !== null
       ? `Theo diện tích mái ${TI.soVN(kq.kWpMai, 1)} kWp · theo hóa đơn ${TI.soVN(kq.kWpHD, 1)} kWp: lấy số nhỏ hơn, làm tròn theo số tấm.`
       : `Theo hóa đơn ${TI.soVN(kq.kWpHD, 1)} kWp, làm tròn theo số tấm${SO(nc.m2kWp) ? ' (chưa nhập diện tích mái)' : ''}.`;
 
@@ -210,12 +243,14 @@ const ManTinhNhanh = (() => {
         o('Diện tích tấm pin', `${TI.soVN(kq.dtTam, 0)} m²`, 'chưa gồm lối đi'),
         o('Điện tạo ra mỗi năm', `${TI.soVN(kq.SLnam, 0)} kWh`, st.banDu ? `dư ${TI.soVN(kq.duNam, 0)} kWh bán lên lưới` : `dùng ${TI.soVN(kq.SLnam - kq.duNam, 0)} kWh`)),
       TI.el('p', { class: 'mo nho' }, giaiThich),
+      kq.vuotMai ? TI.el('div', { class: 'the canh-bao co-icon' }, Icon('alert-triangle'),
+        TI.el('span', {}, `Công suất muốn lắp vượt diện tích mái đã nhập (lắp được khoảng ${TI.soVN(kq.kWpMai, 1)} kWp). Kiểm tra lại mái hoặc giảm công suất.`)) : null,
       TI.el('div', { class: 'the' }, TI.el('h4', {}, 'Điện tạo ra từng tháng (kWh)'), bieuDo(kq)),
       TI.el('details', { class: 'tn-cach-tinh' }, TI.el('summary', {}, 'Cách tính và giả định'),
         TI.el('ul', { class: 'ds-thieu' },
           TI.el('li', {}, 'Tiền điện tính theo bảng bậc thang EVN trong Cài đặt; tiêu thụ mỗi tháng bằng số trên hóa đơn.'),
-          TI.el('li', {}, `kWp theo hóa đơn = kWh/tháng × ${st.banDu ? '100%' : `${st.d}% (điện dùng ban ngày)`} ÷ (30 × giờ nắng đỉnh TB năm × PR ${TI.soVN(nc.PR)}).`),
-          TI.el('li', {}, 'Sản lượng tháng = kWp × giờ nắng đỉnh của tháng × PR × số ngày (giống báo giá).'),
+          TI.el('li', {}, `kWp theo hóa đơn = kWh/tháng × ${st.banDu ? '100%' : `${st.d}% (điện dùng ban ngày)`} ÷ (30 × giờ nắng đỉnh TB năm × PR ${TI.soVN(nc.PR)} × hệ số hướng mái).`),
+          TI.el('li', {}, `Sản lượng tháng = kWp × giờ nắng đỉnh của tháng × PR × số ngày (giống báo giá) × hệ số hướng mái ${kq.tenHuong} ${TI.soVN(kq.hs * 100)}%.`),
           TI.el('li', {}, st.banDu ? 'Điện mặt trời thay phần dùng ban ngày; phần dư bán lên lưới theo giá mua trong Cài đặt.' : 'Điện mặt trời chỉ thay phần dùng ban ngày; phần dư không tính tiền (chống phát ngược).'),
           TI.el('li', {}, 'Đây là ước tính nhanh; số chính xác xem ở báo giá sau khi khảo sát, vẽ mái và xếp pin.'))),
       TI.el('div', { class: 'hang tn-hanh-dong' },
@@ -249,7 +284,7 @@ const ManTinhNhanh = (() => {
     hs.dien.hoaDon = [{ thang: '', kWh: Math.round(kq.C), tien: st.cheDo === 'tien' && SO(st.tien) ? st.tien : Math.round(kq.truoc) }];
     hs.dien.phanTramDungBanNgay = st.d;
     hs.dien.banDienDu = st.banDu ? 'Có' : 'Không';
-    hs.ghiChu = `Tính nhanh: gợi ý ${TI.soVN(kq.kWp, 2)} kWp (${kq.soTam} tấm ${kq.tp.model})${SO(st.dienTich) ? `, mái lắp được khoảng ${TI.soVN(st.dienTich, 0)} m²` : ''}.`;
+    hs.ghiChu = `Tính nhanh: ${kq.theoMuon ? 'muốn lắp' : 'gợi ý'} ${TI.soVN(kq.kWp, 2)} kWp (${kq.soTam} tấm ${kq.tp.model}), mái hướng ${kq.tenHuong}${SO(st.dienTich) ? `, mái lắp được khoảng ${TI.soVN(st.dienTich, 0)} m²` : ''}.`;
     await HoSo.luu(hs);
     TI.thongBao('Đã tạo hồ sơ mới từ số liệu tính nhanh');
     location.hash = `#/ho-so/${hs.id}/khao-sat`;

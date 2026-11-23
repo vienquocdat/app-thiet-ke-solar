@@ -840,3 +840,7 @@ body:has(.bcv-cong-cu) .thong-bao { bottom: calc(var(--cao-thanh-duoi, 72px) + 1
 @media (min-width: 1024px) {
   .bo-cuc-tinh-nhanh { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: 20px; align-items: start; }
 }
+.tn-chon-d { margin-bottom: 4px; }
+.tn-chon-d button { min-height: 44px; }
+.tn-o-ngan { max-width: 200px; }
+.tn-kq > .the.canh-bao { padding: 12px 16px; }

@@ -149,6 +149,38 @@
       "kieu": "so",
       "giaTri": "[CẦN ĐIỀN]",
       "ghiChu": "Theo quy định hiện hành; dùng ở màn Tính nhanh khi khách đăng ký bán điện dư"
+    },
+    {
+      "ma": "heSoHuongNamPhanTram",
+      "ten": "Sản lượng mái hướng Nam (Tính nhanh)",
+      "donVi": "%",
+      "kieu": "so",
+      "giaTri": 100,
+      "ghiChu": "Theo công cụ tính của EVN Hà Nội (dienmattroimainha.evnhanoi.vn); so với mái hướng Nam. Xem lại cho Thanh Hóa nếu có số PVGIS."
+    },
+    {
+      "ma": "heSoHuongDongNamTayNamPhanTram",
+      "ten": "Sản lượng mái hướng Đông Nam / Tây Nam (Tính nhanh)",
+      "donVi": "%",
+      "kieu": "so",
+      "giaTri": 95,
+      "ghiChu": "Theo công cụ tính của EVN Hà Nội (dienmattroimainha.evnhanoi.vn); so với mái hướng Nam. Xem lại cho Thanh Hóa nếu có số PVGIS."
+    },
+    {
+      "ma": "heSoHuongDongTayPhanTram",
+      "ten": "Sản lượng mái hướng Đông / Tây (Tính nhanh)",
+      "donVi": "%",
+      "kieu": "so",
+      "giaTri": 87,
+      "ghiChu": "Theo công cụ tính của EVN Hà Nội (dienmattroimainha.evnhanoi.vn); so với mái hướng Nam. Xem lại cho Thanh Hóa nếu có số PVGIS."
+    },
+    {
+      "ma": "heSoHuongBacPhanTram",
+      "ten": "Sản lượng mái hướng Bắc (Tính nhanh)",
+      "donVi": "%",
+      "kieu": "so",
+      "giaTri": 77,
+      "ghiChu": "Theo công cụ tính của EVN Hà Nội (dienmattroimainha.evnhanoi.vn); so với mái hướng Nam. Xem lại cho Thanh Hóa nếu có số PVGIS."
     }
   ]
 }
