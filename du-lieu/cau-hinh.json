@@ -115,7 +115,7 @@
       "ten": "Dung lượng pin lưu trữ nhỏ nhất bán được",
       "donVi": "kWh",
       "kieu": "so",
-      "giaTri": "[CẦN ĐIỀN]",
+      "giaTri": 3,
       "ghiChu": "Màn Tính nhanh: phương án cần pin nhỏ hơn mức này sẽ nâng lên đúng mức này. Để trống = không giới hạn"
     },
     {
