@@ -184,3 +184,11 @@ Bảng thuật ngữ (dùng đúng một cách gọi trong toàn app):
 - Áp dụng cho Vẽ mái, Xếp pin, 3D: `BoCucVe.dung({ tren, khung, congCu, ben })`.
 - Máy tính: khung vẽ bên trái chiếm phần lớn, cao bằng màn hình; cột phải 340 px gồm phần trên (chọn ảnh), thanh công cụ, bảng thông số cuộn riêng. Cột bước bên trái thu thành dải icon 64 px.
 - Điện thoại: khung vẽ tràn ngang, cao gần kín màn hình; thanh công cụ ghim đáy (cao ~72 px); bảng thông số cuộn xuống dưới khung vẽ.
+
+## 17. Màn Tính nhanh (js/man-tinh-nhanh.js)
+- Trái "nhà khách thế nào" (nhập), phải "lắp thì được gì" (kết quả). Máy tính: lưới 5fr / 6fr, cột nhập ghim và cuộn riêng. Điện thoại: 1 cột, thanh ghim đáy bấm để cuộn tới kết quả, tự ẩn khi kết quả đã hiện trên màn.
+- Cột nhập chia 3 nhóm có số tròn (Điện nhà khách · Thói quen dùng điện · Mái nhà) ngăn bằng 1 đường viền; ô ít dùng gập trong "Tùy chọn thêm". Ô số đặt trên, thanh trượt dưới; số trong ô 18/600.
+- Điểm nhấn: khối navy, số tiền giảm 44 px (điện thoại 34) màu nắng; thanh giảm có vạch chia 10% như thước; dòng "Hóa đơn … → còn khoảng …".
+- Phương án: nút chia đôi Không pin / Có pin; mỗi mục tiêu là 1 dòng bấm được (viền 1,5 px, chọn = viền + nền lá), dòng "Không pin" làm mốc với viền nét đứt.
+- Bản kê hệ thống: `dl` 2 cột, tên trái chữ phụ, giá trị phải 16/600 + dòng phụ 12,5; cảnh báo nhỏ nền `--nang-nen`.
+- Biểu đồ SVG lấy màu qua class (.tn-bd-*), không ghi mã màu trong JS.

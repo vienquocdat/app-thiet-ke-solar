@@ -111,6 +111,30 @@
       "ghiChu": "Màn Tính nhanh: 1 = làm tròn lên số nguyên (cần 9,5 kWh → gợi ý 10 kWh; cần đúng 9 kWh thì giữ 9)"
     },
     {
+      "ma": "pinNhoNhatKWh",
+      "ten": "Dung lượng pin lưu trữ nhỏ nhất bán được",
+      "donVi": "kWh",
+      "kieu": "so",
+      "giaTri": "[CẦN ĐIỀN]",
+      "ghiChu": "Màn Tính nhanh: phương án cần pin nhỏ hơn mức này sẽ nâng lên đúng mức này. Để trống = không giới hạn"
+    },
+    {
+      "ma": "cacCoBienTanKW",
+      "ten": "Các cỡ biến tần hay bán (Tính nhanh)",
+      "donVi": "kW",
+      "kieu": "chu",
+      "giaTri": "3; 5; 6; 8; 10; 12; 15; 20",
+      "ghiChu": "Cách nhau bằng dấu chấm phẩy. App chọn cỡ nhỏ nhất mà tỉ lệ DC/AC không vượt mức cao nhất"
+    },
+    {
+      "ma": "bienTan1PhaToiDaKW",
+      "ten": "Biến tần 1 pha lớn nhất hay dùng",
+      "donVi": "kW",
+      "kieu": "so",
+      "giaTri": "[CẦN ĐIỀN]",
+      "ghiChu": "Màn Tính nhanh: nhà 1 pha mà cần biến tần lớn hơn mức này thì nhắc kiểm tra (có thể cần điện 3 pha)"
+    },
+    {
       "ma": "chuaMepMaiTonM",
       "ten": "Khoảng chừa mép – mái tôn",
       "donVi": "m",
